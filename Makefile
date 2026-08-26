@@ -1,6 +1,10 @@
-.PHONY: all validate ingest figures clean
+.PHONY: all assemble validate ingest figures clean
 
 all: validate ingest figures
+
+# raw/ を作り直すので all には入れない。新しい計測を回収したときだけ回す。
+assemble:
+	python scripts/assemble.py raw_data --apply --clean-sweep
 
 validate:
 	python scripts/validate.py

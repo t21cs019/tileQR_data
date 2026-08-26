@@ -16,16 +16,24 @@ import yaml
 
 from . import paths
 
-# {node}_size{N}_t{threads}_nb{lo}-{hi}_{YYYYMMDD-HHMMSS}.csv
+# {node}_size{N}_t{threads}_nb{lo}-{hi}_{YYYYMMDD-HHMMSS}[_r{k}].csv
+#
+# 末尾の _r{k} はトライアル番号。1ファイル1トライアルにするとき、
+# 同一ファイルから切り出した周はタイムスタンプが同じになるため、
+# これが無いと名前が衝突する。1周しか無いファイルには付けない。
 FILENAME_RE = re.compile(
     r"^(?P<node>[A-Za-z0-9\-]+)"
     r"_size(?P<size>\d+)"
     r"_t(?P<threads>\d+)"
     r"_nb(?P<nb_lo>\d+)-(?P<nb_hi>\d+)"
-    r"_(?P<stamp>[0-9]{8}-[0-9]{6}|nodate)\.csv$"
+    r"_(?P<stamp>[0-9]{8}-[0-9]{6}|nodate)"
+    r"(?:_r(?P<rep>\d+))?\.csv$"
 )
 
 SCHEMA = ["threads", "size", "nb", "ib", "GFlops"]
+
+# ssrfb は Time_sec 列を持つ。列構成が違うので qr_sweep とは別に読む。
+SSRFB_SCHEMA = ["threads", "size", "nb", "ib", "Time_sec", "GFlops"]
 
 
 def parse_filename(name: str) -> dict | None:
@@ -36,6 +44,7 @@ def parse_filename(name: str) -> dict | None:
     d = m.groupdict()
     for k in ("size", "threads", "nb_lo", "nb_hi"):
         d[k] = int(d[k])
+    d["rep"] = int(d["rep"]) if d["rep"] else 1
     return d
 
 
@@ -44,15 +53,18 @@ def load_machines() -> dict:
         return yaml.safe_load(fh)
 
 
-def _read_one(csv: Path, config: str | None) -> pd.DataFrame:
+def _read_one(
+    csv: Path, config: str | None, schema: list[str] | None = None
+) -> pd.DataFrame:
     df = pd.read_csv(csv)
-    missing = [c for c in SCHEMA if c not in df.columns]
+    missing = [c for c in (schema or SCHEMA) if c not in df.columns]
     if missing:
         raise ValueError(f"{csv.name}: 必須列が無い {missing}")
 
     meta = parse_filename(csv.name)
     df["node"] = meta["node"] if meta else csv.name.split("_")[0]
     df["stamp"] = meta["stamp"] if meta else "unknown"
+    df["rep"] = meta["rep"] if meta else 1
     df["source_file"] = csv.name
     if config is not None:
         df["config"] = config
@@ -95,6 +107,25 @@ def load_kernel(use_parquet: bool = True) -> pd.DataFrame:
     ]
     if not frames:
         raise FileNotFoundError(f"kernel_dtsmqr の CSV が無い: {paths.RAW_KERNEL}")
+    return pd.concat(frames, ignore_index=True)
+
+
+def load_ssrfb(use_parquet: bool = True) -> pd.DataFrame:
+    """
+    raw/ssrfb/{node}/*.csv を全部読む。
+
+    ssrfb は Time_sec 列を持つ点が qr_sweep / kernel_dtsmqr と違う。
+    列構成で種別が判別できる唯一の測定。
+    """
+    if use_parquet and paths.SSRFB_PARQUET.exists():
+        return pd.read_parquet(paths.SSRFB_PARQUET)
+
+    frames = [
+        _read_one(csv, config=None, schema=SSRFB_SCHEMA)
+        for csv in sorted(paths.RAW_SSRFB.glob("*/*.csv"))
+    ]
+    if not frames:
+        raise FileNotFoundError(f"ssrfb の CSV が無い: {paths.RAW_SSRFB}")
     return pd.concat(frames, ignore_index=True)
 
 

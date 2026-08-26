@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[2]
 RAW = ROOT / "raw"
 RAW_SWEEP = RAW / "qr_sweep"
 RAW_KERNEL = RAW / "kernel_dtsmqr"
+RAW_SSRFB = RAW / "ssrfb"
 
 DERIVED = ROOT / "derived"
 OUT = ROOT / "out"
@@ -24,5 +25,6 @@ PLAN_YAML = ROOT / "plan.yaml"
 
 SWEEP_PARQUET = DERIVED / "qr_sweep.parquet"
 KERNEL_PARQUET = DERIVED / "kernel_dtsmqr.parquet"
+SSRFB_PARQUET = DERIVED / "ssrfb.parquet"
 OPTIMA_CSV = DERIVED / "optima.csv"
 COVERAGE_MD = ROOT / "COVERAGE.md"

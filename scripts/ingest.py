@@ -36,6 +36,23 @@ BAND = 0.95
 GROUP_KEYS = ["config", "node", "threads", "size"]
 
 
+def average_trials(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    同一 (条件, nb, ib) の反復を平均する。
+
+    **最大ではなく平均を採るのが要点。** 反復が入った状態で idxmax を掛けると
+    「5回のうち一番高く出た回」を拾ってしまい、ノイズを均すどころか
+    上振れを選び取ることになる。95% 帯が単点に潰れる事象はまさにこれで悪化する。
+
+    trials 列に反復数、GFlops_sd に反復間の標準偏差を残す。
+    帯の狭さがノイズ由来かどうかは、後者を見れば判断できる。
+    """
+    keys = GROUP_KEYS + ["nb", "ib"]
+    g = df.groupby(keys, observed=True)["GFlops"]
+    out = g.agg(GFlops="mean", GFlops_sd="std", trials="count").reset_index()
+    return out.fillna({"GFlops_sd": 0.0})
+
+
 def best_over_ib(df: pd.DataFrame) -> pd.DataFrame:
     """各 (group, nb) について ib を最適化した性能を取る。"""
     keys = GROUP_KEYS + ["nb"]
@@ -65,19 +82,26 @@ def band_range(sub: pd.DataFrame, peak: float) -> tuple[int, int]:
 
 
 def build_optima(sweeps: pd.DataFrame) -> pd.DataFrame:
-    per_nb = best_over_ib(sweeps)
+    per_nb = best_over_ib(average_trials(sweeps))
     rows = []
 
     for keys, sub in per_nb.groupby(GROUP_KEYS, observed=True):
         peak_row = sub.loc[sub["GFlops"].idxmax()]
-        lo, hi = band_range(sub, float(peak_row["GFlops"]))
+        peak = float(peak_row["GFlops"])
+        lo, hi = band_range(sub, peak)
         n_in_band = int(((sub["nb"] >= lo) & (sub["nb"] <= hi)).sum())
+        sd = float(peak_row["GFlops_sd"])
         rows.append(
             dict(
                 zip(GROUP_KEYS, keys),
                 nb_opt=int(peak_row["nb"]),
                 ib_opt=int(peak_row["ib"]),
-                GFlops_max=float(peak_row["GFlops"]),
+                GFlops_max=peak,
+                GFlops_sd=sd,
+                # ピークのばらつきが帯の幅（5%）に対してどれくらいか。
+                # 1 に近いほど「帯の狭さはノイズで説明できてしまう」。
+                noise_ratio=(sd / (0.05 * peak)) if peak else float("nan"),
+                trials=int(peak_row["trials"]),
                 nb_lo95=lo,
                 nb_hi95=hi,
                 nb_in_band=n_in_band,
@@ -272,7 +296,8 @@ def reproducibility_section(optima: pd.DataFrame, stats: list[dict]) -> list[str
 def band_section(optima: pd.DataFrame) -> tuple[list[str], int]:
     """95% 性能帯が単点に潰れている条件を挙げる。"""
     lines = _table_header(
-        ["config", "node", "t", "size", "nb_opt", "95%帯", "帯内の点", "判定"]
+        ["config", "node", "t", "size", "nb_opt", "95%帯", "帯内の点",
+         "trials", "ノイズ/帯", "判定"]
     )
     degenerate = 0
     for _, r in optima.iterrows():
@@ -280,15 +305,21 @@ def band_section(optima: pd.DataFrame) -> tuple[list[str], int]:
         at_edge = (
             r["nb_lo95"] == r["nb_scanned_lo"] or r["nb_hi95"] == r["nb_scanned_hi"]
         )
+        ratio = r["noise_ratio"]
         if n <= 1:
             verdict, degenerate = "**退化（単点）**", degenerate + 1
         elif at_edge:
             verdict = "走査端で切断"
+        elif pd.notna(ratio) and ratio >= 1.0:
+            # 反復間のばらつきが帯の幅と同程度。帯の狭さを主張の根拠にできない。
+            verdict = "**ノイズが帯と同程度**"
         else:
             verdict = "ok"
+        rt = "—" if int(r["trials"]) < 2 else f"{ratio:.2f}"
         lines.append(
             f"| `{r['config']}` | {r['node']} | {r['threads']} | {r['size']} | "
-            f"{r['nb_opt']} | {r['nb_lo95']}-{r['nb_hi95']} | {n} | {verdict} |"
+            f"{r['nb_opt']} | {r['nb_lo95']}-{r['nb_hi95']} | {n} | "
+            f"{int(r['trials'])} | {rt} | {verdict} |"
         )
     return lines, degenerate
 
@@ -315,14 +346,19 @@ def node_section(optima: pd.DataFrame, kind: str) -> list[str]:
     return lines
 
 
-def machines_section(sweeps: pd.DataFrame, kernel: pd.DataFrame | None) -> list[str]:
+def machines_section(
+    sweeps: pd.DataFrame,
+    kernel: pd.DataFrame | None,
+    ssrfb: pd.DataFrame | None = None,
+) -> list[str]:
     """machines.yaml に定義があるのに計測が無いノードを挙げる。"""
     machines = io.load_machines()
     defined = set((machines.get("nodes") or {}).keys())
 
     seen = set(sweeps["node"].unique())
-    if kernel is not None and not kernel.empty:
-        seen |= set(kernel["node"].unique())
+    for extra in (kernel, ssrfb):
+        if extra is not None and not extra.empty:
+            seen |= set(extra["node"].unique())
 
     lines = []
     unmeasured = sorted(defined - seen)
@@ -350,10 +386,14 @@ def machines_section(sweeps: pd.DataFrame, kernel: pd.DataFrame | None) -> list[
 
 
 def write_coverage(
-    optima: pd.DataFrame, sweeps: pd.DataFrame, kernel: pd.DataFrame | None
+    optima: pd.DataFrame,
+    sweeps: pd.DataFrame,
+    kernel: pd.DataFrame | None,
+    ssrfb: pd.DataFrame | None = None,
 ) -> None:
     sweep_grid = plan.grid_of("qr_sweep") or {}
     kernel_grid = plan.grid_of("kernel_dtsmqr") or {}
+    ssrfb_grid = plan.grid_of("ssrfb") or {}
 
     sweep_stats = condition_stats(sweeps, GROUP_KEYS, sweep_grid)
     kernel_stats = (
@@ -361,16 +401,23 @@ def write_coverage(
         if kernel is not None and not kernel.empty
         else []
     )
+    ssrfb_stats = (
+        condition_stats(ssrfb, ["node", "threads", "size"], ssrfb_grid)
+        if ssrfb is not None and not ssrfb.empty
+        else []
+    )
 
     band_lines, n_degenerate = band_section(optima)
-    all_stats = sweep_stats + kernel_stats
+    all_stats = sweep_stats + kernel_stats + ssrfb_stats
 
     n_files = int(sweeps["source_file"].nunique())
-    if kernel is not None and not kernel.empty:
-        n_files += int(kernel["source_file"].nunique())
+    for extra in (kernel, ssrfb):
+        if extra is not None and not extra.empty:
+            n_files += int(extra["source_file"].nunique())
 
     under_trials = 0
-    for kind, stats in (("qr_sweep", sweep_stats), ("kernel_dtsmqr", kernel_stats)):
+    for kind, stats in (("qr_sweep", sweep_stats), ("kernel_dtsmqr", kernel_stats),
+                        ("ssrfb", ssrfb_stats)):
         idx = _plan_index(kind)
         for r in stats:
             t = idx.get((r.get("config"), r["node"], r["threads"], r["size"]))
@@ -427,6 +474,17 @@ def write_coverage(
     lines += ["", "### ノード網羅", ""]
     lines += node_section(optima, "qr_sweep")
 
+    if ssrfb_stats:
+        lines += [
+            "",
+            f"## ssrfb — {plan.label_of('ssrfb')}",
+            "",
+            "`Time_sec` 列を持つのはこの種別だけで、中身から判別できる唯一の測定。",
+            "格子の規則は qr_sweep と同じ（`ib <= nb/2`）。",
+            "",
+        ]
+        lines += sweep_section(ssrfb_stats, "ssrfb")
+
     if kernel_stats:
         lines += [
             "",
@@ -439,7 +497,7 @@ def write_coverage(
         lines += sweep_section(kernel_stats, "kernel_dtsmqr")
 
     lines += ["", "## machines.yaml との整合", ""]
-    lines += machines_section(sweeps, kernel)
+    lines += machines_section(sweeps, kernel, ssrfb)
     lines.append("")
 
     paths.COVERAGE_MD.write_text("\n".join(lines), encoding="utf-8")
@@ -460,11 +518,19 @@ def main() -> int:
         kernel = None
         print("kernel_dtsmqr のデータなし。スキップ。")
 
+    try:
+        ssrfb = io.load_ssrfb(use_parquet=False)
+        ssrfb.to_parquet(paths.SSRFB_PARQUET, index=False)
+        print(f"書き出し: {paths.SSRFB_PARQUET.name}  ({len(ssrfb):,} 行)")
+    except FileNotFoundError:
+        ssrfb = None
+        print("ssrfb のデータなし。スキップ。")
+
     optima = build_optima(sweeps)
     optima.to_csv(paths.OPTIMA_CSV, index=False)
     print(f"書き出し: {paths.OPTIMA_CSV.name}  ({len(optima)} 行)")
 
-    write_coverage(optima, sweeps, kernel)
+    write_coverage(optima, sweeps, kernel, ssrfb)
     print(f"書き出し: {paths.COVERAGE_MD.name}")
 
     print(f"\n--- 最適 nb と {int(BAND * 100)}% 性能帯 ---")

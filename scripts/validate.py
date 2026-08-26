@@ -28,7 +28,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from tileqr_data import io, paths  # noqa: E402
+from tileqr_data import io, paths, plan  # noqa: E402
 
 
 class Report:
@@ -56,7 +56,9 @@ class Report:
         return 1 if self.errors else 0
 
 
-def check_file(csv: Path, config: str | None, rep: Report) -> dict | None:
+def check_file(
+    csv: Path, config: str | None, rep: Report, schema: list[str] | None = None
+) -> dict | None:
     meta = io.parse_filename(csv.name)
     if meta is None:
         rep.error(f"{csv.name}: 命名規則に沿っていない")
@@ -68,7 +70,7 @@ def check_file(csv: Path, config: str | None, rep: Report) -> dict | None:
         rep.error(f"{csv.name}: 読めない — {exc}")
         return None
 
-    missing = [c for c in io.SCHEMA if c not in df.columns]
+    missing = [c for c in (schema or io.SCHEMA) if c not in df.columns]
     if missing:
         rep.error(f"{csv.name}: 必須列が無い {missing}")
         return None
@@ -113,7 +115,8 @@ def check_file(csv: Path, config: str | None, rep: Report) -> dict | None:
     if meta["stamp"] == "nodate":
         rep.warn(f"{csv.name}: 計測日時が不明（nodate）")
 
-    return {"config": config, "node": meta["node"],
+    return {"config": config, "node": meta["node"], "rep": meta["rep"],
+            "stamp": meta["stamp"],
             "threads": threads[0], "size": sizes[0], "file": csv.name}
 
 
@@ -172,6 +175,7 @@ def main() -> int:
     known_nodes = set((machines.get("nodes") or {}).keys())
 
     seen: dict[tuple, list[str]] = defaultdict(list)
+    by_condition: dict[tuple, list[dict]] = defaultdict(list)
     n_files = 0
 
     # --- qr_sweep ---
@@ -191,26 +195,49 @@ def main() -> int:
                 rep.error(f"node `{info['node']}` が machines.yaml の nodes に無い")
             key = (config, info["node"], info["threads"], info["size"])
             seen[key].append(info["file"])
+            by_condition[key].append(info)
 
-    # --- kernel_dtsmqr ---
-    for node_dir in sorted(p for p in paths.RAW_KERNEL.glob("*") if p.is_dir()):
-        if node_dir.name not in known_nodes:
-            rep.error(f"node `{node_dir.name}` が machines.yaml の nodes に無い")
-        for csv in sorted(node_dir.glob("*.csv")):
-            n_files += 1
-            info = check_file(csv, None, rep)
-            if info and info["node"] != node_dir.name:
-                rep.error(
-                    f"{csv.name}: ファイル名のノード `{info['node']}` と "
-                    f"ディレクトリ `{node_dir.name}` が不一致"
-                )
+    # --- ノード直下に置く測定種別（kernel_dtsmqr, ssrfb） ---
+    for root, schema in ((paths.RAW_KERNEL, io.SCHEMA),
+                         (paths.RAW_SSRFB, io.SSRFB_SCHEMA)):
+        if not root.exists():
+            continue
+        for node_dir in sorted(p for p in root.glob("*") if p.is_dir()):
+            if node_dir.name not in known_nodes:
+                rep.error(f"node `{node_dir.name}` が machines.yaml の nodes に無い")
+            for csv in sorted(node_dir.glob("*.csv")):
+                n_files += 1
+                info = check_file(csv, None, rep, schema)
+                if info and info["node"] != node_dir.name:
+                    rep.error(
+                        f"{csv.name}: ファイル名のノード `{info['node']}` と "
+                        f"ディレクトリ `{node_dir.name}` が不一致"
+                    )
 
-    # --- 重複 ---
+    # --- 反復数を計画と突き合わせる ---
+    #
+    # 1ファイル1トライアルにしたので、同一条件に複数ファイルあるのは
+    # 「反復して計測した」という意図どおりの状態。数が並んでいること自体は
+    # 異常ではない。異常なのは (a) 計画より多い、(b) 同じ周が二重にある、の2つ。
+    targets = {
+        (t["config"], t["node"], t["threads"], t["size"]): t
+        for t in plan.targets_for("qr_sweep")
+    }
     for key, files in sorted(seen.items()):
-        if len(files) > 1:
+        target = targets.get(key)
+        if target and len(files) > target["trials"]:
             rep.warn(
-                f"同一条件 {key} に {len(files)} ファイル: {', '.join(files)}。"
-                "再計測なら意図的か確認を"
+                f"同一条件 {key} に {len(files)} ファイル。"
+                f"計画は trials={target['trials']} なので多い"
+            )
+
+    for key, infos in sorted(by_condition.items()):
+        stamps = [(i["stamp"], i["rep"]) for i in infos]
+        dupes = {s for s in stamps if stamps.count(s) > 1}
+        if dupes:
+            rep.error(
+                f"同一条件 {key} に同じ (計測日時, 周) が重複: {sorted(dupes)}。"
+                "同じ計測を二重に取り込んでいる"
             )
 
     print(f"検査したファイル: {n_files}")

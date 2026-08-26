@@ -21,6 +21,9 @@ kinds:
       ib_step: 4
       ib_cap: half_nb
     targets:
+      # --- AOBA-B ---
+      # ノードはジョブごとの割り当てなので固定できない。ここでは
+      # 「その条件を何本取りたいか」だけを trials で表し、nodes は書かない。
       - config: aoba-b_s2_smt-off
         threads: 128
         size: 4096
@@ -33,6 +36,59 @@ kinds:
         nb: [20, 512]
         trials: 5
         nodes: [par001, par002, par003, par004, par005, par006, par007]
+
+      # --- 研究室サーバ / 自宅機 ---
+      # 1台につき size を振る。ノードは1台なので nodes は省略。
+      - {config: calc_s2_smt-off,        node: calc,         threads: 24, size: 1024, nb: [32, 512], trials: 5}
+      - {config: calc_s2_smt-off,        node: calc,         threads: 24, size: 4096, nb: [20, 512], trials: 5}
+      - {config: epyc_s1_smt-on,         node: epyc,         threads: 32, size: 1024, nb: [32, 512], trials: 5}
+      - {config: epyc_s1_smt-on,         node: epyc,         threads: 32, size: 2048, nb: [32, 512], trials: 5}
+      - {config: epyc_s1_smt-on,         node: epyc,         threads: 32, size: 4096, nb: [32, 512], trials: 5}
+      - {config: epyc_s1_smt-on,         node: epyc,         threads: 32, size: 8192, nb: [32, 512], trials: 5}
+      - {config: i3-7100_s1_smt-on,      node: i3-7100,      threads: 4,  size: 1024, nb: [32, 512], trials: 5}
+      - {config: i3-7100_s1_smt-on,      node: i3-7100,      threads: 4,  size: 2048, nb: [32, 512], trials: 5}
+      - {config: i3-7100_s1_smt-on,      node: i3-7100,      threads: 4,  size: 4096, nb: [32, 512], trials: 5}
+      - {config: i3-7100_s1_smt-on,      node: i3-7100,      threads: 4,  size: 8192, nb: [32, 512], trials: 5}
+      - {config: i3-8100_s1_smt-off,     node: i3-8100,      threads: 4,  size: 1024, nb: [32, 512], trials: 5}
+      - {config: i3-8100_s1_smt-off,     node: i3-8100,      threads: 4,  size: 2048, nb: [32, 512], trials: 5}
+      - {config: i3-8100_s1_smt-off,     node: i3-8100,      threads: 4,  size: 4096, nb: [32, 512], trials: 5}
+      - {config: i3-8100_s1_smt-off,     node: i3-8100,      threads: 4,  size: 8192, nb: [32, 512], trials: 5}
+      - {config: i5-7400_s1_smt-off,     node: i5-7400,      threads: 4,  size: 1024, nb: [32, 512], trials: 5}
+      - {config: i5-7400_s1_smt-off,     node: i5-7400,      threads: 4,  size: 2048, nb: [32, 512], trials: 5}
+      - {config: i5-7400_s1_smt-off,     node: i5-7400,      threads: 4,  size: 4096, nb: [32, 512], trials: 5}
+      - {config: i5-7400_s1_smt-off,     node: i5-7400,      threads: 4,  size: 8192, nb: [32, 512], trials: 5}
+      - {config: i5-8500_s1_smt-off,     node: i5-8500,      threads: 6,  size: 1024, nb: [32, 512], trials: 5}
+      - {config: i5-8500_s1_smt-off,     node: i5-8500,      threads: 6,  size: 2048, nb: [32, 512], trials: 5}
+      - {config: i5-8500_s1_smt-off,     node: i5-8500,      threads: 6,  size: 4096, nb: [32, 512], trials: 5}
+      - {config: i5-8500_s1_smt-off,     node: i5-8500,      threads: 6,  size: 8192, nb: [32, 512], trials: 5}
+      - {config: i5-8500_s1_smt-off,     node: i5-8500,      threads: 6,  size: 16384, nb: [32, 512], trials: 5}
+      - {config: i7-7700_s1_smt-on,      node: i7-7700,      threads: 8,  size: 1024, nb: [32, 512], trials: 5}
+      - {config: i7-7700_s1_smt-on,      node: i7-7700,      threads: 8,  size: 2048, nb: [32, 512], trials: 5}
+      - {config: ryzen5-7400f_s1_smt-on, node: ryzen5-7400f, threads: 12, size: 1024, nb: [32, 512], trials: 5}
+      - {config: ryzen5-7400f_s1_smt-on, node: ryzen5-7400f, threads: 12, size: 2048, nb: [32, 512], trials: 5}
+      - {config: ryzen5-7400f_s1_smt-on, node: ryzen5-7400f, threads: 12, size: 4096, nb: [32, 512], trials: 5}
+      - {config: ryzen5-7400f_s1_smt-on, node: ryzen5-7400f, threads: 12, size: 8192, nb: [32, 512], trials: 5}
+      - {config: ryzen5-7400f_s1_smt-on, node: ryzen5-7400f, threads: 12, size: 16384, nb: [32, 512], trials: 5}
+
+  ssrfb:
+    label: ssrfb カーネル単体の nb×ib スイープ
+    # 列に Time_sec を持つのはこの種別だけ。中身から判別できる唯一の測定。
+    grid:
+      nb_step: 4
+      ib_min: 8
+      ib_step: 4
+      ib_cap: half_nb
+    targets:
+      - {node: epyc,         threads: 1, size: 4096, nb: [32, 512], trials: 5}
+      - {node: i5-7400,      threads: 4, size: 1024, nb: [32, 512], trials: 5}
+      - {node: i5-7400,      threads: 4, size: 2048, nb: [32, 512], trials: 5}
+      - {node: i5-7400,      threads: 4, size: 4096, nb: [32, 512], trials: 5}
+      - {node: i5-7400,      threads: 4, size: 8192, nb: [32, 512], trials: 5}
+      - {node: i5-8500,      threads: 1, size: 4096, nb: [32, 768], trials: 5}
+      - {node: ryzen5-7400f, threads: 1, size: 1024, nb: [32, 512], trials: 5}
+      - {node: ryzen5-7400f, threads: 1, size: 2048, nb: [32, 512], trials: 5}
+      - {node: ryzen5-7400f, threads: 1, size: 4096, nb: [32, 512], trials: 5}
+      - {node: ryzen5-7400f, threads: 1, size: 8192, nb: [32, 512], trials: 5}
 
   kernel_dtsmqr:
     label: dtsmqr カーネル単体の nb×ib スイープ

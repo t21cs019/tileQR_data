@@ -316,22 +316,94 @@ configs:
     queue: lx
     note: 片ソケットにピン留め。threads=64 の系列。
 
-  # --- 以下はテンプレート。実測時に埋める ---
-  #
-  # i5-8500_s1_smt-off:
-  #   arch: coffeelake-i5-8500
-  #   sockets_used: 1
-  #   smt: off
-  #   memory_channels: 2        # dual channel。nb* に影響するため必ず記録
-  #   turbo: disabled           # intel_pstate/no_turbo=1
-  #   numactl: null
-  #   note: サーマルペースト塗り直し + ケース開放 + 送風後の計測
+  # --- 研究室サーバ ---
+
+  calc_s2_smt-off:
+    arch: xeon-silver-4214
+    sockets_used: 2
+    smt: off                    # cpus.toml threads_per_core = 1
+    memory_channels: unknown    # 要確認
+    turbo: unknown
+    numactl: null
+    note: threads=24（2ソケット全24コア）。
+
+  epyc_s1_smt-on:
+    arch: epyc-7543
+    sockets_used: 1
+    smt: on                     # cpus.toml threads_per_core = 2
+    memory_channels: unknown
+    turbo: unknown
+    numactl: null
+    note: >
+      threads=32。SMT が有効なまま物理コア数と同じスレッド数で回している。
+      SMT 有効時のスケジューリング次第で兄弟スレッドへの割り当てが変わるため、
+      交絡要因として要確認。
+
+  # --- 自宅デスクトップ群 ---
+
+  i3-7100_s1_smt-on:
+    arch: kabylake-i3-7100
+    sockets_used: 1
+    smt: on
+    memory_channels: unknown
+    turbo: unknown
+    numactl: null
+    note: threads=4（2コア x SMT）。
+
+  i3-8100_s1_smt-off:
+    arch: coffeelake-i3-8100
+    sockets_used: 1
+    smt: off
+    memory_channels: unknown
+    turbo: unknown
+    numactl: null
+    note: threads=4（4コア、SMT なし）。
+
+  i5-7400_s1_smt-off:
+    arch: kabylake-i5-7400
+    sockets_used: 1
+    smt: off
+    memory_channels: unknown
+    turbo: unknown
+    numactl: null
+    note: threads=4。
+
+  i5-8500_s1_smt-off:
+    arch: coffeelake-i5-8500
+    sockets_used: 1
+    smt: off
+    memory_channels: unknown    # dual channel のはず。nb* に影響するため要確認
+    turbo: unknown
+    numactl: null
+    note: threads=6。
+
+  i7-7700_s1_smt-on:
+    arch: kabylake-i7-7700
+    sockets_used: 1
+    smt: on
+    memory_channels: unknown
+    turbo: unknown
+    numactl: null
+    note: threads=8（4コア x SMT）。
+
+  ryzen5-7400f_s1_smt-on:
+    arch: zen4-ryzen5-7400f
+    sockets_used: 1
+    smt: on
+    memory_channels: unknown
+    turbo: unknown
+    numactl: null
+    note: threads=12（6コア x SMT）。
 
 
 nodes:
   # 物理ノード名 → architecture
   # 同一構成でもノードが違えば個体差が出るため、ファイル名にノード名を残す。
   # source_key は plasma-perf の sources.toml のキー。
+  #
+  # AOBA はバッチ計算機で、ジョブごとに空いているノードが割り当たる。
+  # 走査を再開すると別のノード集合になるため、par 番号は飛ぶ。
+  # 連結でどのノードが1本にまとまったかは raw/JOINS.md にある。
   par001: { arch: aoba-b, source_key: aoba_b }
   par002: { arch: aoba-b, source_key: aoba_b }
   par003: { arch: aoba-b, source_key: aoba_b }
@@ -339,6 +411,20 @@ nodes:
   par005: { arch: aoba-b, source_key: aoba_b }
   par006: { arch: aoba-b, source_key: aoba_b }
   par007: { arch: aoba-b, source_key: aoba_b }
+  par008: { arch: aoba-b, source_key: aoba_b }
+  par009: { arch: aoba-b, source_key: aoba_b }
+  par010: { arch: aoba-b, source_key: aoba_b }
+  par013: { arch: aoba-b, source_key: aoba_b }
+  par018: { arch: aoba-b, source_key: aoba_b }
+  par023: { arch: aoba-b, source_key: aoba_b }
+  par029: { arch: aoba-b, source_key: aoba_b }
+  par030: { arch: aoba-b, source_key: aoba_b }
+  par032: { arch: aoba-b, source_key: aoba_b }
+  par034: { arch: aoba-b, source_key: aoba_b }
+  par035: { arch: aoba-b, source_key: aoba_b }
+  par045: { arch: aoba-b, source_key: aoba_b }
+  par057: { arch: aoba-b, source_key: aoba_b }
+  par058: { arch: aoba-b, source_key: aoba_b }
 
   # --- 研究室サーバ ---
   epyc:  { arch: epyc-7543,        source_key: epyc }
