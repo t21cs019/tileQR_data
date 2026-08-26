@@ -19,6 +19,7 @@ raw/ 配下の健全性を検証する。push 前に走らせる。
 
 from __future__ import annotations
 
+import re
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -116,9 +117,57 @@ def check_file(csv: Path, config: str | None, rep: Report) -> dict | None:
             "threads": threads[0], "size": sizes[0], "file": csv.name}
 
 
+NODE_NAME_RE = re.compile(r"^[A-Za-z0-9\-]+$")
+
+
+def check_machines(machines: dict, rep: Report) -> None:
+    """
+    machines.yaml 自体の整合を検査する。
+
+    諸元の食い違いは計測が全部終わってから気づくと手遅れなので、
+    push のたびに見る。特に L3 の共有単位は shared-tile cache model の
+    C_unit そのものなので、ここがずれるとモデルの当てはめが狂う。
+    """
+    archs = machines.get("architectures") or {}
+    nodes = machines.get("nodes") or {}
+    configs = machines.get("configs") or {}
+
+    for name, node in nodes.items():
+        # ファイル名の node 部分は [A-Za-z0-9-]+ しか通らない。
+        # sources.toml のキー（アンダースコア）をそのまま持ち込む事故を防ぐ。
+        if not NODE_NAME_RE.match(name):
+            rep.error(
+                f"node `{name}`: ファイル名に使えない文字がある。"
+                "ハイフンに直し、sources.toml のキーは source_key に書くこと"
+            )
+        if (node or {}).get("arch") not in archs:
+            rep.error(f"node `{name}`: architecture `{(node or {}).get('arch')}` が未定義")
+
+    for name, cfg in configs.items():
+        if (cfg or {}).get("arch") not in archs:
+            rep.error(f"config `{name}`: architecture `{(cfg or {}).get('arch')}` が未定義")
+
+    for name, a in archs.items():
+        per_ccx = a.get("l3_mb_per_ccx")
+        cores_per_ccx = a.get("cores_per_ccx")
+        per_socket = a.get("l3_mb_per_socket")
+        cores_per_socket = a.get("physical_cores_per_socket") or a.get(
+            "physical_cores_total"
+        )
+        if per_ccx and cores_per_ccx and per_socket and cores_per_socket:
+            expect = (cores_per_socket // cores_per_ccx) * per_ccx
+            if expect != per_socket:
+                rep.error(
+                    f"architecture `{name}`: L3 が矛盾。"
+                    f"{cores_per_socket}コア / {cores_per_ccx}コア per CCX "
+                    f"x {per_ccx}MB = {expect}MB だが l3_mb_per_socket={per_socket}MB"
+                )
+
+
 def main() -> int:
     rep = Report()
     machines = io.load_machines()
+    check_machines(machines, rep)
     known_configs = set((machines.get("configs") or {}).keys())
     known_nodes = set((machines.get("nodes") or {}).keys())
 

@@ -53,6 +53,7 @@ git の「全バージョンを保持する」性質が履歴肥大の問題に�
 ```
 tileQR_data/
 ├── machines.yaml       # アーキテクチャ / 計測構成 / ノードの定義
+├── plan.yaml           # 計測計画。COVERAGE.md の「分母」
 ├── raw/                # 計測の生データ。原則として書き換えない
 │   ├── qr_sweep/{config}/*.csv
 │   └── kernel_dtsmqr/{node}/*.csv
@@ -64,11 +65,12 @@ tileQR_data/
 ├── out/                # 生成した図。コミットする
 ├── scripts/
 │   ├── migrate.py      # 旧命名 → 新命名への移行
-│   ├── ingest.py       # raw → derived
-│   └── validate.py     # 命名規則・スキーマの検証
+│   ├── ingest.py       # raw → derived + COVERAGE.md
+│   └── validate.py     # 命名規則・スキーマ・machines.yaml の検証
 ├── src/tileqr_data/
 │   ├── paths.py        # パス定義
 │   ├── io.py           # 読み込み層
+│   ├── plan.py         # 計画の読み込みと計測点の数え方
 │   └── style.py        # 図のフォント・配色・プリセット
 ├── COVERAGE.md         # ingest.py が自動生成。手で編集しない
 └── Makefile
@@ -155,6 +157,38 @@ L3 の共有単位（shared-tile cache model の `C_unit`）が変わる以上�
 
 `memory_channels` / `turbo` / `numactl` / `smt`。
 
+`unknown` のまま残っている構成は COVERAGE.md の
+「交絡要因が未確認の構成」に出るので、埋め忘れに気づける。
+
+---
+
+## ダッシュボード（plasma-perf）との対応
+
+向こうの `cpus.toml` が CPU 諸元、`sources.toml` がソース定義を持つ。
+同じ機材を両方で定義しているので、食い違うと同じ計測を別物として扱うことになる。
+対応は次の2フィールドで明示する。
+
+| ここ | 向こう |
+|---|---|
+| `architectures.*.dashboard_cpu` | `cpus.toml` のキー（例 `epyc_7702`） |
+| `nodes.*.source_key` | `sources.toml` のキー（例 `aoba_b`） |
+
+**node 名はハイフン、`source_key` はアンダースコア。** `sources.toml` のキーは
+`i3_6100` だが、ここの node 名は `i3-6100` でなければならない。
+ファイル名の node 部分が `[A-Za-z0-9-]+` に限られているため
+（`io.FILENAME_RE`）。`validate.py` がこの取り違えを弾く。
+
+### validate.py が見る machines.yaml の整合
+
+- node 名がファイル名に使える文字か
+- node / config が参照する architecture が定義されているか
+- L3 の算術が合うか（`コア数 / cores_per_ccx × l3_mb_per_ccx == l3_mb_per_socket`）
+
+最後のものは実際に効いた。`epyc-7543` を `cores_per_ccx: 8` と書くと
+L3 総量が 128MB になり、`cpus.toml` の 256MB と食い違う
+（7543 は CCD あたり4コアのみ有効）。L3 の共有単位は
+shared-tile cache model の `C_unit` そのものなので、ここがずれるとモデルが狂う。
+
 ---
 
 ## 最適 nb の定義はここだけが持つ
@@ -175,7 +209,46 @@ L3 の共有単位（shared-tile cache model の `C_unit`）が変わる以上�
 | `nb_opt`, `ib_opt` | ピークを与える nb, ib |
 | `GFlops_max` | ピーク性能 |
 | `nb_lo95`, `nb_hi95` | ピークの 95% 以上を満たす nb の**連続区間** |
+| `nb_in_band` | 帯に入る nb の**点数**。1 ならピークはノイズの棘 |
 | `nb_scanned_lo/hi`, `n_nb` | 走査範囲（帯が範囲端で切れていないかの確認用） |
+
+---
+
+## 計測計画（plan.yaml）と COVERAGE.md
+
+「何を測ったか」ではなく **「計画に対してどこが空いているか」** と
+**「その数字を主張に使ってよいか」** を出すのが COVERAGE.md の役目。
+前者が格子と trials、後者が 95% 帯の幅。
+
+### 計測点の数え方
+
+`plan.yaml` の `grid` が nb×ib の格子を定義する。**ib の上限規則は測定種別で違う**。
+
+| 種別 | nb 刻み | ib | 規則 |
+|---|---|---|---|
+| `qr_sweep` | 4 | 8 から 4 刻み | `ib <= nb/2` (`half_nb`) |
+| `kernel_dtsmqr` | 2 | 2 から 2 刻み | `ib <= nb - step` (`nb_minus_step`) |
+
+取り違えると期待点数が倍ずれる。数え方は `src/tileqr_data/plan.py` だけが持つ。
+
+この算術は plasma-perf 側の `coverage` 列と一致する。
+（例: nb 32-512 の qr_sweep は両方とも 3963 点になる）
+
+### COVERAGE.md が出すもの
+
+- **条件別** … nb 走査範囲・刻み・ib 範囲・計測点・格子の充填率・計画達成率・trials・status
+- **反復と最適 nb のばらつき** … ノード間の nb_opt の幅と変動係数
+- **95% 性能帯の健全性** … 帯内の点が1つしかない条件を「退化」として名指し
+- **ノード網羅** … 計画にあって未計測のノード
+- **machines.yaml との整合** … 未計測ノード、未定義ノード、交絡要因が unknown の構成
+
+### trials（反復回数）を計画に入れてある理由
+
+128 スレッド系で 95% 性能帯が単点に潰れる条件が出ている。
+ピークが「なだらかな山の頂上」ではなく「ノイズの中で偶然突き出した棘」で、
+この状態の `nb_opt` は再現性がない。同一条件を反復して平均を取るまで、
+その値は研究の主張に使えない。`plan.yaml` の `trials` がその目標値で、
+達成できていない条件は COVERAGE.md のサマリに件数が出る。
 
 ---
 

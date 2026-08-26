@@ -7,75 +7,277 @@
 #
 # raw/qr_sweep/ 配下のディレクトリ名は configs のキーと 1:1 で対応する。
 # ディレクトリ名は短く保ち、詳細はすべてここに書く。
+#
+# --- ダッシュボード (plasma-perf) との対応 ------------------------------
+#
+# 向こうの cpus.toml / sources.toml が CPU 諸元とソース定義を持つ。
+# 諸元が食い違うと同じ計測を別物として扱うことになるので、
+# 各 architecture に `dashboard_cpu`（cpus.toml のキー）、
+# 各 node に `source_key`（sources.toml のキー）を書いて対応を明示する。
+#
+# 注意: sources.toml のキーはアンダースコア（i3_6100）だが、
+# ここの node 名はハイフン（i3-6100）でなければならない。
+# ファイル名の node 部分が `[A-Za-z0-9-]+` に限られているため
+# （io.FILENAME_RE）。アンダースコアを使うと validate.py が弾く。
+#
+# smt_capable  … ハードウェアが SMT を持つか（不変）
+# smt_default  … cpus.toml の threads_per_core から読める「計測時の設定」
+#                 実際に使った値は configs 側の smt が優先。
 
 architectures:
 
   aoba-b:
     cpu: AMD EPYC 7702
+    dashboard_cpu: epyc_7702
     vendor: amd
+    microarch: zen2
     sockets_physical: 2
     physical_cores_total: 128
     physical_cores_per_socket: 64
     smt_capable: true
+    smt_default: off          # cpus.toml threads_per_core = 1
+    numa_nodes_total: 8       # 2 socket x NPS4
+    l1d_kb_per_core: 32
     l2_kb_per_core: 512
     l3_mb_per_ccx: 16
     cores_per_ccx: 4
+    l3_mb_per_socket: 256     # 16 CCX x 16 MB。cpus.toml と一致すること
     # L3 共有単位は CCX（Zen 系）。shared-tile cache model の C_unit に対応。
     l3_sharing_unit: ccx
 
   epyc-7543:
     cpu: AMD EPYC 7543
+    dashboard_cpu: epyc_7543
     vendor: amd
+    microarch: zen3
     sockets_physical: 1
     physical_cores_total: 32
     physical_cores_per_socket: 32
     smt_capable: true
+    smt_default: on           # cpus.toml threads_per_core = 2
+    numa_nodes_total: 4
+    l1d_kb_per_core: 32
     l2_kb_per_core: 512
     l3_mb_per_ccx: 32
-    cores_per_ccx: 8
+    cores_per_ccx: 4          # 8 CCD x 4 有効コア。32MB/CCD で計 256MB
+    l3_mb_per_socket: 256
     l3_sharing_unit: ccx
+    # 注意: cores_per_ccx を 8 と書くと L3 総量が 128MB になり cpus.toml と
+    #       食い違う。7543 は CCD あたり 4 コアのみ有効な構成。
 
-  coffeelake-i5-8500:
-    cpu: Intel Core i5-8500
+  xeon-silver-4214:
+    cpu: Intel Xeon Silver 4214
+    dashboard_cpu: xeon_silver_4214
     vendor: intel
-    sockets_physical: 1
-    physical_cores_total: 6
-    physical_cores_per_socket: 6
-    smt_capable: false
-    l2_kb_per_core: 256
-    l3_mb_total: 9
-    l3_sharing_unit: socket
-
-  raptorlake-i5-13400f:
-    cpu: Intel Core i5-13400F
-    vendor: intel
-    sockets_physical: 1
-    physical_cores_total: 10   # P-core 6 + E-core 4
-    p_cores: 6
-    e_cores: 4
+    microarch: cascadelake
+    sockets_physical: 2
+    physical_cores_total: 24
+    physical_cores_per_socket: 12
     smt_capable: true
-    l3_mb_total: 20
+    smt_default: off          # cpus.toml threads_per_core = 1
+    numa_nodes_total: 2
+    l1d_kb_per_core: 32
+    l2_kb_per_core: 1024
+    l3_mb_per_socket: 16      # 実機は 16.5 MiB。cpus.toml に合わせて 16
     l3_sharing_unit: socket
-    # 注意: ハイブリッド構成のため physical core による並列モデルの
-    #       適用可否は要検討（P/E で per-core 性能が異なる）。
+
+  zen3-ryzen7-5800x:
+    cpu: AMD Ryzen 7 5800X
+    dashboard_cpu: ryzen7_5800x
+    vendor: amd
+    microarch: zen3
+    sockets_physical: 1
+    physical_cores_total: 8
+    smt_capable: true
+    smt_default: on
+    numa_nodes_total: 1
+    l1d_kb_per_core: 32
+    l2_kb_per_core: 512
+    l3_mb_per_ccx: 32
+    cores_per_ccx: 8          # 単一 CCX に 8 コア全部が乗る
+    l3_sharing_unit: ccx
 
   zen4-ryzen5-7400f:
     cpu: AMD Ryzen 5 7400F
+    dashboard_cpu: ryzen5_7400f
     vendor: amd
+    microarch: zen4
     sockets_physical: 1
     physical_cores_total: 6
     smt_capable: true
+    smt_default: on
+    numa_nodes_total: 1
+    l1d_kb_per_core: 32
     l2_kb_per_core: 1024
     l3_mb_per_ccx: 32
     cores_per_ccx: 6
     l3_sharing_unit: ccx
 
-  cometlake-i3-10100:
-    cpu: Intel Core i3-10100
+  coffeelake-i5-8500:
+    cpu: Intel Core i5-8500
+    dashboard_cpu: i5_8500
     vendor: intel
+    microarch: coffeelake
+    sockets_physical: 1
+    physical_cores_total: 6
+    physical_cores_per_socket: 6
+    smt_capable: false
+    smt_default: off
+    numa_nodes_total: 1
+    l1d_kb_per_core: 32
+    l2_kb_per_core: 256
+    l3_mb_total: 9
+    l3_sharing_unit: socket
+
+  coffeelake-i3-8100:
+    cpu: Intel Core i3-8100
+    dashboard_cpu: i3_8100
+    vendor: intel
+    microarch: coffeelake
+    sockets_physical: 1
+    physical_cores_total: 4
+    smt_capable: false
+    smt_default: off
+    numa_nodes_total: 1
+    l1d_kb_per_core: 32
+    l2_kb_per_core: 256
+    l3_mb_total: 6
+    l3_sharing_unit: socket
+
+  coffeelake-i3-9100:
+    cpu: Intel Core i3-9100
+    dashboard_cpu: i3_9100
+    vendor: intel
+    microarch: coffeelake
+    sockets_physical: 1
+    physical_cores_total: 4
+    smt_capable: false
+    smt_default: off
+    numa_nodes_total: 1
+    l1d_kb_per_core: 32
+    l2_kb_per_core: 256
+    l3_mb_total: 6
+    l3_sharing_unit: socket
+
+  skylake-i3-6100:
+    cpu: Intel Core i3-6100
+    dashboard_cpu: i3_6100
+    vendor: intel
+    microarch: skylake
+    sockets_physical: 1
+    physical_cores_total: 2
+    smt_capable: true
+    smt_default: on           # cpus.toml threads_per_core = 2
+    numa_nodes_total: 1
+    l1d_kb_per_core: 32
+    l2_kb_per_core: 256
+    l3_mb_total: 3
+    l3_sharing_unit: socket
+
+  kabylake-i3-7100:
+    cpu: Intel Core i3-7100
+    dashboard_cpu: i3_7100
+    vendor: intel
+    microarch: kabylake
+    sockets_physical: 1
+    physical_cores_total: 2
+    smt_capable: true
+    smt_default: on
+    numa_nodes_total: 1
+    l1d_kb_per_core: 32
+    l2_kb_per_core: 256
+    l3_mb_total: 3
+    l3_sharing_unit: socket
+
+  kabylake-i5-7400:
+    cpu: Intel Core i5-7400
+    dashboard_cpu: i5_7400
+    vendor: intel
+    microarch: kabylake
+    sockets_physical: 1
+    physical_cores_total: 4
+    smt_capable: false
+    smt_default: off
+    numa_nodes_total: 1
+    l1d_kb_per_core: 32
+    l2_kb_per_core: 256
+    l3_mb_total: 6
+    l3_sharing_unit: socket
+
+  kabylake-i5-7500:
+    cpu: Intel Core i5-7500
+    dashboard_cpu: i5_7500
+    vendor: intel
+    microarch: kabylake
+    sockets_physical: 1
+    physical_cores_total: 4
+    smt_capable: false
+    smt_default: off
+    numa_nodes_total: 1
+    l1d_kb_per_core: 32
+    l2_kb_per_core: 256
+    l3_mb_total: 6
+    l3_sharing_unit: socket
+
+  kabylake-i7-7700:
+    cpu: Intel Core i7-7700
+    dashboard_cpu: i7_7700
+    vendor: intel
+    microarch: kabylake
     sockets_physical: 1
     physical_cores_total: 4
     smt_capable: true
+    smt_default: on           # cpus.toml threads_per_core = 2
+    numa_nodes_total: 1
+    l1d_kb_per_core: 32
+    l2_kb_per_core: 256
+    l3_mb_total: 8
+    l3_sharing_unit: socket
+
+  haswell-xeon-e3-1220v3:
+    cpu: Intel Xeon E3-1220 v3
+    dashboard_cpu: xeon_e3_1220v3
+    vendor: intel
+    microarch: haswell
+    sockets_physical: 1
+    physical_cores_total: 4
+    smt_capable: false
+    smt_default: off
+    numa_nodes_total: 1
+    l1d_kb_per_core: 32
+    l2_kb_per_core: 256
+    l3_mb_total: 8
+    l3_sharing_unit: socket
+
+  raptorlake-i5-13400f:
+    cpu: Intel Core i5-13400F
+    dashboard_cpu: null        # sources.toml に未登録
+    vendor: intel
+    microarch: raptorlake
+    sockets_physical: 1
+    physical_cores_total: 10   # P-core 6 + E-core 4
+    p_cores: 6
+    e_cores: 4
+    smt_capable: true
+    smt_default: on
+    numa_nodes_total: 1
+    l1d_kb_per_core: 48
+    l3_mb_total: 20
+    l3_sharing_unit: socket
+    # 注意: ハイブリッド構成のため physical core による並列モデルの
+    #       適用可否は要検討（P/E で per-core 性能が異なる）。
+
+  cometlake-i3-10100:
+    cpu: Intel Core i3-10100
+    dashboard_cpu: null        # sources.toml に未登録
+    vendor: intel
+    microarch: cometlake
+    sockets_physical: 1
+    physical_cores_total: 4
+    smt_capable: true
+    smt_default: on
+    numa_nodes_total: 1
+    l1d_kb_per_core: 32
     l2_kb_per_core: 256
     l3_mb_total: 6
     l3_sharing_unit: socket
@@ -87,12 +289,16 @@ configs:
   #
   # sockets_used は「物理搭載数」ではなく「実際に使用したソケット数」。
   # numactl --cpunodebind でピン留めした場合は、ピン留め後の値を書く。
+  #
+  # memory_channels / turbo は「メモリチャネル構成が最適 nb そのものを変える」
+  # 「ターボの有無で再現性が崩れる」ため必ず埋める。unknown のまま残っている
+  # ものは COVERAGE.md の「交絡要因が未確認の構成」に出る。
 
   aoba-b_s2_smt-off:
     arch: aoba-b
     sockets_used: 2
     smt: off
-    memory_channels: 8          # per socket。要確認
+    memory_channels: 8          # per socket。EPYC 7702 の最大構成と同値。要実機確認
     turbo: unknown              # 要確認
     numactl: null
     scheduler: nqsv
@@ -125,17 +331,35 @@ configs:
 nodes:
   # 物理ノード名 → architecture
   # 同一構成でもノードが違えば個体差が出るため、ファイル名にノード名を残す。
-  par001: { arch: aoba-b }
-  par002: { arch: aoba-b }
-  par003: { arch: aoba-b }
-  par004: { arch: aoba-b }
-  par005: { arch: aoba-b }
-  par006: { arch: aoba-b }
-  par007: { arch: aoba-b }
+  # source_key は plasma-perf の sources.toml のキー。
+  par001: { arch: aoba-b, source_key: aoba_b }
+  par002: { arch: aoba-b, source_key: aoba_b }
+  par003: { arch: aoba-b, source_key: aoba_b }
+  par004: { arch: aoba-b, source_key: aoba_b }
+  par005: { arch: aoba-b, source_key: aoba_b }
+  par006: { arch: aoba-b, source_key: aoba_b }
+  par007: { arch: aoba-b, source_key: aoba_b }
 
-  epyc:    { arch: epyc-7543 }
-  calc:    { arch: epyc-7543 }
-  i5-8500: { arch: coffeelake-i5-8500 }
-  corei5-13400F: { arch: raptorlake-i5-13400f }
-  ryzen5-7400f:  { arch: zen4-ryzen5-7400f }
-  i3-10100:      { arch: cometlake-i3-10100 }
+  # --- 研究室サーバ ---
+  epyc:  { arch: epyc-7543,        source_key: epyc }
+  calc:  { arch: xeon-silver-4214, source_key: calc }
+  ryzen: { arch: zen3-ryzen7-5800x, source_key: ryzen }
+  # calc は以前 epyc-7543 と書いてあったが、sources.toml では
+  # xeon_silver_4214。別CPUなので L3 共有単位も per-core L2 も違う。
+
+  # --- 自宅デスクトップ群 ---
+  # node 名はハイフン。sources.toml のキー（アンダースコア）は source_key に。
+  i3-6100:      { arch: skylake-i3-6100,       source_key: i3_6100 }
+  i3-7100:      { arch: kabylake-i3-7100,      source_key: i3_7100 }
+  i3-8100:      { arch: coffeelake-i3-8100,    source_key: i3_8100 }
+  i3-9100:      { arch: coffeelake-i3-9100,    source_key: i3_9100 }
+  i5-7400:      { arch: kabylake-i5-7400,      source_key: i5_7400 }
+  i5-7500:      { arch: kabylake-i5-7500,      source_key: i5_7500 }
+  i5-8500:      { arch: coffeelake-i5-8500,    source_key: i5_8500 }
+  i7-7700:      { arch: kabylake-i7-7700,      source_key: i7_7700 }
+  xeon-e3-1220v3: { arch: haswell-xeon-e3-1220v3, source_key: xeon_e3_1220v3 }
+  ryzen5-7400f: { arch: zen4-ryzen5-7400f,     source_key: ryzen5_7400f }
+
+  # --- sources.toml に未登録。計測データだけがある / 予備 ---
+  corei5-13400F: { arch: raptorlake-i5-13400f, source_key: null }
+  i3-10100:      { arch: cometlake-i3-10100,   source_key: null }

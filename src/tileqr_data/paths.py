@@ -20,6 +20,7 @@ DERIVED = ROOT / "derived"
 OUT = ROOT / "out"
 
 MACHINES_YAML = ROOT / "machines.yaml"
+PLAN_YAML = ROOT / "plan.yaml"
 
 SWEEP_PARQUET = DERIVED / "qr_sweep.parquet"
 KERNEL_PARQUET = DERIVED / "kernel_dtsmqr.parquet"

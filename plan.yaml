@@ -1,0 +1,57 @@
+# tileQR_data / plan.yaml
+#
+# 計測計画。COVERAGE.md の「分母」はここが決める。
+#
+# plasma-perf 側の「計測進捗」テーブル（size / threads / nb / ib_min / step /
+# trials / status / coverage）と同じ語彙で書く。両者が同じ規則で点数を数えるので、
+# bench 側の coverage 列と COVERAGE.md の数字が一致する。
+#
+# grid が計測点の数え方を決める。ib の上限規則は測定種別で違うので必ず明示する:
+#   half_nb        ib <= nb/2      … qr_sweep（PLASMA dgeqrf のスイープ）
+#   nb_minus_step  ib <= nb - step … kernel_dtsmqr（カーネル単体）
+# この2つを取り違えると計測点の期待値が2倍ずれる。
+
+kinds:
+
+  qr_sweep:
+    label: 全体QR分解 (PLASMA dgeqrf) の nb×ib スイープ
+    grid:
+      nb_step: 4
+      ib_min: 8
+      ib_step: 4
+      ib_cap: half_nb
+    targets:
+      - config: aoba-b_s2_smt-off
+        threads: 128
+        size: 4096
+        nb: [20, 512]
+        trials: 5
+        nodes: [par001, par002, par003, par004, par005, par006, par007]
+      - config: aoba-b_s1_smt-off
+        threads: 64
+        size: 4096
+        nb: [20, 512]
+        trials: 5
+        nodes: [par001, par002, par003, par004, par005, par006, par007]
+
+  kernel_dtsmqr:
+    label: dtsmqr カーネル単体の nb×ib スイープ
+    grid:
+      nb_step: 2
+      ib_min: 2
+      ib_step: 2
+      ib_cap: nb_minus_step
+    targets:
+      - node: corei5-13400F
+        threads: [4, 8, 16]
+        size: 4096
+        nb: [4, 350]
+        trials: 5
+
+# trials の既定値。targets で個別に上書きできる。
+#
+# 5 にしてあるのは、128スレッド系で 95% 性能帯が単点に潰れる
+# （＝ピークがノイズの棘）事象が出ているため。同一条件を反復して
+# 平均を取らない限り、nb_opt を研究の主張には使えない。
+defaults:
+  trials: 5
