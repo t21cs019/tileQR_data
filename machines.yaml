@@ -1,0 +1,141 @@
+# tileQR_data / machines.yaml
+#
+# 三段構成:
+#   architectures … CPU そのものの諸元（不変）
+#   configs       … 計測時の構成（ディレクトリ名がそのままキー）
+#   nodes         … 物理ノード → どの architecture か
+#
+# raw/qr_sweep/ 配下のディレクトリ名は configs のキーと 1:1 で対応する。
+# ディレクトリ名は短く保ち、詳細はすべてここに書く。
+
+architectures:
+
+  aoba-b:
+    cpu: AMD EPYC 7702
+    vendor: amd
+    sockets_physical: 2
+    physical_cores_total: 128
+    physical_cores_per_socket: 64
+    smt_capable: true
+    l2_kb_per_core: 512
+    l3_mb_per_ccx: 16
+    cores_per_ccx: 4
+    # L3 共有単位は CCX（Zen 系）。shared-tile cache model の C_unit に対応。
+    l3_sharing_unit: ccx
+
+  epyc-7543:
+    cpu: AMD EPYC 7543
+    vendor: amd
+    sockets_physical: 1
+    physical_cores_total: 32
+    physical_cores_per_socket: 32
+    smt_capable: true
+    l2_kb_per_core: 512
+    l3_mb_per_ccx: 32
+    cores_per_ccx: 8
+    l3_sharing_unit: ccx
+
+  coffeelake-i5-8500:
+    cpu: Intel Core i5-8500
+    vendor: intel
+    sockets_physical: 1
+    physical_cores_total: 6
+    physical_cores_per_socket: 6
+    smt_capable: false
+    l2_kb_per_core: 256
+    l3_mb_total: 9
+    l3_sharing_unit: socket
+
+  raptorlake-i5-13400f:
+    cpu: Intel Core i5-13400F
+    vendor: intel
+    sockets_physical: 1
+    physical_cores_total: 10   # P-core 6 + E-core 4
+    p_cores: 6
+    e_cores: 4
+    smt_capable: true
+    l3_mb_total: 20
+    l3_sharing_unit: socket
+    # 注意: ハイブリッド構成のため physical core による並列モデルの
+    #       適用可否は要検討（P/E で per-core 性能が異なる）。
+
+  zen4-ryzen5-7400f:
+    cpu: AMD Ryzen 5 7400F
+    vendor: amd
+    sockets_physical: 1
+    physical_cores_total: 6
+    smt_capable: true
+    l2_kb_per_core: 1024
+    l3_mb_per_ccx: 32
+    cores_per_ccx: 6
+    l3_sharing_unit: ccx
+
+  cometlake-i3-10100:
+    cpu: Intel Core i3-10100
+    vendor: intel
+    sockets_physical: 1
+    physical_cores_total: 4
+    smt_capable: true
+    l2_kb_per_core: 256
+    l3_mb_total: 6
+    l3_sharing_unit: socket
+
+
+configs:
+  # キー = raw/qr_sweep/ 直下のディレクトリ名
+  # 命名規則: {arch}_s{sockets_used}_smt-{on|off}
+  #
+  # sockets_used は「物理搭載数」ではなく「実際に使用したソケット数」。
+  # numactl --cpunodebind でピン留めした場合は、ピン留め後の値を書く。
+
+  aoba-b_s2_smt-off:
+    arch: aoba-b
+    sockets_used: 2
+    smt: off
+    memory_channels: 8          # per socket。要確認
+    turbo: unknown              # 要確認
+    numactl: null
+    scheduler: nqsv
+    queue: lx
+    note: 両ソケット使用。threads=128 の系列。
+
+  aoba-b_s1_smt-off:
+    arch: aoba-b
+    sockets_used: 1
+    smt: off
+    memory_channels: 8
+    turbo: unknown
+    numactl: "--cpunodebind=0 --membind=0"
+    scheduler: nqsv
+    queue: lx
+    note: 片ソケットにピン留め。threads=64 の系列。
+
+  # --- 以下はテンプレート。実測時に埋める ---
+  #
+  # i5-8500_s1_smt-off:
+  #   arch: coffeelake-i5-8500
+  #   sockets_used: 1
+  #   smt: off
+  #   memory_channels: 2        # dual channel。nb* に影響するため必ず記録
+  #   turbo: disabled           # intel_pstate/no_turbo=1
+  #   numactl: null
+  #   note: サーマルペースト塗り直し + ケース開放 + 送風後の計測
+
+
+nodes:
+  # 物理ノード名 → architecture
+  # 同一構成でもノードが違えば個体差が出るため、ファイル名にノード名を残す。
+  par001: { arch: aoba-b }
+  par002: { arch: aoba-b }
+  par003: { arch: aoba-b }
+  par004: { arch: aoba-b }
+  par005: { arch: aoba-b }
+  par006: { arch: aoba-b }
+  par007: { arch: aoba-b }
+
+  epyc:    { arch: epyc-7543 }
+  calc:    { arch: epyc-7543 }
+  i5-8500: { arch: coffeelake-i5-8500 }
+  corei5-13400F: { arch: raptorlake-i5-13400f }
+  ryzen5-7400f:  { arch: zen4-ryzen5-7400f }
+  i3-10100:      { arch: cometlake-i3-10100 }

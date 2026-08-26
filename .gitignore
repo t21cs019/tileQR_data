@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+.venv/
+.uv/
+.ipynb_checkpoints/
+.DS_Store
+
+# derived/ と out/ は意図的にコミットする（README 参照）
+# ダッシュボードが即座に読めること、資料から図を参照できることを優先する
