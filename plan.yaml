@@ -7,107 +7,87 @@
 # bench 側の coverage 列と COVERAGE.md の数字が一致する。
 #
 # grid が計測点の数え方を決める。ib の上限規則は測定種別で違うので必ず明示する:
-#   half_nb        ib <= nb/2      … qr_sweep（PLASMA dgeqrf のスイープ）
+#   half_nb        ib <= nb/2      … qr_sweep / ssrfb
 #   nb_minus_step  ib <= nb - step … kernel_dtsmqr（カーネル単体）
 # この2つを取り違えると計測点の期待値が2倍ずれる。
+#
+# ノードは計画に書かない。AOBA はバッチ計算機でジョブごとに割り当てが変わるし、
+# 他は1構成1台なので、条件を分ける軸にならない。
+# 「その条件を何本取りたいか」は trials だけで表す。
 
 kinds:
 
   qr_sweep:
     label: 全体QR分解 (PLASMA dgeqrf) の nb×ib スイープ
+
+    # どの CPU でも同じ計画。size 5種、nb 32-512。
+    sizes: [1024, 2048, 4096, 8192, 16384]
+    nb: [32, 512]
+    trials: 5
+
     grid:
-      nb_step: 4
       ib_min: 8
       ib_step: 4
       ib_cap: half_nb
-    targets:
-      # --- AOBA-B ---
-      # ノードはジョブごとの割り当てなので固定できない。ここでは
-      # 「その条件を何本取りたいか」だけを trials で表し、nodes は書かない。
-      - config: aoba-b_s2_smt-off
-        threads: 128
-        size: 4096
-        nb: [20, 512]
-        trials: 5
-        nodes: [par001, par002, par003, par004, par005, par006, par007]
-      - config: aoba-b_s1_smt-off
-        threads: 64
-        size: 4096
-        nb: [20, 512]
-        trials: 5
-        nodes: [par001, par002, par003, par004, par005, par006, par007]
+      # nb の刻みは size で変える。大きい行列は1点あたりの計測時間が延びるので、
+      # 同じ密度で走らせると終わらない。
+      nb_step_by_size:
+        1024: 4
+        2048: 4
+        4096: 4
+        8192: 8
+        16384: 8
+      # 刻みを粗くするとき ib も一緒に粗くなる（size 8192 は nb も ib も 8 刻み）。
+      # ib_step を 4 に固定すると、大きい size で期待点数が倍近く過大になる。
+      ib_step_follows_nb_step: true
 
-      # --- 研究室サーバ / 自宅機 ---
-      # 1台につき size を振る。ノードは1台なので nodes は省略。
-      - {config: calc_s2_smt-off,        node: calc,         threads: 24, size: 1024, nb: [32, 512], trials: 5}
-      - {config: calc_s2_smt-off,        node: calc,         threads: 24, size: 4096, nb: [20, 512], trials: 5}
-      - {config: epyc_s1_smt-on,         node: epyc,         threads: 32, size: 1024, nb: [32, 512], trials: 5}
-      - {config: epyc_s1_smt-on,         node: epyc,         threads: 32, size: 2048, nb: [32, 512], trials: 5}
-      - {config: epyc_s1_smt-on,         node: epyc,         threads: 32, size: 4096, nb: [32, 512], trials: 5}
-      - {config: epyc_s1_smt-on,         node: epyc,         threads: 32, size: 8192, nb: [32, 512], trials: 5}
-      - {config: i3-7100_s1_smt-on,      node: i3-7100,      threads: 4,  size: 1024, nb: [32, 512], trials: 5}
-      - {config: i3-7100_s1_smt-on,      node: i3-7100,      threads: 4,  size: 2048, nb: [32, 512], trials: 5}
-      - {config: i3-7100_s1_smt-on,      node: i3-7100,      threads: 4,  size: 4096, nb: [32, 512], trials: 5}
-      - {config: i3-7100_s1_smt-on,      node: i3-7100,      threads: 4,  size: 8192, nb: [32, 512], trials: 5}
-      - {config: i3-8100_s1_smt-off,     node: i3-8100,      threads: 4,  size: 1024, nb: [32, 512], trials: 5}
-      - {config: i3-8100_s1_smt-off,     node: i3-8100,      threads: 4,  size: 2048, nb: [32, 512], trials: 5}
-      - {config: i3-8100_s1_smt-off,     node: i3-8100,      threads: 4,  size: 4096, nb: [32, 512], trials: 5}
-      - {config: i3-8100_s1_smt-off,     node: i3-8100,      threads: 4,  size: 8192, nb: [32, 512], trials: 5}
-      - {config: i5-7400_s1_smt-off,     node: i5-7400,      threads: 4,  size: 1024, nb: [32, 512], trials: 5}
-      - {config: i5-7400_s1_smt-off,     node: i5-7400,      threads: 4,  size: 2048, nb: [32, 512], trials: 5}
-      - {config: i5-7400_s1_smt-off,     node: i5-7400,      threads: 4,  size: 4096, nb: [32, 512], trials: 5}
-      - {config: i5-7400_s1_smt-off,     node: i5-7400,      threads: 4,  size: 8192, nb: [32, 512], trials: 5}
-      - {config: i5-8500_s1_smt-off,     node: i5-8500,      threads: 6,  size: 1024, nb: [32, 512], trials: 5}
-      - {config: i5-8500_s1_smt-off,     node: i5-8500,      threads: 6,  size: 2048, nb: [32, 512], trials: 5}
-      - {config: i5-8500_s1_smt-off,     node: i5-8500,      threads: 6,  size: 4096, nb: [32, 512], trials: 5}
-      - {config: i5-8500_s1_smt-off,     node: i5-8500,      threads: 6,  size: 8192, nb: [32, 512], trials: 5}
-      - {config: i5-8500_s1_smt-off,     node: i5-8500,      threads: 6,  size: 16384, nb: [32, 512], trials: 5}
-      - {config: i7-7700_s1_smt-on,      node: i7-7700,      threads: 8,  size: 1024, nb: [32, 512], trials: 5}
-      - {config: i7-7700_s1_smt-on,      node: i7-7700,      threads: 8,  size: 2048, nb: [32, 512], trials: 5}
-      - {config: ryzen5-7400f_s1_smt-on, node: ryzen5-7400f, threads: 12, size: 1024, nb: [32, 512], trials: 5}
-      - {config: ryzen5-7400f_s1_smt-on, node: ryzen5-7400f, threads: 12, size: 2048, nb: [32, 512], trials: 5}
-      - {config: ryzen5-7400f_s1_smt-on, node: ryzen5-7400f, threads: 12, size: 4096, nb: [32, 512], trials: 5}
-      - {config: ryzen5-7400f_s1_smt-on, node: ryzen5-7400f, threads: 12, size: 8192, nb: [32, 512], trials: 5}
-      - {config: ryzen5-7400f_s1_smt-on, node: ryzen5-7400f, threads: 12, size: 16384, nb: [32, 512], trials: 5}
+    # config ごとにスレッド数だけ書く。size は上の sizes を全部展開する。
+    targets:
+      - {config: aoba-b_s2_smt-off,      threads: 128}
+      - {config: aoba-b_s1_smt-off,      threads: 64}
+      - {config: calc_s2_smt-off,        threads: 24}
+      - {config: epyc_s1_smt-on,         threads: 32}
+      - {config: i3-7100_s1_smt-on,      threads: 4}
+      - {config: i3-8100_s1_smt-off,     threads: 4}
+      - {config: i5-7400_s1_smt-off,     threads: 4}
+      - {config: i5-8500_s1_smt-off,     threads: 6}
+      - {config: i7-7700_s1_smt-on,      threads: 8}
+      - {config: ryzen5-7400f_s1_smt-on, threads: 12}
 
   ssrfb:
     label: ssrfb カーネル単体の nb×ib スイープ
     # 列に Time_sec を持つのはこの種別だけ。中身から判別できる唯一の測定。
+    sizes: [1024, 2048, 4096, 8192]
+    nb: [32, 512]
+    trials: 5
     grid:
       nb_step: 4
       ib_min: 8
       ib_step: 4
       ib_cap: half_nb
     targets:
-      - {node: epyc,         threads: 1, size: 4096, nb: [32, 512], trials: 5}
-      - {node: i5-7400,      threads: 4, size: 1024, nb: [32, 512], trials: 5}
-      - {node: i5-7400,      threads: 4, size: 2048, nb: [32, 512], trials: 5}
-      - {node: i5-7400,      threads: 4, size: 4096, nb: [32, 512], trials: 5}
-      - {node: i5-7400,      threads: 4, size: 8192, nb: [32, 512], trials: 5}
-      - {node: i5-8500,      threads: 1, size: 4096, nb: [32, 768], trials: 5}
-      - {node: ryzen5-7400f, threads: 1, size: 1024, nb: [32, 512], trials: 5}
-      - {node: ryzen5-7400f, threads: 1, size: 2048, nb: [32, 512], trials: 5}
-      - {node: ryzen5-7400f, threads: 1, size: 4096, nb: [32, 512], trials: 5}
-      - {node: ryzen5-7400f, threads: 1, size: 8192, nb: [32, 512], trials: 5}
+      - {node: epyc,         threads: 1}
+      - {node: i5-7400,      threads: 4}
+      - {node: i5-8500,      threads: 1}
+      - {node: ryzen5-7400f, threads: 1}
 
   kernel_dtsmqr:
     label: dtsmqr カーネル単体の nb×ib スイープ
+    sizes: [4096]
+    nb: [4, 350]
+    trials: 5
     grid:
       nb_step: 2
       ib_min: 2
       ib_step: 2
       ib_cap: nb_minus_step
     targets:
-      - node: corei5-13400F
-        threads: [4, 8, 16]
-        size: 4096
-        nb: [4, 350]
-        trials: 5
+      - {node: corei5-13400F, threads: [4, 8, 16]}
 
-# trials の既定値。targets で個別に上書きできる。
+# targets で個別に上書きできる既定値。
 #
-# 5 にしてあるのは、128スレッド系で 95% 性能帯が単点に潰れる
-# （＝ピークがノイズの棘）事象が出ているため。同一条件を反復して
-# 平均を取らない限り、nb_opt を研究の主張には使えない。
+# trials を 5 にしてあるのは、反復なしだと 95% 性能帯が単点に潰れる条件が
+# 出るため。ピークが「なだらかな山の頂上」ではなく「ノイズの中で偶然突き出した棘」
+# になっている状態で、その nb_opt は研究の主張に使えない。
 defaults:
   trials: 5

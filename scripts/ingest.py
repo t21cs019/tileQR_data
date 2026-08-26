@@ -150,7 +150,9 @@ def condition_stats(df: pd.DataFrame, keys: list[str], grid: dict) -> list[dict]
         missing_nb = sorted(set(full_nbs) - set(nbs))
 
         pts = int(sub[["nb", "ib"]].drop_duplicates().shape[0])
-        expected = plan.expected_points(full_nbs, grid) if grid else 0
+        # 格子の刻みは size で変わるので、size ごとに解決してから数える。
+        size_grid = plan.grid_for_size(int(dict(zip(keys, kv))["size"]), grid)
+        expected = plan.expected_points(full_nbs, size_grid) if size_grid else 0
 
         ibs = sorted(int(x) for x in sub["ib"].unique())
         rows.append(
@@ -175,12 +177,31 @@ def condition_stats(df: pd.DataFrame, keys: list[str], grid: dict) -> list[dict]
     return rows
 
 
+# 表示の粒度。node は入れない。
+#
+# AOBA はバッチ計算機でジョブごとにノードが変わるので、node で割ると
+# 同じ条件が5行に散る。読み手が知りたいのは「その条件が何本取れているか」で、
+# それはノードをまたいだ本数の合計。ノードの個体差は
+# 「反復と最適 nb のばらつき」の節が受け持つ。
+COND_KEYS = {
+    "qr_sweep": ["config", "threads", "size"],
+    "ssrfb": ["node", "threads", "size"],
+    "kernel_dtsmqr": ["node", "threads", "size"],
+}
+
+
+def _machine_col(kind: str) -> str:
+    return "config" if kind == "qr_sweep" else "node"
+
+
+def _cond_key(kind: str, d: dict) -> tuple:
+    """計画 target と実測 stats の双方から同じ形の鍵を作る。"""
+    return (d.get(_machine_col(kind)), d["threads"], d["size"])
+
+
 def _plan_index(kind: str) -> dict[tuple, dict]:
-    """計画を (node, threads, size) で引けるようにする。"""
-    out = {}
-    for t in plan.targets_for(kind):
-        out[(t.get("config"), t["node"], t["threads"], t["size"])] = t
-    return out
+    """計画を (config|node, threads, size) で引けるようにする。"""
+    return {_cond_key(kind, t): t for t in plan.targets_for(kind)}
 
 
 def _status(measured: dict | None, target: dict | None) -> tuple[str, str, str]:
@@ -194,8 +215,7 @@ def _status(measured: dict | None, target: dict | None) -> tuple[str, str, str]:
 
     if target:
         trials_txt = f"{measured['trials']}/{target['trials']}"
-        nbs = plan.nb_values(target["nb_lo"], target["nb_hi"], target["grid"]["nb_step"])
-        want = plan.expected_points(nbs, target["grid"])
+        want = plan.expected_for(target)
         got = min(measured["points"], want)
         ok_plan = measured["points"] >= want
         plan_txt = f"{100 * got / want:.0f}%" if want else "—"
@@ -218,26 +238,88 @@ def _table_header(cols: list[str]) -> list[str]:
     return ["| " + " | ".join(cols) + " |", "|" + "---|" * len(cols)]
 
 
+def progress_section(stats_by_kind: dict[str, list[dict]]) -> tuple[list[str], str]:
+    """
+    計画に対してどこまで終わっているかを 機材 × size の一覧にする。
+
+    条件別の表は細かすぎて全体像が掴めないので、まずこれを見る。
+    セルは「取れている反復数 / 計画の反復数」。
+    """
+    lines: list[str] = []
+    done_all = plan_all = 0
+
+    for kind, stats in stats_by_kind.items():
+        idx = _plan_index(kind)
+        if not idx:
+            continue
+
+        by_key = {_cond_key(kind, r): r for r in stats}
+        sizes = sorted({t["size"] for t in idx.values()})
+        machines: dict[tuple, list] = {}
+        for t in idx.values():
+            machines.setdefault((t[_machine_col(kind)], t["threads"]), [])
+
+        label = _machine_col(kind)
+        lines += ["", f"### {kind}", ""]
+        lines += _table_header([label, "t", *[str(s) for s in sizes], "達成"])
+
+        for (machine, threads) in sorted(machines, key=lambda k: str(k[0])):
+            cells = []
+            done_row = 0
+            for size in sizes:
+                key = (machine, threads, size)
+                target = idx.get(key)
+                if target is None:
+                    cells.append("·")
+                    continue
+                plan_all += 1
+                got = by_key.get(key)
+                if got is None:
+                    cells.append("—")
+                    continue
+                want = plan.expected_for(target)
+                enough_nb = got["points"] >= want
+                enough_trials = got["trials"] >= target["trials"]
+                cell = f"{got['trials']}/{target['trials']}"
+                if enough_trials and enough_nb:
+                    done_row += 1
+                    done_all += 1
+                elif enough_trials and not enough_nb:
+                    cell += " !"          # 反復は足りているが nb が計画に届かない
+                cells.append(cell)
+            n_planned = sum(1 for s in sizes if (machine, threads, s) in idx)
+            lines.append(
+                f"| `{machine}` | {threads} | " + " | ".join(cells)
+                + f" | {done_row}/{n_planned} |"
+            )
+
+    summary = f"{done_all} / {plan_all}"
+    lines += [
+        "",
+        f"完了 **{summary}** 条件。"
+        "セルは「取れている反復数 / 計画の反復数」。"
+        "`—` は未計測、`·` は計画に無い、"
+        "`!` は反復は足りているが nb が計画の範囲に届いていない。",
+    ]
+    return lines, summary
+
+
 def sweep_section(stats: list[dict], kind: str) -> list[str]:
     idx = _plan_index(kind)
-    has_config = "config" in stats[0] if stats else False
+    label = _machine_col(kind)
 
-    cols = (["config"] if has_config else []) + [
-        "node", "t", "size", "nb 走査", "step", "n_nb", "ib",
-        "計測点", "格子", "計画", "trials", "status", "計測日",
-    ]
+    cols = [label, "t", "size", "nb 走査", "step", "n_nb", "ib",
+            "計測点", "格子", "計画", "trials", "status", "計測日"]
     lines = _table_header(cols)
 
     seen = set()
-    for r in sorted(stats, key=lambda r: (r.get("config") or "", r["node"],
-                                          r["threads"], r["size"])):
-        key = (r.get("config"), r["node"], r["threads"], r["size"])
+    for r in sorted(stats, key=lambda r: (str(r.get(label)), r["threads"], r["size"])):
+        key = _cond_key(kind, r)
         seen.add(key)
         status, plan_txt, trials_txt = _status(r, idx.get(key))
-        cfg = f"`{r['config']}` | " if has_config else ""
         hole = f" (欠測 {len(r['missing_nb'])})" if r["missing_nb"] else ""
         lines.append(
-            f"| {cfg}{r['node']} | {r['threads']} | {r['size']} | "
+            f"| `{r[label]}` | {r['threads']} | {r['size']} | "
             f"{r['nb_lo']}-{r['nb_hi']} | {r['nb_step']} | {r['n_nb']}{hole} | "
             f"{r['ib_lo']}-{r['ib_hi']}/{r['ib_step']} | {r['points']:,} | "
             f"{_pct(r['fill'])} | {plan_txt} | {trials_txt} | {status} | {r['dates']} |"
@@ -247,103 +329,106 @@ def sweep_section(stats: list[dict], kind: str) -> list[str]:
     for key, t in sorted(idx.items(), key=lambda kv: tuple(str(x) for x in kv[0])):
         if key in seen:
             continue
-        cfg = f"`{t['config']}` | " if has_config else ""
         lines.append(
-            f"| {cfg}{t['node']} | {t['threads']} | {t['size']} | "
-            f"{t['nb_lo']}-{t['nb_hi']} | {t['grid']['nb_step']} | — | — | 0 | "
+            f"| `{t[label]}` | {t['threads']} | {t['size']} | "
+            f"{t['nb_lo']}-{t['nb_hi']} | {t['nb_step']} | — | — | 0 | "
             f"0% | 0% | 0/{t['trials']} | **missing** | — |"
         )
 
     return lines
 
 
-def reproducibility_section(optima: pd.DataFrame, stats: list[dict]) -> list[str]:
+def reproducibility_section(optima: pd.DataFrame) -> list[str]:
     """
-    最適 nb がノード間でどれだけ散るか。
+    最適 nb がどれだけ散るか。
 
-    同一ハード・同一条件での散らばりなので、これが大きいまま nb_opt を
-    「最適タイルサイズ」と呼ぶと、再現性のない値を主張することになる。
+    AOBA は同一構成でも物理ノードが複数あるので、その間の散らばりが出る。
+    これが大きいまま nb_opt を「最適タイルサイズ」と呼ぶと、
+    再現性のない値を主張することになる。ノード名を出す唯一の節。
     """
-    trials_of = {
-        (r.get("config"), r["node"], r["threads"], r["size"]): r["trials"]
-        for r in stats
-    }
-
     lines = _table_header(
-        ["config", "t", "size", "ノード数", "trials(最小)", "nb_opt", "幅", "変動係数"]
+        ["config", "t", "size", "独立測定", "nb_opt", "幅", "変動係数"]
     )
+    single = 0
     for (config, threads, size), sub in optima.groupby(
         ["config", "threads", "size"], observed=True
     ):
         vals = sorted(int(v) for v in sub["nb_opt"])
+        # 独立測定が1つだと散らばりようがない。行にしても情報が無いので数だけ数える。
+        if len(vals) < 2:
+            single += 1
+            continue
         mean = sum(vals) / len(vals)
-        if len(vals) > 1:
-            var = sum((v - mean) ** 2 for v in vals) / (len(vals) - 1)
-            cv = f"{100 * (var ** 0.5) / mean:.1f}%"
-        else:
-            cv = "—"
-        tmin = min(
-            (trials_of.get((config, n, threads, size), 0) for n in sub["node"]),
-            default=0,
-        )
+        var = sum((v - mean) ** 2 for v in vals) / (len(vals) - 1)
+        shown = ", ".join(str(v) for v in vals[:8]) + ("…" if len(vals) > 8 else "")
         lines.append(
-            f"| `{config}` | {threads} | {size} | {len(vals)} | {tmin} | "
-            f"{', '.join(str(v) for v in vals)} | {max(vals) - min(vals)} | {cv} |"
+            f"| `{config}` | {threads} | {size} | {len(vals)} | "
+            f"{shown} | {max(vals) - min(vals)} | "
+            f"{100 * (var ** 0.5) / mean:.1f}% |"
         )
+
+    lines += [
+        "",
+        f"独立測定が1つしかない条件が {single} 件（1台構成の機材はここに入る）。"
+        "その条件の nb_opt には、ハード個体差の裏付けが無い。",
+    ]
     return lines
+
+
+def _verdict(r) -> tuple[str, bool]:
+    """1つの測定に対する 95% 帯の判定。"""
+    n = int(r["nb_in_band"])
+    at_edge = r["nb_lo95"] == r["nb_scanned_lo"] or r["nb_hi95"] == r["nb_scanned_hi"]
+    ratio = r["noise_ratio"]
+    if n <= 1:
+        return "退化（単点）", True
+    if at_edge:
+        return "走査端で切断", False
+    if pd.notna(ratio) and ratio >= 1.0:
+        # 反復間のばらつきが帯の幅と同程度。帯の狭さを主張の根拠にできない。
+        return "ノイズが帯と同程度", False
+    return "ok", False
 
 
 def band_section(optima: pd.DataFrame) -> tuple[list[str], int]:
-    """95% 性能帯が単点に潰れている条件を挙げる。"""
+    """95% 性能帯の健全性。条件ごとにまとめ、問題のある測定数を数える。"""
     lines = _table_header(
-        ["config", "node", "t", "size", "nb_opt", "95%帯", "帯内の点",
+        ["config", "t", "size", "nb_opt", "95%帯(代表)", "帯内の点",
          "trials", "ノイズ/帯", "判定"]
     )
     degenerate = 0
-    for _, r in optima.iterrows():
-        n = int(r["nb_in_band"])
-        at_edge = (
-            r["nb_lo95"] == r["nb_scanned_lo"] or r["nb_hi95"] == r["nb_scanned_hi"]
-        )
-        ratio = r["noise_ratio"]
-        if n <= 1:
-            verdict, degenerate = "**退化（単点）**", degenerate + 1
-        elif at_edge:
-            verdict = "走査端で切断"
-        elif pd.notna(ratio) and ratio >= 1.0:
-            # 反復間のばらつきが帯の幅と同程度。帯の狭さを主張の根拠にできない。
-            verdict = "**ノイズが帯と同程度**"
+
+    for (config, threads, size), sub in optima.groupby(
+        ["config", "threads", "size"], observed=True
+    ):
+        verdicts = [_verdict(r) for _, r in sub.iterrows()]
+        n_bad = sum(1 for _, bad in verdicts if bad)
+        degenerate += n_bad
+
+        # 代表は帯が最も狭い測定。問題があるならそれが見えるべき。
+        worst = sub.loc[sub["nb_in_band"].idxmin()]
+        others = {v for v, _ in verdicts if v != "ok"}
+
+        if n_bad:
+            verdict = f"**退化 {n_bad}/{len(sub)}**"
+        elif others:
+            verdict = "・".join(sorted(others))
         else:
             verdict = "ok"
-        rt = "—" if int(r["trials"]) < 2 else f"{ratio:.2f}"
+
+        nb_opts = sorted(int(v) for v in sub["nb_opt"])
+        nb_txt = (
+            str(nb_opts[0]) if len(set(nb_opts)) == 1
+            else f"{nb_opts[0]}-{nb_opts[-1]}"
+        )
+        ratio = worst["noise_ratio"]
+        rt = "—" if int(worst["trials"]) < 2 else f"{ratio:.2f}"
         lines.append(
-            f"| `{r['config']}` | {r['node']} | {r['threads']} | {r['size']} | "
-            f"{r['nb_opt']} | {r['nb_lo95']}-{r['nb_hi95']} | {n} | "
-            f"{int(r['trials'])} | {rt} | {verdict} |"
+            f"| `{config}` | {threads} | {size} | {nb_txt} | "
+            f"{worst['nb_lo95']}-{worst['nb_hi95']} | {int(worst['nb_in_band'])} | "
+            f"{int(worst['trials'])} | {rt} | {verdict} |"
         )
     return lines, degenerate
-
-
-def node_section(optima: pd.DataFrame, kind: str) -> list[str]:
-    idx = _plan_index(kind)
-    planned: dict[tuple, set] = defaultdict(set)
-    for (config, node, threads, size), t in idx.items():
-        planned[(config, threads, size)].add(node)
-
-    measured: dict[tuple, set] = defaultdict(set)
-    for _, r in optima.iterrows():
-        measured[(r["config"], r["threads"], r["size"])].add(r["node"])
-
-    lines = _table_header(["config", "t", "size", "計測済", "未計測"])
-    for key in sorted(set(planned) | set(measured), key=lambda k: tuple(map(str, k))):
-        config, threads, size = key
-        got = sorted(measured.get(key, set()))
-        missing = sorted(planned.get(key, set()) - set(got))
-        lines.append(
-            f"| `{config}` | {threads} | {size} | {len(got)}: {', '.join(got) or '—'} "
-            f"| {', '.join(missing) if missing else 'なし'} |"
-        )
-    return lines
 
 
 def machines_section(
@@ -395,19 +480,25 @@ def write_coverage(
     kernel_grid = plan.grid_of("kernel_dtsmqr") or {}
     ssrfb_grid = plan.grid_of("ssrfb") or {}
 
-    sweep_stats = condition_stats(sweeps, GROUP_KEYS, sweep_grid)
+    sweep_stats = condition_stats(sweeps, COND_KEYS["qr_sweep"], sweep_grid)
     kernel_stats = (
-        condition_stats(kernel, ["node", "threads", "size"], kernel_grid)
+        condition_stats(kernel, COND_KEYS["kernel_dtsmqr"], kernel_grid)
         if kernel is not None and not kernel.empty
         else []
     )
     ssrfb_stats = (
-        condition_stats(ssrfb, ["node", "threads", "size"], ssrfb_grid)
+        condition_stats(ssrfb, COND_KEYS["ssrfb"], ssrfb_grid)
         if ssrfb is not None and not ssrfb.empty
         else []
     )
 
+    stats_by_kind = {
+        "qr_sweep": sweep_stats,
+        "ssrfb": ssrfb_stats,
+        "kernel_dtsmqr": kernel_stats,
+    }
     band_lines, n_degenerate = band_section(optima)
+    progress_lines, progress = progress_section(stats_by_kind)
     all_stats = sweep_stats + kernel_stats + ssrfb_stats
 
     n_files = int(sweeps["source_file"].nunique())
@@ -416,11 +507,10 @@ def write_coverage(
             n_files += int(extra["source_file"].nunique())
 
     under_trials = 0
-    for kind, stats in (("qr_sweep", sweep_stats), ("kernel_dtsmqr", kernel_stats),
-                        ("ssrfb", ssrfb_stats)):
+    for kind, stats in stats_by_kind.items():
         idx = _plan_index(kind)
         for r in stats:
-            t = idx.get((r.get("config"), r["node"], r["threads"], r["size"]))
+            t = idx.get(_cond_key(kind, r))
             if t and r["trials"] < t["trials"]:
                 under_trials += 1
     with_holes = sum(1 for r in all_stats if r["missing_nb"])
@@ -431,15 +521,25 @@ def write_coverage(
         "`scripts/ingest.py` が自動生成する。手で編集しない。",
         "計画は `plan.yaml`、機材は `machines.yaml` を参照。",
         "",
+        "## 計画の進捗",
+        "",
+        "どの CPU でも size 1024/2048/4096/8192/16384 の5種、nb 32-512 を測る計画。",
+        "nb の刻みは size 4096 までが 4、それ以上が 8。反復は各 5 回。",
+    ]
+    lines += progress_lines
+
+    lines += [
+        "",
         "## サマリ",
         "",
         "| 指標 | 値 |",
         "|---|---|",
+        f"| 計画に対する完了 | {progress} 条件 |",
         f"| 計測ファイル | {n_files} |",
-        f"| 条件 (種別×config×node×threads×size) | {len(all_stats)} |",
+        f"| 計測済みの条件 (種別×機材×threads×size) | {len(all_stats)} |",
         f"| 計測点 (nb×ib) | {sum(r['points'] for r in all_stats):,} |",
         f"| **反復が計画に届かない条件** | {under_trials} / {len(all_stats)} |",
-        f"| **95%帯が単点に潰れた条件** | {n_degenerate} |",
+        f"| **95%帯が単点に潰れた測定** | {n_degenerate} |",
         f"| 格子に穴がある条件 | {with_holes} |",
         "",
         f"## qr_sweep — {plan.label_of('qr_sweep')}",
@@ -452,27 +552,24 @@ def write_coverage(
 
     lines += [
         "",
-        "### 反復と最適 nb のばらつき",
+        "### 最適 nb のばらつき",
         "",
-        "同一ハード・同一条件でのノード間の散らばり。trials=1 は",
-        "「1回の計測で最適 nb を主張している」状態を意味する。",
+        "AOBA は同一構成でも物理ノードが複数あるので、その個体差がここに出る。",
+        "1測定しかない条件は「1回の計測で最適 nb を主張している」状態を意味する。",
         "",
     ]
-    lines += reproducibility_section(optima, sweep_stats)
+    lines += reproducibility_section(optima)
 
     lines += [
         "",
         "### 95% 性能帯の健全性",
         "",
-        "帯内の点が1つしかない条件は、ピークが「なだらかな山の頂上」ではなく",
+        "帯内の点が1つしかない測定は、ピークが「なだらかな山の頂上」ではなく",
         "「ノイズの中で偶然突き出した棘」である疑いが強い。反復して平均を取るまで",
-        "その `nb_opt` は主張に使えない。",
+        "その `nb_opt` は主張に使えない。代表は帯が最も狭い測定を出している。",
         "",
     ]
     lines += band_lines
-
-    lines += ["", "### ノード網羅", ""]
-    lines += node_section(optima, "qr_sweep")
 
     if ssrfb_stats:
         lines += [

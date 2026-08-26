@@ -37,6 +37,37 @@ def nb_values(lo: int, hi: int, step: int) -> list[int]:
     return list(range(int(lo), int(hi) + 1, int(step)))
 
 
+def nb_step_for(size: int, grid: dict) -> int:
+    """
+    その行列サイズでの nb の刻み。
+
+    大きい行列は1点あたりの計測時間が延びるので、同じ密度で走らせると
+    終わらない。size ごとに刻みを変える計画になっている。
+    """
+    by_size = grid.get("nb_step_by_size")
+    if by_size:
+        if int(size) in by_size:
+            return int(by_size[int(size)])
+        # 表に無い size は、一番大きい既知サイズの刻みに倣う
+        return int(by_size[max(by_size)])
+    return int(grid.get("nb_step", 1))
+
+
+def grid_for_size(size: int, grid: dict) -> dict:
+    """
+    その行列サイズでの実効的な格子。
+
+    刻みを粗くするとき、nb だけでなく ib も一緒に粗くなる
+    （size 8192 は nb も ib も 8 刻み）。ib_step を固定にすると
+    大きい size で期待点数が倍近く過大になる。
+    """
+    g = dict(grid)
+    g["nb_step"] = nb_step_for(size, grid)
+    if grid.get("ib_step_follows_nb_step"):
+        g["ib_step"] = g["nb_step"]
+    return g
+
+
 def ib_count(nb: int, grid: dict) -> int:
     """ある nb に対して走査するはずの ib の個数。"""
     ib_min = int(grid["ib_min"])
@@ -60,7 +91,9 @@ def targets_for(kind: str, plan: dict | None = None) -> list[dict]:
     """
     ある測定種別の計画を、(config|node, threads, size) 単位に展開して返す。
 
-    plan.yaml では threads や nodes をリストで書けるので、ここで平坦化する。
+    plan.yaml は「どの CPU でも同じ size 一式」という書き方をするので、
+    種別ごとの sizes / nb / trials を各 target に配り、threads のリストと
+    掛け合わせて平坦化する。
     """
     plan = plan if plan is not None else load()
     spec = (plan.get("kinds") or {}).get(kind)
@@ -75,24 +108,34 @@ def targets_for(kind: str, plan: dict | None = None) -> list[dict]:
         threads_list = t["threads"]
         if not isinstance(threads_list, list):
             threads_list = [threads_list]
-        nodes = t.get("nodes") or ([t["node"]] if "node" in t else [None])
+
+        sizes = t.get("sizes", spec.get("sizes")) or [t["size"]]
+        nb = t.get("nb", spec.get("nb"))
+        trials = int(t.get("trials", spec.get("trials", default_trials)))
 
         for threads in threads_list:
-            for node in nodes:
+            for size in sizes:
                 out.append(
                     {
                         "kind": kind,
                         "config": t.get("config"),
-                        "node": node,
+                        "node": t.get("node"),
                         "threads": int(threads),
-                        "size": int(t["size"]),
-                        "nb_lo": int(t["nb"][0]),
-                        "nb_hi": int(t["nb"][1]),
-                        "trials": int(t.get("trials", default_trials)),
-                        "grid": grid,
+                        "size": int(size),
+                        "nb_lo": int(nb[0]),
+                        "nb_hi": int(nb[1]),
+                        "nb_step": nb_step_for(size, grid),
+                        "trials": trials,
+                        "grid": grid_for_size(size, grid),
                     }
                 )
     return out
+
+
+def expected_for(target: dict) -> int:
+    """計画1条件ぶんの計測点数。"""
+    nbs = nb_values(target["nb_lo"], target["nb_hi"], target["nb_step"])
+    return expected_points(nbs, target["grid"])
 
 
 def grid_of(kind: str, plan: dict | None = None) -> dict | None:
