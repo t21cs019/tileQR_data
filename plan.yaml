@@ -75,6 +75,7 @@ kinds:
       - {node: epyc,         threads: 1}
       - {node: i5-7400,      threads: 4}
       - {node: i5-8500,      threads: 1}
+      - {node: i7-7700,      threads: 1}
       - {node: ryzen5-7400f, threads: 1}
 
   kernel_dtsmqr:
