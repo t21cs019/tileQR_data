@@ -69,7 +69,8 @@ SRC_RE = re.compile(
 CONFIG_RULES = {
     # AOBA-B は 64 スレッドなら片ソケット固定、128 なら両ソケット
     "aoba": lambda th: f"aoba-b_s{2 if th > 64 else 1}_smt-off",
-    "calc": lambda th: "calc_s2_smt-off",           # Xeon Silver 4214 x2, HT off
+    # Xeon Silver 4214, HT off。物理12コア/ソケットなので th<=12 は片ソケット固定。
+    "calc": lambda th: f"calc_s{2 if th > 12 else 1}_smt-off",
     "epyc": lambda th: "epyc_s1_smt-on",            # EPYC 7543, threads_per_core=2
     "i3-7100": lambda th: "i3-7100_s1_smt-on",
     "i3-8100": lambda th: "i3-8100_s1_smt-off",

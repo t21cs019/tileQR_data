@@ -327,6 +327,15 @@ configs:
     numactl: null
     note: threads=24（2ソケット全24コア）。
 
+  calc_s1_smt-off:
+    arch: xeon-silver-4214
+    sockets_used: 1
+    smt: off
+    memory_channels: unknown    # 要確認
+    turbo: unknown
+    numactl: "--cpunodebind=0 --membind=0"
+    note: 片ソケットにピン留め。threads=12（1ソケット全12コア）の系列。
+
   epyc_s1_smt-on:
     arch: epyc-7543
     sockets_used: 1

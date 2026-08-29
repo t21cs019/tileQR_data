@@ -46,6 +46,7 @@ kinds:
       - {config: aoba-b_s2_smt-off,      threads: 128}
       - {config: aoba-b_s1_smt-off,      threads: 64}
       - {config: calc_s2_smt-off,        threads: 24}
+      - {config: calc_s1_smt-off,        threads: 12}
       - {config: epyc_s1_smt-on,         threads: 32}
       - {config: i3-7100_s1_smt-on,      threads: 4}
       - {config: i3-8100_s1_smt-off,     threads: 4}
@@ -66,6 +67,7 @@ kinds:
       ib_step: 4
       ib_cap: half_nb
     targets:
+      - {node: calc,         threads: 1}
       - {node: epyc,         threads: 1}
       - {node: i5-7400,      threads: 4}
       - {node: i5-8500,      threads: 1}
