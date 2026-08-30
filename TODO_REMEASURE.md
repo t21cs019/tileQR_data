@@ -27,7 +27,7 @@
 （Time_sec/GFlopsとも算術平均、5.85 GFlops）で置き換え、
 `raw/ssrfb/ryzen/ryzen_size1024_t1_nb32-512_20260830-081745.csv` に反映済み。
 
-## qr_sweep: nb 404-512 の反復不足（zen3-ryzen7-5800x_s1_smt-on / ryzen）
+## qr_sweep: nb 404-512 の反復不足（ryzen7-5800x_s1_smt-on / ryzen）
 
 学部時代のデータを成形して取り込んだもの。nb=32-400 は元データが
 5トライアル分あったが、404-512 まで走査していたのは1トライアルのみ

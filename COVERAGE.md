@@ -23,7 +23,7 @@ nb の刻みは size 4096 までが 4、それ以上が 8。反復は各 5 回�
 | `i5-8500_s1_smt-off` | 6 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 |
 | `i7-7700_s1_smt-on` | 8 | 5/5 | 5/5 | 5/5 | 5/5 | — | 4/5 |
 | `ryzen5-7400f_s1_smt-on` | 12 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 |
-| `zen3-ryzen7-5800x_s1_smt-on` | 16 | · | 5/5 ! | 5/5 | · | · | 1/2 |
+| `ryzen7-5800x_s1_smt-on` | 16 | · | 5/5 ! | 5/5 | · | · | 1/2 |
 
 ### ssrfb
 
@@ -111,8 +111,8 @@ nb の刻みは size 4096 までが 4、それ以上が 8。反復は各 5 回�
 | `ryzen5-7400f_s1_smt-on` | 12 | 4096 | 32-512 | 4 | 121 | 8-256/4 | 3,963 | 100% | 100% | 5/5 | done | 2026-06-24 |
 | `ryzen5-7400f_s1_smt-on` | 12 | 8192 | 32-512 | 8 | 61 | 8-256/8 | 1,022 | 100% | 100% | 5/5 | done | 2026-07-28 |
 | `ryzen5-7400f_s1_smt-on` | 12 | 16384 | 32-512 | 8 | 61 | 8-256/8 | 1,022 | 100% | 100% | 5/5 | done | 2026-08-02 |
-| `zen3-ryzen7-5800x_s1_smt-on` | 16 | 2048 | 32-400 | 4 | 93 | 8-200/4 | 2,395 | 100% | 60% | 5/5 | partial | 不明 |
-| `zen3-ryzen7-5800x_s1_smt-on` | 16 | 4096 | 32-512 | 4 | 121 | 8-256/4 | 3,963 | 100% | 100% | 5/5 | done | 不明 |
+| `ryzen7-5800x_s1_smt-on` | 16 | 2048 | 32-400 | 4 | 93 | 8-200/4 | 2,395 | 100% | 60% | 5/5 | partial | 不明 |
+| `ryzen7-5800x_s1_smt-on` | 16 | 4096 | 32-512 | 4 | 121 | 8-256/4 | 3,963 | 100% | 100% | 5/5 | done | 不明 |
 | `aoba-b_s1_smt-off` | 64 | 1024 | 32-512 | 4 | — | — | 0 | 0% | 0% | 0/5 | **missing** | — |
 | `aoba-b_s2_smt-off` | 128 | 1024 | 32-512 | 4 | — | — | 0 | 0% | 0% | 0/5 | **missing** | — |
 | `aoba-b_s2_smt-off` | 128 | 16384 | 32-512 | 8 | — | — | 0 | 0% | 0% | 0/5 | **missing** | — |
@@ -193,8 +193,8 @@ AOBA は同一構成でも物理ノードが複数あるので、その個体差
 | `ryzen5-7400f_s1_smt-on` | 12 | 4096 | 336 | 176-404 | 58 | 5 | 0.04 | ok |
 | `ryzen5-7400f_s1_smt-on` | 12 | 8192 | 376 | 240-504 | 34 | 5 | 0.03 | ok |
 | `ryzen5-7400f_s1_smt-on` | 12 | 16384 | 384 | 264-504 | 31 | 5 | 0.01 | ok |
-| `zen3-ryzen7-5800x_s1_smt-on` | 16 | 2048 | 144 | 144-144 | 1 | 5 | 0.64 | **退化 1/1** |
-| `zen3-ryzen7-5800x_s1_smt-on` | 16 | 4096 | 276 | 276-280 | 2 | 5 | 0.13 | ok |
+| `ryzen7-5800x_s1_smt-on` | 16 | 2048 | 144 | 144-144 | 1 | 5 | 0.64 | **退化 1/1** |
+| `ryzen7-5800x_s1_smt-on` | 16 | 4096 | 276 | 276-280 | 2 | 5 | 0.13 | ok |
 
 ## ssrfb — ssrfb カーネル単体の nb×ib スイープ
 
@@ -251,4 +251,4 @@ qr_sweep とは ib の上限規則が違う（`ib <= nb - step`）。
 
 - 定義済みだが未計測のノード (10): `i3-10100`, `i3-6100`, `i3-9100`, `i5-7500`, `par008`, `par029`, `par030`, `par035`, `par045`, `xeon-e3-1220v3`
 - 計測されたが machines.yaml に無いノード (0): なし
-- 交絡要因が未確認の構成 (12): `aoba-b_s2_smt-off` (turbo), `aoba-b_s1_smt-off` (turbo), `calc_s2_smt-off` (turbo, memory_channels), `calc_s1_smt-off` (turbo, memory_channels), `epyc_s1_smt-on` (turbo, memory_channels), `i3-7100_s1_smt-on` (turbo, memory_channels), `i3-8100_s1_smt-off` (turbo, memory_channels), `i5-7400_s1_smt-off` (turbo, memory_channels), `i5-8500_s1_smt-off` (turbo, memory_channels), `i7-7700_s1_smt-on` (turbo, memory_channels), `ryzen5-7400f_s1_smt-on` (turbo, memory_channels), `zen3-ryzen7-5800x_s1_smt-on` (turbo, memory_channels)
+- 交絡要因が未確認の構成 (12): `aoba-b_s2_smt-off` (turbo), `aoba-b_s1_smt-off` (turbo), `calc_s2_smt-off` (turbo, memory_channels), `calc_s1_smt-off` (turbo, memory_channels), `epyc_s1_smt-on` (turbo, memory_channels), `i3-7100_s1_smt-on` (turbo, memory_channels), `i3-8100_s1_smt-off` (turbo, memory_channels), `i5-7400_s1_smt-off` (turbo, memory_channels), `i5-8500_s1_smt-off` (turbo, memory_channels), `i7-7700_s1_smt-on` (turbo, memory_channels), `ryzen5-7400f_s1_smt-on` (turbo, memory_channels), `ryzen7-5800x_s1_smt-on` (turbo, memory_channels)

@@ -420,7 +420,7 @@ configs:
     numactl: null
     note: threads=12（6コア x SMT）。
 
-  zen3-ryzen7-5800x_s1_smt-on:
+  ryzen7-5800x_s1_smt-on:
     arch: zen3-ryzen7-5800x
     sockets_used: 1
     smt: on
