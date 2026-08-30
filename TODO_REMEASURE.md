@@ -12,10 +12,20 @@
 | node | size | 元ファイル | 症状 |
 |---|---|---|---|
 | `dogwood` (i7-6900K) | 4096 | `raw_data/benchmark_i7-6900k/dogwood_ssrfb_size4096_nb32-512_th1_t1_20260803_080415.csv` | nb=32,ib=8 が 0.057 GFlops（他は9.8以上） |
-| `ryzen` (Ryzen 7 5800X) | 1024 | `raw_data/benchmark_ryzen/ryzen_ssrfb_size1024_nb32-512_th1_t1_20260830_081745.csv` | nb=32,ib=8 が 0.76 GFlops（他は7〜9） |
-| `i7-7700` | 1024 | `raw_data/i7_7700/i7-7700_ssrfb_size1024_nb32-512_th1_t1_20260830_065953.csv` | nb=32,ib=8 が 0.15 GFlops（他は11以上） |
 
 格子自体は完全（欠損・重複なし）で、この1点を除けば異常なし。
+
+解消済み: `i7-7700` size1024 は該当点のみ手動で5回再計測した
+（`raw_data/i7_7700/i7-7700_manual_ssrfb_nb32_ib8.csv`、10.1〜10.7 GFlops で安定）。
+平均値（Time_sec/GFlopsとも算術平均）で置き換え、
+`raw/ssrfb/i7-7700/i7-7700_size1024_t1_nb32-512_20260830-065953.csv` に反映済み。
+
+解消済み: `ryzen` size1024 は該当点のみ手動で10回再計測した
+（`raw_data/benchmark_ryzen/ryzen_manual_ssrfb_nb32_ib8.csv`）。**この再計測でも
+1回目の呼び出しだけ Time_sec が約10倍に跳ねており（0.52 GFlops、他9回は5.5〜6.2）**、
+同じコールドスタート性ノイズの再現と判断して1回目を除外。残り9回の平均
+（Time_sec/GFlopsとも算術平均、5.85 GFlops）で置き換え、
+`raw/ssrfb/ryzen/ryzen_size1024_t1_nb32-512_20260830-081745.csv` に反映済み。
 
 ## qr_sweep: nb 404-512 の反復不足（zen3-ryzen7-5800x_s1_smt-on / ryzen）
 
