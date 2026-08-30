@@ -282,6 +282,22 @@ architectures:
     l3_mb_total: 6
     l3_sharing_unit: socket
 
+  broadwell-e-i7-6900k:
+    cpu: Intel Core i7-6900K
+    dashboard_cpu: null        # sources.toml に未登録
+    vendor: intel
+    microarch: broadwell-e
+    sockets_physical: 1
+    physical_cores_total: 8
+    smt_capable: true
+    smt_default: on           # 8コア x SMT = 16 threads
+    numa_nodes_total: 1
+    l1d_kb_per_core: 32
+    l2_kb_per_core: 256
+    l3_mb_total: 20
+    l3_sharing_unit: socket
+    # LGA2011-v3 / X99。メインストリーム機と違いクアッドチャネル DDR4。
+
 
 configs:
   # キー = raw/qr_sweep/ 直下のディレクトリ名
@@ -404,6 +420,18 @@ configs:
     numactl: null
     note: threads=12（6コア x SMT）。
 
+  zen3-ryzen7-5800x_s1_smt-on:
+    arch: zen3-ryzen7-5800x
+    sockets_used: 1
+    smt: on
+    memory_channels: unknown
+    turbo: unknown
+    numactl: null
+    note: >
+      threads=16（8コア x SMT）。学部生時代に計測した旧データ。nb=4/ib=2刻みの
+      フルスキャンから、他機材と同じ nb>=32・ib>=8・4刻みの部分だけを抽出して
+      成形した。size4096 の trial1 のみ nb=512 まで、他は nb=400 止まり。
+
 
 nodes:
   # 物理ノード名 → architecture
@@ -458,3 +486,4 @@ nodes:
   # --- sources.toml に未登録。計測データだけがある / 予備 ---
   corei5-13400F: { arch: raptorlake-i5-13400f, source_key: null }
   i3-10100:      { arch: cometlake-i3-10100,   source_key: null }
+  dogwood:       { arch: broadwell-e-i7-6900k, source_key: null }
