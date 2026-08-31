@@ -127,6 +127,10 @@ def targets_for(kind: str, plan: dict | None = None) -> list[dict]:
                         "nb_step": nb_step_for(size, grid),
                         "trials": trials,
                         "grid": grid_for_size(size, grid),
+                        # 「これ以上データが来ない」条件の理由。None なら通常。
+                        # 計測機材が失われた条件を「未達」として数え続けると、
+                        # その数字が行動につながらなくなる。
+                        "frozen": t.get("frozen"),
                     }
                 )
     return out

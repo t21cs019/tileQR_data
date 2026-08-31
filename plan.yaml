@@ -101,8 +101,19 @@ kinds:
       ib_min: 2
       ib_step: 2
       ib_cap: nb_minus_step
+    # corei5-13400F は友人の PC で、2026-09 以降アクセスできない。
+    # 手元の attic/Full_search/intel_corei5_13400F/ が全ての在庫で、
+    # th=16 は5トライアル揃っているが th=4 / th=8 は1本ずつしか無い。
+    #
+    # frozen を書いた条件は「これ以上データが来ない」の宣言。COVERAGE の
+    # 進捗表に `x` が付き、「反復が計画に届かない条件」の件数から外れる
+    # （行動できないものを数え続けると、その数字を見なくなるため）。
+    # trials を 1 に下げて done 扱いにはしない。反復1本の nb_opt が
+    # 主張に使えないことは変わらず、そこは 95% 帯の節が受け持つ。
     targets:
-      - {node: corei5-13400F, threads: [4, 8, 16]}
+      - {node: corei5-13400F, threads: [16]}
+      - {node: corei5-13400F, threads: [4, 8],
+         frozen: "友人の PC。2026-09 以降アクセスできず、在庫は各1本のみ"}
 
 # targets で個別に上書きできる既定値。
 #

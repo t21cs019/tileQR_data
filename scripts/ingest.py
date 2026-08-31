@@ -293,10 +293,14 @@ def progress_section(
                 if target is None:
                     cells.append("·")
                     continue
-                plan_all += 1
+                frozen = bool(target.get("frozen"))
+                # 凍結条件は「計画に対する完了」の分母から外す。もう埋まらない
+                # ものを分母に残すと、達成率が永遠に 100% にならず指標が死ぬ。
+                if not frozen:
+                    plan_all += 1
                 in_flight = (kind, machine, threads, size) in running
                 running_hits += bool(in_flight)
-                mark = " ▶" if in_flight else ""
+                mark = " ▶" if in_flight else ("  x" if frozen else "")
                 got = by_key.get(key)
                 if got is None:
                     cells.append(f"—{mark}")
@@ -305,13 +309,20 @@ def progress_section(
                 enough_nb = got["points"] >= want
                 enough_trials = got["trials"] >= target["trials"]
                 cell = f"{got['trials']}/{target['trials']}"
+                if frozen:
+                    cells.append(cell + mark)
+                    continue
                 if enough_trials and enough_nb:
                     done_row += 1
                     done_all += 1
                 elif enough_trials and not enough_nb:
                     cell += " !"          # 反復は足りているが nb が計画に届かない
                 cells.append(cell + mark)
-            n_planned = sum(1 for s in sizes if (machine, threads, s) in idx)
+            n_planned = sum(
+                1 for s in sizes
+                if (machine, threads, s) in idx
+                and not idx[(machine, threads, s)].get("frozen")
+            )
             lines.append(
                 f"| `{machine}` | {threads} | " + " | ".join(cells)
                 + f" | {done_row}/{n_planned} |"
@@ -324,9 +335,51 @@ def progress_section(
         "セルは「取れている反復数 / 計画の反復数」。"
         "`—` は未計測、`·` は計画に無い、"
         "`!` は反復は足りているが nb が計画の範囲に届いていない、"
-        "`▶` は計測中（`running.yaml`）。",
+        "`▶` は計測中（`running.yaml`）、"
+        "`x` はこれ以上データが来ない（`plan.yaml` の `frozen`。分母から除く）。",
     ]
     return lines, summary, running_hits
+
+
+def frozen_section() -> list[str]:
+    """
+    もうデータが来ない条件と、その理由。
+
+    進捗表の `x` だけだと「なぜ埋まらないのか」が分からない。計測機材が
+    手を離れた事情は数年後には誰も覚えていないので、理由をここに出す。
+    """
+    rows = []
+    for kind in ("qr_sweep", "ssrfb", "kernel_dtsmqr"):
+        for t in plan.targets_for(kind):
+            if t.get("frozen"):
+                rows.append((kind, t.get("config") or t.get("node"),
+                             t["threads"], t["size"], t["trials"], t["frozen"]))
+    if not rows:
+        return ["これ以上データが来ないと宣言された条件はありません。"]
+
+    lines = _table_header(["kind", "機材", "t", "size", "計画", "理由"])
+    for kind, machine, threads, size, trials, why in sorted(rows, key=lambda r: str(r)):
+        lines.append(
+            f"| {kind} | `{machine}` | {threads} | {size} | {trials} | {why} |"
+        )
+    thin = [r for r in rows if r[4] > 1]
+    lines += [
+        "",
+        "これらは「計画に対する完了」の分母から外してある。埋まらないものを"
+        "分母に残すと達成率が永遠に 100% にならず、指標として見なくなるため。",
+    ]
+    if thin:
+        lines += [
+            "",
+            "**分母から外すのは進捗の話であって、データの信頼性の話ではない。**",
+            "反復が計画に届かない以上、これらの `nb_opt` は「ノイズの中で偶然"
+            "突き出した棘」である可能性を排除できず、研究の主張には使えない。",
+            "",
+            "なお `derived/optima.csv` と「95% 性能帯の健全性」は qr_sweep しか"
+            "見ていないので、kernel_dtsmqr / ssrfb の条件はそちらにも出てこない。"
+            "この節が唯一の警告になる。",
+        ]
+    return lines
 
 
 def running_section(entries: list[dict]) -> list[str]:
@@ -582,7 +635,9 @@ def write_coverage(
         idx = _plan_index(kind)
         for r in stats:
             t = idx.get(_cond_key(kind, r))
-            if t and r["trials"] < t["trials"]:
+            # 凍結条件は数えない。行動できない件数を混ぜると、この数字を
+            # 見ても「次に何を測るか」が決まらなくなる。
+            if t and not t.get("frozen") and r["trials"] < t["trials"]:
                 under_trials += 1
     with_holes = sum(1 for r in all_stats if r["missing_nb"])
 
@@ -608,6 +663,16 @@ def write_coverage(
         "",
     ]
     lines += running_section(running)
+
+    lines += [
+        "",
+        "## これ以上データが来ない条件",
+        "",
+        "`plan.yaml` の `frozen`。計測機材が手を離れたなどの理由で、",
+        "計画に届かないまま確定した条件。",
+        "",
+    ]
+    lines += frozen_section()
 
     lines += [
         "",
