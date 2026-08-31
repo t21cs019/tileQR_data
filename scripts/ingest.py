@@ -28,7 +28,9 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from tileqr_data import io, paths, plan  # noqa: E402
+from tileqr_data import console, io, paths, plan  # noqa: E402
+
+console.use_utf8()
 
 # 性能帯の閾値。ピークの何割以上を「実用上ほぼ最適」とみなすか。
 BAND = 0.95
@@ -238,15 +240,23 @@ def _table_header(cols: list[str]) -> list[str]:
     return ["| " + " | ".join(cols) + " |", "|" + "---|" * len(cols)]
 
 
-def progress_section(stats_by_kind: dict[str, list[dict]]) -> tuple[list[str], str]:
+def progress_section(
+    stats_by_kind: dict[str, list[dict]], running: dict[tuple, dict]
+) -> tuple[list[str], str, int]:
     """
     計画に対してどこまで終わっているかを 機材 × size の一覧にする。
 
     条件別の表は細かすぎて全体像が掴めないので、まずこれを見る。
     セルは「取れている反復数 / 計画の反復数」。
+
+    `running.yaml` に載っている条件には `▶` を付ける。データの有無だけだと
+    「まだ流していない」と「流したがまだ終わっていない」が同じ `—` に見え、
+    数日かかる走査（size16384、AOBA のバッチジョブ）で同じ計測を二重に
+    投入したり、落ちたジョブを放置したりする。
     """
     lines: list[str] = []
     done_all = plan_all = 0
+    running_hits = 0
 
     for kind, stats in stats_by_kind.items():
         idx = _plan_index(kind)
@@ -273,9 +283,12 @@ def progress_section(stats_by_kind: dict[str, list[dict]]) -> tuple[list[str], s
                     cells.append("·")
                     continue
                 plan_all += 1
+                in_flight = (kind, machine, threads, size) in running
+                running_hits += bool(in_flight)
+                mark = " ▶" if in_flight else ""
                 got = by_key.get(key)
                 if got is None:
-                    cells.append("—")
+                    cells.append(f"—{mark}")
                     continue
                 want = plan.expected_for(target)
                 enough_nb = got["points"] >= want
@@ -286,7 +299,7 @@ def progress_section(stats_by_kind: dict[str, list[dict]]) -> tuple[list[str], s
                     done_all += 1
                 elif enough_trials and not enough_nb:
                     cell += " !"          # 反復は足りているが nb が計画に届かない
-                cells.append(cell)
+                cells.append(cell + mark)
             n_planned = sum(1 for s in sizes if (machine, threads, s) in idx)
             lines.append(
                 f"| `{machine}` | {threads} | " + " | ".join(cells)
@@ -299,9 +312,40 @@ def progress_section(stats_by_kind: dict[str, list[dict]]) -> tuple[list[str], s
         f"完了 **{summary}** 条件。"
         "セルは「取れている反復数 / 計画の反復数」。"
         "`—` は未計測、`·` は計画に無い、"
-        "`!` は反復は足りているが nb が計画の範囲に届いていない。",
+        "`!` は反復は足りているが nb が計画の範囲に届いていない、"
+        "`▶` は計測中（`running.yaml`）。",
     ]
-    return lines, summary
+    return lines, summary, running_hits
+
+
+def running_section(entries: list[dict]) -> list[str]:
+    """
+    いま流している計測と、そのとき打ったコマンド。
+
+    「どこまでコマンドを打ったか」を後から思い出すのが目的。進捗表の `▶` は
+    どのセルが計測中かしか言わないので、実際に打った内容はここに出す。
+    """
+    if not entries:
+        return ["計測中の項目はありません（`running.yaml` が空）。"]
+
+    lines = _table_header(["kind", "機材", "t", "size", "開始", "host", "備考"])
+    for e in sorted(entries, key=lambda e: (e["kind"], str(e.get("config") or e.get("node")))):
+        machine = e.get("config") or e.get("node")
+        sizes = ", ".join(str(s) for s in e["sizes"])
+        lines.append(
+            f"| {e['kind']} | `{machine}` | {e['threads']} | {sizes} | "
+            f"{e['since']} | {e.get('host', '—')} | {e.get('note', '')} |"
+        )
+
+    with_cmd = [e for e in entries if e.get("command")]
+    if with_cmd:
+        lines += ["", "打ったコマンド:", ""]
+        for e in with_cmd:
+            machine = e.get("config") or e.get("node")
+            lines += [f"`{machine}` t{e['threads']} ({e['since']}):", "", "```sh"]
+            lines += str(e["command"]).rstrip().splitlines()
+            lines += ["```", ""]
+    return lines
 
 
 def sweep_section(stats: list[dict], kind: str) -> list[str]:
@@ -497,8 +541,11 @@ def write_coverage(
         "ssrfb": ssrfb_stats,
         "kernel_dtsmqr": kernel_stats,
     }
+    running = plan.load_running()
     band_lines, n_degenerate = band_section(optima)
-    progress_lines, progress = progress_section(stats_by_kind)
+    progress_lines, progress, n_running = progress_section(
+        stats_by_kind, plan.running_keys(running)
+    )
     all_stats = sweep_stats + kernel_stats + ssrfb_stats
 
     n_files = int(sweeps["source_file"].nunique())
@@ -530,11 +577,22 @@ def write_coverage(
 
     lines += [
         "",
+        "## 計測中",
+        "",
+        "`running.yaml` に載っているもの。計測コマンドを打ったら足し、",
+        "データが `raw/` に入ったら消す。`make validate` が消し忘れを警告する。",
+        "",
+    ]
+    lines += running_section(running)
+
+    lines += [
+        "",
         "## サマリ",
         "",
         "| 指標 | 値 |",
         "|---|---|",
         f"| 計画に対する完了 | {progress} 条件 |",
+        f"| 計測中の条件 | {n_running} |",
         f"| 計測ファイル | {n_files} |",
         f"| 計測済みの条件 (種別×機材×threads×size) | {len(all_stats)} |",
         f"| 計測点 (nb×ib) | {sum(r['points'] for r in all_stats):,} |",

@@ -2,9 +2,10 @@
 
 all: validate ingest figures
 
-# raw/ を作り直すので all には入れない。新しい計測を回収したときだけ回す。
+# raw/ を作り直すので all には入れない。新しい計測を回収したときと、
+# curation.yaml を書き換えたときに回す。
 assemble:
-	python scripts/assemble.py raw_data --apply --clean-sweep
+	python scripts/assemble.py raw_data --apply --clean
 
 validate:
 	python scripts/validate.py

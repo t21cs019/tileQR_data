@@ -5,9 +5,23 @@ raw_data/（手持ちの生ファイル）を raw/ の規約へ組み直す。
 やること:
   1. 測定種別の判定   Time_sec 列があれば ssrfb、無ければ qr_sweep
   2. トライアルの分割 1ファイルに複数周ぶん入っているものを1周1ファイルに
-  3. セグメントの連結 計測が途中で切れて分かれたものを1本の走査に戻す
-  4. プローブの除外   nb が1点しかない試し撃ちを捨てる
-  5. 命名と配置       {node}_size{N}_t{threads}_nb{lo}-{hi}_{stamp}[_r{k}].csv
+  3. curation の適用  curation.yaml に書いた除外・置換を効かせる
+  4. セグメントの連結 計測が途中で切れて分かれたものを1本の走査に戻す
+  5. プローブの除外   nb が1点しかない試し撃ちを捨てる
+  6. 命名と配置       {node}_size{N}_t{threads}_nb{lo}-{hi}_{stamp}[_r{k}].csv
+
+--- 除外が2種類あるのはなぜか ----------------------------------------
+
+このスクリプトが自前で持つ除外（プローブ、部分集合の周）は**データの形から
+決まる**。同じ入力なら同じ結果になるのでコードに書ける。
+
+対して「サーマルスロットリングで汚染された」「スレッド数が計画と違う」
+「この1点だけ手で測り直した」はデータを見ても分からない。人間の判断が要る。
+それは curation.yaml に宣言的に置き、ここは適用するだけにする。
+
+raw/ を手で消して除外を表現すると、次の `make assemble` で黙って元に戻る。
+raw/ は raw_data/ から再生成できることが前提のディレクトリなので、
+判断もまた再生成の入力側に無ければ保たない。
 
 --- なぜ「等分割」ではなくパターン検出でトライアルを切るか -------------
 
@@ -41,7 +55,6 @@ from __future__ import annotations
 
 import argparse
 import re
-import shutil
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -50,7 +63,9 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from tileqr_data import paths  # noqa: E402
+from tileqr_data import console, curation, paths  # noqa: E402
+
+console.use_utf8()
 
 # raw_data のファイル名。node は _size / _ssrfb の手前まで。
 SRC_RE = re.compile(
@@ -118,10 +133,23 @@ def split_trials(df: pd.DataFrame) -> list[pd.DataFrame]:
     ]
 
 
-def scan(src_dir: Path) -> tuple[list[dict], list[str]]:
-    """raw_data を読み、トライアル単位に展開する。"""
+def scan(
+    src_dir: Path, rules: list[curation.Rule] | None = None
+) -> tuple[list[dict], list[str], list[str]]:
+    """
+    raw_data を読み、トライアル単位に展開する。
+
+    curation.yaml の適用はここで行う。連結（join_segments）より前に効かせるのが
+    要点で、除外したトライアルが「セグメントの1本」として数えられると、
+    連結の組み合わせ本数がずれて別の周まで巻き添えになる。
+    """
+    rules = rules if rules is not None else []
     trials: list[dict] = []
     notes: list[str] = []
+    curated: list[str] = []
+    # このスクリプトが面倒を見る出力先。curation で全部落ちた条件も入れる
+    # （空にすべきディレクトリを「所有していない」と誤判定しないため）。
+    owned: set[Path] = set()
 
     for path in sorted(src_dir.glob("*/*.csv")):
         m = SRC_RE.match(path.name)
@@ -168,27 +196,68 @@ def scan(src_dir: Path) -> tuple[list[dict], list[str]]:
                 f"（行数 {len(df)}）。検出結果を採用"
             )
 
-        for k, part in enumerate(parts, start=1):
-            nbs = sorted(part["nb"].unique())
-            trials.append(
-                {
-                    "kind": kind,
-                    "node": m.group("node"),
-                    "threads": threads,
-                    "size": size,
-                    "nb_lo": int(nbs[0]),
-                    "nb_hi": int(nbs[-1]),
-                    "n_nb": len(nbs),
-                    "span": int(nbs[-1]) - int(nbs[0]),
-                    "stamp": f"{m.group('date')}-{m.group('time')}",
-                    "index": k,
-                    "of": len(parts),
-                    "src": path.name,
-                    "df": part,
-                }
-            )
+        node = m.group("node")
+        # qr_sweep だけ config を持つ。curation.yaml から config 単位で
+        # 指定できるように、ここで解決してトライアルに載せておく。
+        config = config_for(node, threads) if kind == "qr_sweep" else None
+        owned.add(destination_dir(kind, node, threads))
 
-    return trials, notes
+        for k, part in enumerate(parts, start=1):
+            trial = {
+                "kind": kind,
+                "node": node,
+                "config": config,
+                "threads": threads,
+                "size": size,
+                "stamp": f"{m.group('date')}-{m.group('time')}",
+                "index": k,
+                "trial": k,          # curation の match 用（index と同じ値）
+                "of": len(parts),
+                "src": path.name,
+                "df": part,
+            }
+
+            kept, log = curation.apply(trial, rules, src_dir)
+            curated += log
+            if kept is None:
+                continue
+
+            nbs = sorted(kept["nb"].unique())
+            trial["df"] = kept
+            trial["nb_lo"] = int(nbs[0])
+            trial["nb_hi"] = int(nbs[-1])
+            trial["n_nb"] = len(nbs)
+            trial["span"] = int(nbs[-1]) - int(nbs[0])
+            trials.append(trial)
+
+    return trials, notes, curated, owned
+
+
+def stale_files(owned: set[Path], writing: set[Path]) -> list[Path]:
+    """
+    今回書き出す先のうち、前回の名残として残っている CSV。
+
+    --- なぜディレクトリを丸ごと消さないか -------------------------------
+
+    raw/qr_sweep には assemble.py の管轄でないものが混ざっている。
+    `ryzen7-5800x_s1_smt-on` は学部時代のファイルを migrate.py が成形したもので、
+    元ファイル（`Ryzen7-5800X_16_2048_trial1.csv` 等）は SRC_RE に合わないため
+    assemble.py は読まない。`rm -rf raw/qr_sweep` してから書き直すと、
+    この構成のデータは**消えたきり戻らない**。
+
+    そこで「今回 raw_data を読んで出力先が決まったディレクトリ」だけを
+    自分の持ち物とみなし、その中の見覚えのないファイルを消す。
+    curation で全トライアルが落ちた条件（i5-7400）もここに入るので、
+    除外したデータはちゃんと消える。読まなかった構成には触らない。
+    """
+    stale = []
+    for parent in sorted(owned, key=str):
+        if not parent.is_dir():
+            continue
+        for csv in sorted(parent.glob("*.csv")):
+            if csv not in writing:
+                stale.append(csv)
+    return stale
 
 
 def group_key(t: dict) -> tuple:
@@ -297,11 +366,14 @@ def _by(items, keyfn):
     return d
 
 
+def destination_dir(kind: str, node: str, threads: int) -> Path:
+    if kind == "qr_sweep":
+        return paths.RAW_SWEEP / config_for(node, threads)
+    return paths.RAW / kind / node
+
+
 def destination(t: dict) -> Path:
-    if t["kind"] == "qr_sweep":
-        parent = paths.RAW_SWEEP / config_for(t["node"], t["threads"])
-    else:
-        parent = paths.RAW / t["kind"] / t["node"]
+    parent = destination_dir(t["kind"], t["node"], t["threads"])
 
     suffix = f"_r{t['index']}" if t["of"] > 1 else ""
     name = (
@@ -317,8 +389,11 @@ def main() -> int:
     ap.add_argument("--apply", action="store_true", help="実際に書き出す")
     ap.add_argument(
         "--clean-sweep",
+        "--clean",
+        dest="clean",
         action="store_true",
-        help="raw/qr_sweep を空にしてから書く（旧移行分と重複させない）",
+        help="今回書き出す先に残っている前回の名残を消す"
+        "（改名・除外の取り残しを掃除する。読まなかった構成には触らない）",
     )
     args = ap.parse_args()
 
@@ -326,7 +401,17 @@ def main() -> int:
         print(f"エラー: {args.src} がありません", file=sys.stderr)
         return 1
 
-    trials, notes = scan(args.src)
+    try:
+        rules = curation.load()
+    except curation.CurationError as exc:
+        print(f"エラー: curation.yaml — {exc}", file=sys.stderr)
+        return 1
+
+    try:
+        trials, notes, curated, owned = scan(args.src, rules)
+    except curation.CurationError as exc:
+        print(f"エラー: curation.yaml — {exc}", file=sys.stderr)
+        return 1
     print(f"=== 読み込み: {len(trials)} トライアル ===")
 
     trials, joins = join_segments(trials)
@@ -349,10 +434,35 @@ def main() -> int:
         for j in joins:
             print(f"  {j}")
 
+    if curated:
+        print(f"\n=== curation.yaml の適用 ({len(curated)}) ===")
+        for c in curated:
+            print(f"  {c}")
+
+    stale = curation.unused(rules)
+    if stale:
+        print(f"\n=== 当たらなかった curation ルール ({len(stale)}) ===")
+        for r in stale:
+            print(f"  ! [{r.id}] {r.describe()}")
+        print(
+            "  再計測が済んで元データを差し替えたなら、ルールを消してください。"
+            "残っていると新しい計測が黙って除外され続けます。"
+        )
+
     if notes:
         print(f"\n=== 注意 ({len(notes)}) ===")
         for n in notes:
             print(f"  ! {n}")
+
+    # 除外したファイルは「書き出さない」だけでは消えない。前回の assemble が
+    # 残したものが raw/ に居座り、除外したつもりのデータが derived まで通る。
+    stale = stale_files(owned, set(collisions))
+    if stale:
+        print(f"\n=== 前回の名残 ({len(stale)}) ===")
+        for csv in stale:
+            print(f"  - {csv.relative_to(paths.ROOT)}")
+        if not args.clean:
+            print("  消すには --clean を付けてください。")
 
     if not args.apply:
         print("\n(dry-run。書き出すには --apply)")
@@ -362,8 +472,14 @@ def main() -> int:
         print("\n衝突があるため中止。", file=sys.stderr)
         return 1
 
-    if args.clean_sweep and paths.RAW_SWEEP.exists():
-        shutil.rmtree(paths.RAW_SWEEP)
+    if args.clean:
+        for csv in stale:
+            csv.unlink()
+        # 除外で空になったディレクトリは残さない。中身が無いのに
+        # ディレクトリだけあると「測ったはずだが読めていない」に見える。
+        for parent in sorted(owned, key=str):
+            if parent.is_dir() and not any(parent.iterdir()):
+                parent.rmdir()
 
     cols_of = {
         "qr_sweep": ["threads", "size", "nb", "ib", "GFlops"],
@@ -380,11 +496,73 @@ def main() -> int:
     manifest += joins if joins else ["- 連結なし"]
     if notes:
         manifest += ["", "## 取り込み時の注意", ""] + [f"- {n}" for n in notes]
-    (paths.RAW / "JOINS.md").write_text("\n".join(manifest) + "\n", encoding="utf-8")
+    paths.JOINS_MD.write_text("\n".join(manifest) + "\n", encoding="utf-8")
+
+    write_curation_md(rules, curated)
 
     print(f"\n{len(trials)} ファイルを書き出しました。")
-    print(f"連結の記録: {(paths.RAW / 'JOINS.md').relative_to(paths.ROOT)}")
+    print(f"連結の記録:   {paths.JOINS_MD.relative_to(paths.ROOT)}")
+    print(f"除外の記録:   {paths.CURATION_MD.relative_to(paths.ROOT)}")
     return 0
+
+
+def write_curation_md(rules: list[curation.Rule], applied: list[str]) -> None:
+    """
+    curation.yaml のどのルールが何件に効いたかを raw/ に残す。
+
+    raw/ だけを見た人が「なぜ i5-7400 が無いのか」を辿れるようにするため。
+    yaml を読めば理由は書いてあるが、実際に何件落ちたかは適用してみないと
+    分からないので、結果はこちらに置く。
+    """
+    lines = [
+        "# CURATION",
+        "",
+        "`scripts/assemble.py` が自動生成する。手で編集しない。",
+        "",
+        "`curation.yaml` に書いた「機械には判断できない取捨選択」を、",
+        "raw_data → raw で実際に適用した結果。理由と再計測の方針は",
+        "`curation.yaml` と `TODO_REMEASURE.md` にある。",
+        "",
+    ]
+
+    for action, title in (("exclude", "raw/ に上げなかったもの"),
+                          ("replace", "別ファイルの値で置き換えたもの")):
+        subset = [r for r in rules if r.action == action]
+        lines += ["", f"## {title}", ""]
+        if not subset:
+            lines.append("- なし")
+            continue
+        lines += _table_header(["id", "対象", "当たり", "行数", "since"])
+        for r in subset:
+            lines.append(
+                f"| `{r.id}` | {r.describe()} | {r.hits} | {r.rows:,} | "
+                f"{r.since or '—'} |"
+            )
+        lines.append("")
+        for r in subset:
+            if r.reason:
+                lines.append(f"- **`{r.id}`** — {' '.join(r.reason.split())}")
+
+    stale = curation.unused(rules)
+    if stale:
+        lines += [
+            "",
+            "## 当たらなかったルール",
+            "",
+            "元データを差し替えたなら消すこと。残っていると新しい計測が",
+            "黙って除外され続ける。",
+            "",
+        ]
+        lines += [f"- `{r.id}` — {r.describe()}" for r in stale]
+
+    lines += ["", "## 適用のログ", ""]
+    lines += [f"- {a}" for a in applied] if applied else ["- なし"]
+
+    paths.CURATION_MD.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def _table_header(cols: list[str]) -> list[str]:
+    return ["| " + " | ".join(cols) + " |", "|" + "---|" * len(cols)]
 
 
 if __name__ == "__main__":

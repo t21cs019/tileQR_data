@@ -56,12 +56,15 @@ git の「全バージョンを保持する」性質が履歴肥大の問題に�
 tileQR_data/
 ├── machines.yaml       # アーキテクチャ / 計測構成 / ノードの定義
 ├── plan.yaml           # 計測計画。COVERAGE.md の「分母」
+├── curation.yaml       # raw に上げないもの / 置き換えるもの。理由つき
+├── running.yaml        # いま流している計測。進捗表に ▶ で出る
 ├── raw_data/           # 計測機から回収したままの原本。触らない
 ├── raw/                # assemble.py が組み直したもの。1ファイル1トライアル
 │   ├── qr_sweep/{config}/*.csv
 │   ├── ssrfb/{node}/*.csv
 │   ├── kernel_dtsmqr/{node}/*.csv
-│   └── JOINS.md        # 連結の出所。assemble.py が生成
+│   ├── JOINS.md        # 連結の出所。assemble.py が生成
+│   └── CURATION.md     # 除外・置換の適用結果。assemble.py が生成
 ├── derived/            # ingest.py が生成。コミットする
 │   ├── qr_sweep.parquet
 │   ├── ssrfb.parquet
@@ -109,8 +112,15 @@ tileQR_data/
 
 ```bash
 python scripts/assemble.py raw_data              # dry-run
-python scripts/assemble.py raw_data --apply --clean-sweep
+python scripts/assemble.py raw_data --apply --clean
 ```
+
+`--clean` は「今回 `raw_data` を読んで出力先が決まったディレクトリ」の中だけを
+掃除する。ディレクトリを丸ごと消さないのは、`raw/qr_sweep` に assemble の
+管轄でないものが混ざっているため。`ryzen7-5800x_s1_smt-on` は学部時代の
+ファイルを `migrate.py` が成形したもので、元ファイルは `SRC_RE` に合わず
+assemble は読まない。`rm -rf raw/qr_sweep` してから書き直すと、
+**この構成のデータは消えたきり戻らない**。
 
 ### `t{N}` はスレッド数ではなくトライアル数だった
 
@@ -156,6 +166,117 @@ CSV の列には出所を書く場所が無いので、`JOINS.md` が無いと�
 - **より広い走査の部分集合になっている周**。走査が途中で切れただけの周を
   完走した周に混ぜることになるため、単独の部分トライアルとして残す。
 - **nb が1点しかないファイル**。本番前の試し撃ちとみなして取り込まない。
+
+---
+
+## 使えないデータをどう扱うか（curation.yaml）
+
+サーマルスロットリング、メモリチャネル構成の違い、スレッド数の取り違え。
+こうした理由で「取ったが使えない」データは普通に出る。
+
+**`raw/` から手で消すのではいけない。** `raw/` は `raw_data/` から
+`make assemble` で再生成できることが前提のディレクトリなので、
+手で消した除外も手で直した1点も、次の assemble で黙って元に戻る。
+判断は再生成の**入力側**、つまり `curation.yaml` に置く。
+
+```yaml
+exclude:
+  - id: i5-7400-qr_sweep-thermal
+    match: {kind: qr_sweep, node: i5-7400}
+    since: 2026-09-01
+    reason: サーマルスロットリングによる汚染が確定。…
+    remeasure: 冷却を確保したうえで size 1024/2048/4096/8192 を各5反復
+```
+
+`assemble.py` が自前で持つ除外（プローブ、部分集合の周）は**データの形から
+決まる**のでコードにある。`curation.yaml` が持つのは、データを見ても分からない
+判断だけ。この2つを混ぜないこと。
+
+### 部分的に使う
+
+`match` に `nb` / `ib` を書くと、トライアル全体ではなく**該当行だけ**に効く。
+古い計測のうち一部の nb 区間だけ使いたいときはこれを使う。
+
+```yaml
+  - match: {node: i5-8500, kind: ssrfb, nb: [32, 100]}   # この区間だけ落とす
+```
+
+| match のキー | 効く単位 |
+|---|---|
+| `kind` / `node` / `config` / `threads` / `size` / `src` / `trial` | トライアル |
+| `nb` / `ib` | 行（＝部分的に使う） |
+
+`nb` は `32`（値）、`[32, 64]`（区間）、`[32, 40, 48]`（3つ以上なら集合）。
+`src` は `raw_data` 側のファイル名で glob 可。
+
+未知のキーと空の `match` は読み込み時にエラーになる。`kind` を `kinds` と
+書き間違えたルールが黙って全件を除外するのが一番こわいため。
+
+### 1点だけ測り直したとき（replace）
+
+`replace` は別ファイルの値で該当点を置き換える。数値そのものを yaml に
+直書きしないのは、「どのファイルの何行をどう畳んだ値か」が失われるため。
+
+```yaml
+replace:
+  - id: ryzen-ssrfb-coldstart
+    match: {kind: ssrfb, node: ryzen, size: 1024, nb: 32, ib: 8}
+    from: {file: benchmark_ryzen/ryzen_manual_ssrfb_nb32_ib8.csv,
+           agg: mean, drop_first: 1}
+```
+
+`drop_first` があるのは、手動再計測でも1回目だけコールドスタートで跳ねたため。
+何行捨てたかが残るので、後から判断を検証できる。
+
+### 消し忘れが一番あぶない
+
+再計測が済んで元データを差し替えたのにルールを残すと、**新しい計測が黙って
+除外され続ける**。`assemble.py` は1件も当たらなかったルールを「未使用」として
+必ず報告する。`make validate` は、除外したはずのデータが `raw/` に残っていたら
+エラーにする。
+
+散文（何が起きたか、どう測り直すか）は `TODO_REMEASURE.md`、
+機械が守る形が `curation.yaml`、適用結果が `raw/CURATION.md`。
+
+---
+
+## いま流している計測（running.yaml）
+
+進捗表は「計画にあるか」「データがあるか」の2値しか持たないので、
+そのままだと次の4つが全部おなじ `—` に見える。
+
+- まだ流していない
+- 流したが数日かかるのでまだ終わっていない
+- 流したつもりでコマンドを打ち忘れていた
+- 流したがジョブが落ちていた
+
+size16384 や AOBA のバッチジョブは数日かかるため、この区別がつかないと
+同じ計測を二重に投入するか、落ちたジョブを放置することになる。
+
+```yaml
+running:
+  - kind: qr_sweep
+    config: i5-7400_s1_smt-off
+    threads: 4
+    sizes: [1024, 2048]
+    since: 2026-09-01
+    host: i5-7400
+    command: |
+      ./run_sweep.sh --size 1024 --nb 32-512 --trials 5
+```
+
+1. 計測コマンドを打ったら1エントリ足して push
+2. データが `raw/` に入ったらエントリを消す
+
+`COVERAGE.md` の進捗表に `▶` が付き、「計測中」の節に打ったコマンドが出る。
+消し忘れ（データがあるのに running のまま）は `make validate` が警告する。
+
+`command` は実際に打ったものをそのまま貼る。「どこまで打ったか」を後から
+思い出すのが目的なので、清書しないこと。
+
+**`plan.yaml` と分けてあるのは**、あちらが COVERAGE の分母を決める
+レビュー対象のファイルだから。同じファイルに混ぜると「計測を1本流した」
+コミットと「計画の分母を変えた」コミットが見分けられなくなる。
 
 ---
 
@@ -365,7 +486,11 @@ size 8192 以上で期待点数が倍近く過大になり、完走した計測�
 | `5/5` | 計画どおり |
 | `1/5` | 反復が足りない |
 | `—` | 未計測 |
+| `·` | 計画に無い |
 | `!` | 反復は足りているが nb が計画の範囲に届いていない |
+| `▶` | 計測中（`running.yaml` に載っている） |
+
+次が「計測中」。`running.yaml` の内容と、そのとき打ったコマンドが出る。
 
 以下は詳細。
 

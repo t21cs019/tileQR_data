@@ -23,8 +23,15 @@ OUT = ROOT / "out"
 MACHINES_YAML = ROOT / "machines.yaml"
 PLAN_YAML = ROOT / "plan.yaml"
 
+# raw_data → raw の取捨選択（除外・置換）。assemble.py が読む。
+CURATION_YAML = ROOT / "curation.yaml"
+# いま走らせている計測。COVERAGE.md の進捗表に出る。
+RUNNING_YAML = ROOT / "running.yaml"
+
 SWEEP_PARQUET = DERIVED / "qr_sweep.parquet"
 KERNEL_PARQUET = DERIVED / "kernel_dtsmqr.parquet"
 SSRFB_PARQUET = DERIVED / "ssrfb.parquet"
 OPTIMA_CSV = DERIVED / "optima.csv"
 COVERAGE_MD = ROOT / "COVERAGE.md"
+JOINS_MD = RAW / "JOINS.md"
+CURATION_MD = RAW / "CURATION.md"

@@ -148,3 +148,56 @@ def label_of(kind: str, plan: dict | None = None) -> str:
     plan = plan if plan is not None else load()
     spec = (plan.get("kinds") or {}).get(kind) or {}
     return spec.get("label", kind)
+
+
+# --- 計測中（running.yaml） ------------------------------------------------
+#
+# 進捗表は「計画にあるか」「データがあるか」の2値しか持たないので、
+# 「まだ流していない」と「流したがまだ終わっていない」が同じ `—` に見える。
+# size16384 や AOBA のバッチジョブは数日かかるため、この区別がつかないと
+# 同じ計測を二重に投入するか、落ちたジョブを放置することになる。
+
+
+class RunningError(ValueError):
+    """running.yaml の書き方が壊れている。"""
+
+
+REQUIRED_RUNNING = ("kind", "threads", "sizes", "since")
+
+
+def load_running() -> list[dict]:
+    """running.yaml を読む。無ければ空（従来どおり進捗表に `▶` が出ないだけ）。"""
+    if not paths.RUNNING_YAML.exists():
+        return []
+    with paths.RUNNING_YAML.open(encoding="utf-8") as fh:
+        doc = yaml.safe_load(fh) or {}
+
+    out = []
+    for i, entry in enumerate(doc.get("running") or []):
+        missing = [k for k in REQUIRED_RUNNING if not entry.get(k)]
+        if missing:
+            raise RunningError(f"running.yaml の {i} 番目: {missing} が無い")
+        if not entry.get("config") and not entry.get("node"):
+            raise RunningError(
+                f"running.yaml の {i} 番目: config か node のどちらかが要る"
+            )
+        sizes = entry["sizes"]
+        entry = dict(entry, sizes=[int(s) for s in (sizes if isinstance(sizes, list) else [sizes])])
+        entry["threads"] = int(entry["threads"])
+        out.append(entry)
+    return out
+
+
+def running_keys(entries: list[dict] | None = None) -> dict[tuple, dict]:
+    """
+    計測中のエントリを (kind, config|node, threads, size) で引けるようにする。
+
+    進捗表のセルと同じ鍵の形にしてあるので、表側は引くだけでよい。
+    """
+    entries = entries if entries is not None else load_running()
+    index: dict[tuple, dict] = {}
+    for e in entries:
+        machine = e.get("config") or e.get("node")
+        for size in e["sizes"]:
+            index[(e["kind"], machine, e["threads"], size)] = e
+    return index

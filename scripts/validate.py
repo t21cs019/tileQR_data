@@ -12,6 +12,8 @@ raw/ 配下の健全性を検証する。push 前に走らせる。
   6. config ディレクトリが machines.yaml の configs にあるか
   7. node が machines.yaml の nodes にあるか
   8. 同一条件の重複がないか
+  9. curation.yaml で除外したデータが raw/ に残っていないか
+ 10. running.yaml が読めるか / 済んだ計測が残っていないか
 
 使い方:
     python scripts/validate.py          # 問題があれば終了コード 1
@@ -28,7 +30,9 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from tileqr_data import io, paths, plan  # noqa: E402
+from tileqr_data import console, curation, io, paths, plan  # noqa: E402
+
+console.use_utf8()
 
 
 class Report:
@@ -167,6 +171,55 @@ def check_machines(machines: dict, rep: Report) -> None:
                 )
 
 
+def check_curation(placed: list[dict], rep: Report) -> None:
+    """
+    除外したはずのデータが raw/ に残っていないか。
+
+    curation.yaml にルールを足す前に assemble した、あるいは raw/ へ手で
+    コピーしたファイルは、次の `make assemble --clean` まで残り続ける。
+    その間 ingest は普通に読んでしまうので、push 前に必ず弾く。
+    """
+    try:
+        rules = curation.load()
+    except curation.CurationError as exc:
+        rep.error(f"curation.yaml が読めない — {exc}")
+        return
+
+    for info in placed:
+        rule = curation.excluding_rule(rules, info)
+        if rule is None:
+            continue
+        rep.error(
+            f"{info['file']}: `{rule.id}` で除外したはずのデータが raw/ にある。"
+            "`make assemble` を回して作り直すこと"
+        )
+
+
+def check_running(placed: list[dict], rep: Report) -> None:
+    """
+    running.yaml の書式と、済んだ計測の消し忘れ。
+
+    データが raw/ に入ったのに running のままだと、進捗表がいつまでも
+    「計測中」を出し続け、次に何を流せばよいか分からなくなる。
+    """
+    try:
+        entries = plan.load_running()
+    except plan.RunningError as exc:
+        rep.error(f"running.yaml が読めない — {exc}")
+        return
+
+    have = {(i["kind"], i.get("config") or i["node"], i["threads"], i["size"])
+            for i in placed}
+    for key, entry in plan.running_keys(entries).items():
+        if key in have:
+            kind, machine, threads, size = key
+            rep.warn(
+                f"running.yaml: {kind} `{machine}` t{threads} size{size} は "
+                f"raw/ にデータがある（{entry.get('since', '?')} 開始）。"
+                "終わった計測なら running から消すこと"
+            )
+
+
 def main() -> int:
     rep = Report()
     machines = io.load_machines()
@@ -176,6 +229,8 @@ def main() -> int:
 
     seen: dict[tuple, list[str]] = defaultdict(list)
     by_condition: dict[tuple, list[dict]] = defaultdict(list)
+    # raw/ に実際に置かれているもの。curation / running の照合に使う。
+    placed: list[dict] = []
     n_files = 0
 
     # --- qr_sweep ---
@@ -196,10 +251,11 @@ def main() -> int:
             key = (config, info["node"], info["threads"], info["size"])
             seen[key].append(info["file"])
             by_condition[key].append(info)
+            placed.append(dict(info, kind="qr_sweep"))
 
     # --- ノード直下に置く測定種別（kernel_dtsmqr, ssrfb） ---
-    for root, schema in ((paths.RAW_KERNEL, io.SCHEMA),
-                         (paths.RAW_SSRFB, io.SSRFB_SCHEMA)):
+    for root, kind, schema in ((paths.RAW_KERNEL, "kernel_dtsmqr", io.SCHEMA),
+                               (paths.RAW_SSRFB, "ssrfb", io.SSRFB_SCHEMA)):
         if not root.exists():
             continue
         for node_dir in sorted(p for p in root.glob("*") if p.is_dir()):
@@ -208,11 +264,17 @@ def main() -> int:
             for csv in sorted(node_dir.glob("*.csv")):
                 n_files += 1
                 info = check_file(csv, None, rep, schema)
-                if info and info["node"] != node_dir.name:
+                if info is None:
+                    continue
+                if info["node"] != node_dir.name:
                     rep.error(
                         f"{csv.name}: ファイル名のノード `{info['node']}` と "
                         f"ディレクトリ `{node_dir.name}` が不一致"
                     )
+                placed.append(dict(info, kind=kind))
+
+    check_curation(placed, rep)
+    check_running(placed, rep)
 
     # --- 反復数を計画と突き合わせる ---
     #
