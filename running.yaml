@@ -85,6 +85,17 @@ running:
   # --- 自宅の PC --------------------------------------------------------
 
   - kind: ssrfb
+    node: i3-7100
+    threads: 1
+    sizes: [1024, 2048, 4096, 8192]
+    since: 2026-08-31
+    host: i3-7100（自宅）
+    note: >
+      i3-7100_s1_smt-off 計測の一環。plan.yaml 既定は trials=1 だが、
+      今回はサイズ非依存という前提そのものを検証するため4サイズとも trials=5 で計測。
+      taskset -c 0 で固定。beta が揃うか確認してから qr_sweep(smt-off) に進む。
+
+  - kind: ssrfb
     node: i5-7400
     threads: 1
     sizes: [4096, 8192]

@@ -380,10 +380,17 @@ configs:
     arch: kabylake-i3-7100
     sockets_used: 1
     smt: off
-    memory_channels: unknown    # 自宅機は DIMM を融通し合っていた。要確認
-    turbo: unknown
+    memory_channels: 2          # 実測で確定（2026-08-31、dmidecode）。下の note を読むこと
+    turbo: off                  # intel_pstate no_turbo=1 を実測（2026-08-31）
     numactl: null
-    note: threads=2（2コア、SMT無効）。sysfs（/sys/devices/system/cpu/smt/control）で無効化して計測。
+    note: >
+      threads=2（2コア、SMT無効）。sysfs（/sys/devices/system/cpu/smt/control）で無効化して計測。
+
+      実機は ChannelA-DIMM1（4GB DDR4、定格2667MT/s）/ ChannelB-DIMM1（4GB DDR4、
+      定格2400MT/s）のデュアルチャネル構成。定格が異なるため Configured Memory Speed
+      は両方とも2400MT/sに揃っている（dmidecodeで実測、2026-08-31）。
+      i3-7100_s1_smt-on 計測時（2026-06〜07）の turbo/memory_channels は未確認のまま
+      なので、この smt-off データと直接比較する際は要注意（TODO_REMEASURE.md 参照）。
 
   i3-8100_s1_smt-off:
     arch: coffeelake-i3-8100
