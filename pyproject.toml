@@ -1,6 +1,6 @@
 [project]
 name = "tileqr-data"
-version = "0.7.0"
+version = "0.8.0"
 description = "タイルQR分解のパラメータチューニング研究における計測データと図の管理"
 requires-python = ">=3.11"
 dependencies = [

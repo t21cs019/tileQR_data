@@ -83,6 +83,7 @@ raw/qr_sweep/epyc_s1_smt-on/epyc_size1024_t32_nb32-512_20260725-110847_r3.csv
 raw/qr_sweep/epyc_s1_smt-on/epyc_size1024_t32_nb32-512_20260725-110847_r4.csv
 raw/qr_sweep/epyc_s1_smt-on/epyc_size1024_t32_nb32-512_20260725-110847_r5.csv
 raw/qr_sweep/epyc_s1_smt-on/epyc_size16384_t32_nb32-512_20260629-143700.csv
+raw/qr_sweep/epyc_s1_smt-on/epyc_size16384_t32_nb32-512_20260830-195747.csv
 raw/qr_sweep/epyc_s1_smt-on/epyc_size2048_t32_nb32-500_20260726-011720_r5.csv
 raw/qr_sweep/epyc_s1_smt-on/epyc_size2048_t32_nb32-512_20260726-011720_r1.csv
 raw/qr_sweep/epyc_s1_smt-on/epyc_size2048_t32_nb32-512_20260726-011720_r2.csv

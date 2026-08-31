@@ -144,3 +144,22 @@ def arch_of(node: str, machines: dict | None = None) -> str | None:
     machines = machines or load_machines()
     entry = (machines.get("nodes") or {}).get(node)
     return entry.get("arch") if entry else None
+
+
+def display_rank(machine: str, machines: dict | None = None) -> int:
+    """
+    COVERAGE.md の表で機材を並べるための番号。小さいほど上。
+
+    machine は config 名でも node 名でもよい。どちらも architecture に
+    解決して `architectures.*.display_order` を読む。1つの番号を両方の表が
+    使うので、qr_sweep（config 単位）と ssrfb（node 単位）の並びが揃う。
+
+    番号の割り振り（学外 → 大学 → 自宅・新しい順）は machines.yaml 側の
+    コメントにある。未定義の機材は 99 で最後尾に落ち、同順位は名前で並ぶ。
+    """
+    machines = machines if machines is not None else load_machines()
+    entry = (machines.get("configs") or {}).get(machine) \
+        or (machines.get("nodes") or {}).get(machine)
+    arch = (entry or {}).get("arch")
+    arch_entry = (machines.get("architectures") or {}).get(arch) or {}
+    return int(arch_entry.get("display_order", 99))

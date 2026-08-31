@@ -60,6 +60,8 @@ tileQR_data/
 ├── running.yaml        # いま流している計測。進捗表に ▶ で出る
 ├── raw_data/{config}/  # 計測機から回収したままの原本。触らない
 │                       # ディレクトリ名が計測構成の宣言（machines.yaml の configs）
+├── attic/              # 出自が欠けていて raw/ に上げられない原本（学部時代の
+│                       # フルスイープ等）。パイプラインは読まない。目録は attic/README.md
 ├── raw/                # assemble.py が組み直したもの。1ファイル1トライアル
 │   ├── qr_sweep/{config}/*.csv
 │   ├── ssrfb/{node}/*.csv

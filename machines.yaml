@@ -23,11 +23,20 @@
 # smt_capable  … ハードウェアが SMT を持つか（不変）
 # smt_default  … cpus.toml の threads_per_core から読める「計測時の設定」
 #                 実際に使った値は configs 側の smt が優先。
+#
+# display_order … COVERAGE.md の表で機材を並べる番号。小さいほど上。
+#   10番台 = 学外（AOBA） / 20番台 = 大学のサーバ / 30番台〜 = 自宅
+#   自宅は CPU の世代が新しいほど小さい番号（同世代内は上位ティアが先）。
+#   config も node も architecture 経由でこの番号に解決されるので、
+#   qr_sweep の表と ssrfb の表が同じ順で並ぶ。無い機材は最後尾（99）。
+#   アルファベット順にしないのは、読み手が探すのは「どの設置場所の機材か」
+#   であって名前の綴りではないため。
 
 architectures:
 
   aoba-b:
     cpu: AMD EPYC 7702
+    display_order: 11           # 学外（AOBA）
     dashboard_cpu: epyc_7702
     vendor: amd
     microarch: zen2
@@ -47,6 +56,7 @@ architectures:
 
   epyc-7543:
     cpu: AMD EPYC 7543
+    display_order: 21           # 大学
     dashboard_cpu: epyc_7543
     vendor: amd
     microarch: zen3
@@ -67,6 +77,7 @@ architectures:
 
   xeon-silver-4214:
     cpu: Intel Xeon Silver 4214
+    display_order: 22           # 大学（calc）
     dashboard_cpu: xeon_silver_4214
     vendor: intel
     microarch: cascadelake
@@ -83,6 +94,7 @@ architectures:
 
   zen3-ryzen7-5800x:
     cpu: AMD Ryzen 7 5800X
+    display_order: 23           # 大学
     dashboard_cpu: ryzen7_5800x
     vendor: amd
     microarch: zen3
@@ -99,6 +111,7 @@ architectures:
 
   zen4-ryzen5-7400f:
     cpu: AMD Ryzen 5 7400F
+    display_order: 31           # 自宅・2024 (Zen4)
     dashboard_cpu: ryzen5_7400f
     vendor: amd
     microarch: zen4
@@ -115,6 +128,7 @@ architectures:
 
   coffeelake-i5-8500:
     cpu: Intel Core i5-8500
+    display_order: 35           # 自宅・2018 (Coffee Lake)
     dashboard_cpu: i5_8500
     vendor: intel
     microarch: coffeelake
@@ -131,6 +145,7 @@ architectures:
 
   coffeelake-i3-8100:
     cpu: Intel Core i3-8100
+    display_order: 36           # 自宅・2017 (Coffee Lake)
     dashboard_cpu: i3_8100
     vendor: intel
     microarch: coffeelake
@@ -146,6 +161,7 @@ architectures:
 
   coffeelake-i3-9100:
     cpu: Intel Core i3-9100
+    display_order: 34           # 自宅・2019 (Coffee Lake R)
     dashboard_cpu: i3_9100
     vendor: intel
     microarch: coffeelake
@@ -161,6 +177,7 @@ architectures:
 
   skylake-i3-6100:
     cpu: Intel Core i3-6100
+    display_order: 41           # 自宅・2015 (Skylake)
     dashboard_cpu: i3_6100
     vendor: intel
     microarch: skylake
@@ -176,6 +193,7 @@ architectures:
 
   kabylake-i3-7100:
     cpu: Intel Core i3-7100
+    display_order: 40           # 自宅・2017 (Kaby Lake)
     dashboard_cpu: i3_7100
     vendor: intel
     microarch: kabylake
@@ -191,6 +209,7 @@ architectures:
 
   kabylake-i5-7400:
     cpu: Intel Core i5-7400
+    display_order: 39           # 自宅・2017 (Kaby Lake)
     dashboard_cpu: i5_7400
     vendor: intel
     microarch: kabylake
@@ -206,6 +225,7 @@ architectures:
 
   kabylake-i5-7500:
     cpu: Intel Core i5-7500
+    display_order: 38           # 自宅・2017 (Kaby Lake)
     dashboard_cpu: i5_7500
     vendor: intel
     microarch: kabylake
@@ -221,6 +241,7 @@ architectures:
 
   kabylake-i7-7700:
     cpu: Intel Core i7-7700
+    display_order: 37           # 自宅・2017 (Kaby Lake)
     dashboard_cpu: i7_7700
     vendor: intel
     microarch: kabylake
@@ -236,6 +257,7 @@ architectures:
 
   haswell-xeon-e3-1220v3:
     cpu: Intel Xeon E3-1220 v3
+    display_order: 42           # 自宅・2013 (Haswell) ※設置場所は要確認
     dashboard_cpu: xeon_e3_1220v3
     vendor: intel
     microarch: haswell
@@ -251,6 +273,7 @@ architectures:
 
   raptorlake-i5-13400f:
     cpu: Intel Core i5-13400F
+    display_order: 32           # 自宅・2023 (Raptor Lake) ※設置場所は要確認
     dashboard_cpu: null        # sources.toml に未登録
     vendor: intel
     microarch: raptorlake
@@ -269,6 +292,7 @@ architectures:
 
   cometlake-i3-10100:
     cpu: Intel Core i3-10100
+    display_order: 33           # 自宅・2020 (Comet Lake)
     dashboard_cpu: null        # sources.toml に未登録
     vendor: intel
     microarch: cometlake
@@ -284,6 +308,7 @@ architectures:
 
   broadwell-e-i7-6900k:
     cpu: Intel Core i7-6900K
+    display_order: 24           # 大学（dogwood）
     dashboard_cpu: null        # sources.toml に未登録
     vendor: intel
     microarch: broadwell-e

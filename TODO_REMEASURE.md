@@ -152,11 +152,20 @@ size2048 は nb 32-400 が5本（`migrate.py` 生成の `nodate`）、nb 404-512
 `migrate.py` の管轄を `assemble.py` に寄せない限り自動では直らないので、
 当面は警告を承知のうえで置いておく。
 
-## 学部時代の dgeqrf データ：スレッド数不明
+## 学部時代の dgeqrf データ：スレッド数不明 → attic へ
 
-`raw_data/dogwood_s1_smt-off/Full_search_dgeqrf/benchmark_dtsmqr_4096.csv`
+`attic/Full_search_dgeqrf/benchmark_dtsmqr_4096.csv`
 (実体は `dgeqrf` のフルスイープ、size=4096、nb=20-512/ib=4-nb/2、格子は完全)。
 
-CSV に `threads` 列が無く、当時のスレッド数（8 or 16、SMT有無）を
-本人も覚えていないため未反映。スレッド数が判明するか、既知の条件で
-再計測できれば取り込む。
+CSV に `threads` 列が無く、生成スクリプト（同ディレクトリの
+`Full_search_dgeqrf.py`）もスレッド数を一切指定していない。
+当時の環境デフォルトで走っており、復元不能。
+
+2026-08-30 の th=8 実測との突き合わせ（`studies/full_search_threads/`）では
+**判定できなかった**。形はほぼ同一（相関 0.993、最適 nb は格子1刻み差）で
+th=8 を示唆するが、水準が旧 +16% で、SMT ともビルド差とも説明がつく。
+**決定打は dogwood smt-on th=16 の size4096 を1本測ること**（3963 点）。
+どちらの水準に乗るかで切り分けられる。
+
+学部時代のフルスイープ一式（6機種、140 CSV）も `attic/Full_search/` にある。
+昇格の基準と目録は `attic/README.md`。

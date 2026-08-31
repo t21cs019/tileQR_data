@@ -240,6 +240,16 @@ def _table_header(cols: list[str]) -> list[str]:
     return ["| " + " | ".join(cols) + " |", "|" + "---|" * len(cols)]
 
 
+# 表の並び順。io.display_rank が machines.yaml の display_order を引く。
+# 学外（AOBA）→ 大学のサーバ → 自宅（世代が新しい順）。
+# アルファベット順にしないのは、読み手が探すのは「どの設置場所の機材か」
+# であって名前の綴りではないため。qr_sweep（config）と ssrfb（node）の
+# 両方の表が同じ番号で並ぶので、資料間で順序が食い違わない。
+def _ranker():
+    machines = io.load_machines()
+    return lambda name: (io.display_rank(str(name), machines), str(name))
+
+
 def progress_section(
     stats_by_kind: dict[str, list[dict]], running: dict[tuple, dict]
 ) -> tuple[list[str], str, int]:
@@ -257,6 +267,7 @@ def progress_section(
     lines: list[str] = []
     done_all = plan_all = 0
     running_hits = 0
+    rank = _ranker()
 
     for kind, stats in stats_by_kind.items():
         idx = _plan_index(kind)
@@ -273,7 +284,7 @@ def progress_section(
         lines += ["", f"### {kind}", ""]
         lines += _table_header([label, "t", *[str(s) for s in sizes], "達成"])
 
-        for (machine, threads) in sorted(machines, key=lambda k: str(k[0])):
+        for (machine, threads) in sorted(machines, key=lambda k: (*rank(k[0]), k[1])):
             cells = []
             done_row = 0
             for size in sizes:
@@ -329,7 +340,8 @@ def running_section(entries: list[dict]) -> list[str]:
         return ["計測中の項目はありません（`running.yaml` が空）。"]
 
     lines = _table_header(["kind", "機材", "t", "size", "開始", "host", "備考"])
-    for e in sorted(entries, key=lambda e: (e["kind"], str(e.get("config") or e.get("node")))):
+    rank = _ranker()
+    for e in sorted(entries, key=lambda e: rank(e.get("config") or e.get("node"))):
         machine = e.get("config") or e.get("node")
         sizes = ", ".join(str(s) for s in e["sizes"])
         # note は yaml の折り返し（`>`）で改行が残る。表のセルに改行を入れると
@@ -354,13 +366,14 @@ def running_section(entries: list[dict]) -> list[str]:
 def sweep_section(stats: list[dict], kind: str) -> list[str]:
     idx = _plan_index(kind)
     label = _machine_col(kind)
+    rank = _ranker()
 
     cols = [label, "t", "size", "nb 走査", "step", "n_nb", "ib",
             "計測点", "格子", "計画", "trials", "status", "計測日"]
     lines = _table_header(cols)
 
     seen = set()
-    for r in sorted(stats, key=lambda r: (str(r.get(label)), r["threads"], r["size"])):
+    for r in sorted(stats, key=lambda r: (*rank(r.get(label)), r["threads"], r["size"])):
         key = _cond_key(kind, r)
         seen.add(key)
         status, plan_txt, trials_txt = _status(r, idx.get(key))
@@ -373,7 +386,7 @@ def sweep_section(stats: list[dict], kind: str) -> list[str]:
         )
 
     # 計画にあるが1件も測っていない条件
-    for key, t in sorted(idx.items(), key=lambda kv: tuple(str(x) for x in kv[0])):
+    for key, t in sorted(idx.items(), key=lambda kv: (*rank(kv[0][0]), kv[0][1], kv[0][2])):
         if key in seen:
             continue
         lines.append(
@@ -396,6 +409,8 @@ def reproducibility_section(optima: pd.DataFrame) -> list[str]:
     lines = _table_header(
         ["config", "t", "size", "独立測定", "nb_opt", "幅", "変動係数"]
     )
+    rank = _ranker()
+    rows: list[tuple[tuple, str]] = []
     single = 0
     for (config, threads, size), sub in optima.groupby(
         ["config", "threads", "size"], observed=True
@@ -408,11 +423,13 @@ def reproducibility_section(optima: pd.DataFrame) -> list[str]:
         mean = sum(vals) / len(vals)
         var = sum((v - mean) ** 2 for v in vals) / (len(vals) - 1)
         shown = ", ".join(str(v) for v in vals[:8]) + ("…" if len(vals) > 8 else "")
-        lines.append(
+        rows.append((
+            (*rank(config), threads, size),
             f"| `{config}` | {threads} | {size} | {len(vals)} | "
             f"{shown} | {max(vals) - min(vals)} | "
             f"{100 * (var ** 0.5) / mean:.1f}% |"
-        )
+        ))
+    lines += [line for _, line in sorted(rows, key=lambda t: t[0])]
 
     lines += [
         "",
@@ -444,6 +461,8 @@ def band_section(optima: pd.DataFrame) -> tuple[list[str], int]:
          "trials", "ノイズ/帯", "判定"]
     )
     degenerate = 0
+    rank = _ranker()
+    rows: list[tuple[tuple, str]] = []
 
     for (config, threads, size), sub in optima.groupby(
         ["config", "threads", "size"], observed=True
@@ -470,11 +489,13 @@ def band_section(optima: pd.DataFrame) -> tuple[list[str], int]:
         )
         ratio = worst["noise_ratio"]
         rt = "—" if int(worst["trials"]) < 2 else f"{ratio:.2f}"
-        lines.append(
+        rows.append((
+            (*rank(config), threads, size),
             f"| `{config}` | {threads} | {size} | {nb_txt} | "
             f"{worst['nb_lo95']}-{worst['nb_hi95']} | {int(worst['nb_in_band'])} | "
             f"{int(worst['trials'])} | {rt} | {verdict} |"
-        )
+        ))
+    lines += [line for _, line in sorted(rows, key=lambda t: t[0])]
     return lines, degenerate
 
 
