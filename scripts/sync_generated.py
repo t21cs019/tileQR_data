@@ -36,11 +36,14 @@ import subprocess
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from tileqr_data import console  # noqa: E402
+
 # Windows のコンソールは既定で cp932 になり、日本語 print() が文字化けまたは
-# UnicodeEncodeError で落ちる。出力先を明示的に UTF-8 へ固定する。
-for _stream in (sys.stdout, sys.stderr):
-    if hasattr(_stream, "reconfigure"):
-        _stream.reconfigure(encoding="utf-8")
+# UnicodeEncodeError で落ちる。対策は console.py が持つ（各スクリプトに同じ
+# コードを貼ると、新しいスクリプトで貼り忘れて同じ壊れ方をするため）。
+console.use_utf8()
 
 DATA_ROOT = Path(__file__).resolve().parent.parent
 
