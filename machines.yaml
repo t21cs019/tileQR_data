@@ -376,6 +376,15 @@ configs:
     numactl: null
     note: threads=4（2コア x SMT）。
 
+  i3-7100_s1_smt-off:
+    arch: kabylake-i3-7100
+    sockets_used: 1
+    smt: off
+    memory_channels: unknown    # 自宅機は DIMM を融通し合っていた。要確認
+    turbo: unknown
+    numactl: null
+    note: threads=2（2コア、SMT無効）。sysfs（/sys/devices/system/cpu/smt/control）で無効化して計測。
+
   i3-8100_s1_smt-off:
     arch: coffeelake-i3-8100
     sockets_used: 1

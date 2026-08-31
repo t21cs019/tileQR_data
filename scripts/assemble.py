@@ -87,7 +87,8 @@ CONFIG_RULES = {
     # Xeon Silver 4214, HT off。物理12コア/ソケットなので th<=12 は片ソケット固定。
     "calc": lambda th: f"calc_s{2 if th > 12 else 1}_smt-off",
     "epyc": lambda th: "epyc_s1_smt-on",            # EPYC 7543, threads_per_core=2
-    "i3-7100": lambda th: "i3-7100_s1_smt-on",
+    # Core i3-7100 は2コア。th<=2 なら SMT 無効。
+    "i3-7100": lambda th: f"i3-7100_s1_smt-{'off' if th <= 2 else 'on'}",
     "i3-8100": lambda th: "i3-8100_s1_smt-off",
     "i5-7400": lambda th: "i5-7400_s1_smt-off",
     "i5-8500": lambda th: "i5-8500_s1_smt-off",

@@ -19,6 +19,7 @@ nb の刻みは size 4096 までが 4、それ以上が 8。反復は各 5 回�
 | `dogwood_s1_smt-off` | 8 | 5/5 | 5/5 | 5/5 | — ▶ | — | 3/5 |
 | `epyc_s1_smt-on` | 32 | 5/5 | 5/5 | 5/5 | 5/5 | 1/5 ▶ | 4/5 |
 | `i3-10100_s1_smt-off` | 4 | 5/5 | 5/5 | 5/5 | — | — | 3/5 |
+| `i3-7100_s1_smt-off` | 2 | — | — | — | — | — | 0/5 |
 | `i3-7100_s1_smt-on` | 4 | 5/5 | 5/5 | 5/5 | 5/5 | — | 4/5 |
 | `i3-8100_s1_smt-off` | 4 | 5/5 | 5/5 | 5/5 | 5/5 | 1/5 | 4/5 |
 | `i5-7400_s1_smt-off` | 4 | — | — | — | — | — | 0/5 |
@@ -37,6 +38,7 @@ nb の刻みは size 4096 までが 4、それ以上が 8。反復は各 5 回�
 | `dogwood` | 1 | 1/1 | 1/1 | 1/1 | 1/1 | 4/4 |
 | `epyc` | 1 | 1/1 | 1/1 | 5/1 | 1/1 | 4/4 |
 | `i3-10100` | 1 | — | — | 1/1 | — | 1/4 |
+| `i3-7100` | 1 | — | — | — | — | 0/4 |
 | `i5-7400` | 1 | 1/1 | 1/1 | — ▶ | — ▶ | 2/4 |
 | `i5-8500` | 1 | 1/1 | 1/1 | 1/1 | 1/1 | 4/4 |
 | `i7-7700` | 1 | 1/1 | 1/1 | 1/1 | 1/1 | 4/4 |
@@ -51,7 +53,7 @@ nb の刻みは size 4096 までが 4、それ以上が 8。反復は各 5 回�
 | `corei5-13400F` | 8 | 1/5 | 0/1 |
 | `corei5-13400F` | 16 | 1/5 | 0/1 |
 
-完了 **79 / 116** 条件。セルは「取れている反復数 / 計画の反復数」。`—` は未計測、`·` は計画に無い、`!` は反復は足りているが nb が計画の範囲に届いていない、`▶` は計測中（`running.yaml`）。
+完了 **79 / 125** 条件。セルは「取れている反復数 / 計画の反復数」。`—` は未計測、`·` は計画に無い、`!` は反復は足りているが nb が計画の範囲に届いていない、`▶` は計測中（`running.yaml`）。
 
 ## 計測中
 
@@ -75,7 +77,7 @@ nb の刻みは size 4096 までが 4、それ以上が 8。反復は各 5 回�
 
 | 指標 | 値 |
 |---|---|
-| 計画に対する完了 | 79 / 116 条件 |
+| 計画に対する完了 | 79 / 125 条件 |
 | 計測中の条件 | 12 |
 | 計測ファイル | 300 |
 | 計測済みの条件 (種別×機材×threads×size) | 87 |
@@ -156,6 +158,11 @@ nb の刻みは size 4096 までが 4、それ以上が 8。反復は各 5 回�
 | `dogwood_s1_smt-off` | 8 | 8192 | 32-512 | 8 | — | — | 0 | 0% | 0% | 0/5 | **missing** | — |
 | `i3-10100_s1_smt-off` | 4 | 16384 | 32-512 | 8 | — | — | 0 | 0% | 0% | 0/5 | **missing** | — |
 | `i3-10100_s1_smt-off` | 4 | 8192 | 32-512 | 8 | — | — | 0 | 0% | 0% | 0/5 | **missing** | — |
+| `i3-7100_s1_smt-off` | 2 | 1024 | 32-512 | 4 | — | — | 0 | 0% | 0% | 0/5 | **missing** | — |
+| `i3-7100_s1_smt-off` | 2 | 16384 | 32-512 | 8 | — | — | 0 | 0% | 0% | 0/5 | **missing** | — |
+| `i3-7100_s1_smt-off` | 2 | 2048 | 32-512 | 4 | — | — | 0 | 0% | 0% | 0/5 | **missing** | — |
+| `i3-7100_s1_smt-off` | 2 | 4096 | 32-512 | 4 | — | — | 0 | 0% | 0% | 0/5 | **missing** | — |
+| `i3-7100_s1_smt-off` | 2 | 8192 | 32-512 | 8 | — | — | 0 | 0% | 0% | 0/5 | **missing** | — |
 | `i3-7100_s1_smt-on` | 4 | 16384 | 32-512 | 8 | — | — | 0 | 0% | 0% | 0/5 | **missing** | — |
 | `i5-7400_s1_smt-off` | 4 | 1024 | 32-512 | 4 | — | — | 0 | 0% | 0% | 0/5 | **missing** | — |
 | `i5-7400_s1_smt-off` | 4 | 16384 | 32-512 | 8 | — | — | 0 | 0% | 0% | 0/5 | **missing** | — |
@@ -289,6 +296,10 @@ AOBA は同一構成でも物理ノードが複数あるので、その個体差
 | `i3-10100` | 1 | 1024 | 32-512 | 4 | — | — | 0 | 0% | 0% | 0/1 | **missing** | — |
 | `i3-10100` | 1 | 2048 | 32-512 | 4 | — | — | 0 | 0% | 0% | 0/1 | **missing** | — |
 | `i3-10100` | 1 | 8192 | 32-512 | 4 | — | — | 0 | 0% | 0% | 0/1 | **missing** | — |
+| `i3-7100` | 1 | 1024 | 32-512 | 4 | — | — | 0 | 0% | 0% | 0/1 | **missing** | — |
+| `i3-7100` | 1 | 2048 | 32-512 | 4 | — | — | 0 | 0% | 0% | 0/1 | **missing** | — |
+| `i3-7100` | 1 | 4096 | 32-512 | 4 | — | — | 0 | 0% | 0% | 0/1 | **missing** | — |
+| `i3-7100` | 1 | 8192 | 32-512 | 4 | — | — | 0 | 0% | 0% | 0/1 | **missing** | — |
 | `i5-7400` | 1 | 4096 | 32-512 | 4 | — | — | 0 | 0% | 0% | 0/1 | **missing** | — |
 | `i5-7400` | 1 | 8192 | 32-512 | 4 | — | — | 0 | 0% | 0% | 0/1 | **missing** | — |
 
@@ -307,4 +318,4 @@ qr_sweep とは ib の上限規則が違う（`ib <= nb - step`）。
 
 - 定義済みだが未計測のノード (9): `i3-6100`, `i3-9100`, `i5-7500`, `par008`, `par029`, `par030`, `par035`, `par045`, `xeon-e3-1220v3`
 - 計測されたが machines.yaml に無いノード (0): なし
-- 交絡要因が未確認の構成 (15): `aoba-b_s2_smt-off` (turbo), `aoba-b_s1_smt-off` (turbo), `calc_s2_smt-off` (turbo, memory_channels), `calc_s1_smt-off` (turbo, memory_channels), `epyc_s1_smt-on` (turbo, memory_channels), `i3-7100_s1_smt-on` (turbo, memory_channels), `i3-8100_s1_smt-off` (turbo, memory_channels), `i5-8500_s1_smt-off` (turbo, memory_channels), `i7-7700_s1_smt-on` (turbo, memory_channels), `i7-7700_s1_smt-off` (turbo, memory_channels), `ryzen5-7400f_s1_smt-on` (turbo, memory_channels), `ryzen5-7400f_s1_smt-off` (turbo, memory_channels), `i3-10100_s1_smt-off` (turbo, memory_channels), `dogwood_s1_smt-off` (turbo, memory_channels), `ryzen7-5800x_s1_smt-on` (turbo, memory_channels)
+- 交絡要因が未確認の構成 (16): `aoba-b_s2_smt-off` (turbo), `aoba-b_s1_smt-off` (turbo), `calc_s2_smt-off` (turbo, memory_channels), `calc_s1_smt-off` (turbo, memory_channels), `epyc_s1_smt-on` (turbo, memory_channels), `i3-7100_s1_smt-on` (turbo, memory_channels), `i3-7100_s1_smt-off` (turbo, memory_channels), `i3-8100_s1_smt-off` (turbo, memory_channels), `i5-8500_s1_smt-off` (turbo, memory_channels), `i7-7700_s1_smt-on` (turbo, memory_channels), `i7-7700_s1_smt-off` (turbo, memory_channels), `ryzen5-7400f_s1_smt-on` (turbo, memory_channels), `ryzen5-7400f_s1_smt-off` (turbo, memory_channels), `i3-10100_s1_smt-off` (turbo, memory_channels), `dogwood_s1_smt-off` (turbo, memory_channels), `ryzen7-5800x_s1_smt-on` (turbo, memory_channels)

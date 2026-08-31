@@ -49,6 +49,7 @@ kinds:
       - {config: calc_s1_smt-off,        threads: 12}
       - {config: epyc_s1_smt-on,         threads: 32}
       - {config: i3-7100_s1_smt-on,      threads: 4}
+      - {config: i3-7100_s1_smt-off,     threads: 2}
       - {config: i3-8100_s1_smt-off,     threads: 4}
       - {config: i5-7400_s1_smt-off,     threads: 4}
       - {config: i5-8500_s1_smt-off,     threads: 6}
@@ -80,6 +81,7 @@ kinds:
       - {node: dogwood,      threads: 1}
       - {node: epyc,         threads: 1}
       - {node: i3-10100,     threads: 1}
+      - {node: i3-7100,      threads: 1}
       # 他の全ノードと同じ threads=1。既存の i5-7400 の計測は threads=4 で
       # 回っており、1台だけ条件が違うと機種間で beta を比べられないため
       # curation.yaml で除外してある（i5-7400-ssrfb-threads）。
