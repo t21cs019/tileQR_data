@@ -1,0 +1,19 @@
+analyzing CPU 3:
+  driver: amd-pstate-epp
+  CPUs which run at the same hardware frequency: 3
+  CPUs which need to have their frequency coordinated by software: 3
+  maximum transition latency:  Cannot determine or is not supported.
+  hardware limits: 545 MHz - 4.76 GHz
+  available cpufreq governors: performance powersave
+  current policy: frequency should be within 545 MHz and 4.76 GHz.
+                  The governor "performance" may decide which speed to use
+                  within this range.
+  current CPU frequency: Unable to call hardware
+  current CPU frequency: 4.54 GHz (asserted by call to kernel)
+  boost state support:
+    Supported: yes
+    Active: yes
+    AMD PSTATE Highest Performance: 166. Maximum Frequency: 4.76 GHz.
+    AMD PSTATE Nominal Performance: 129. Nominal Frequency: 3.70 GHz.
+    AMD PSTATE Lowest Non-linear Performance: 104. Lowest Non-linear Frequency: 2.98 GHz.
+    AMD PSTATE Lowest Performance: 14. Lowest Frequency: 545 MHz.

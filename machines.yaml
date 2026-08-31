@@ -440,6 +440,33 @@ configs:
     numactl: null
     note: threads=12（6コア x SMT）。
 
+  ryzen5-7400f_s1_smt-off:
+    arch: zen4-ryzen5-7400f
+    sockets_used: 1
+    smt: off
+    memory_channels: unknown
+    turbo: unknown
+    numactl: null
+    note: threads=6（6コア、SMT 無効）。BIOS で SMT を切って再計測。
+
+  i3-10100_s1_smt-off:
+    arch: cometlake-i3-10100
+    sockets_used: 1
+    smt: off
+    memory_channels: unknown
+    turbo: unknown
+    numactl: null
+    note: threads=4（4コア、SMT 無効。lscpu 実機確認済み）。
+
+  dogwood_s1_smt-off:
+    arch: broadwell-e-i7-6900k
+    sockets_used: 1
+    smt: off
+    memory_channels: unknown
+    turbo: unknown
+    numactl: null
+    note: threads=8（8コア、SMT 無効）。
+
   ryzen7-5800x_s1_smt-on:
     arch: zen3-ryzen7-5800x
     sockets_used: 1

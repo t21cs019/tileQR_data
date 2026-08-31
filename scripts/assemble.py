@@ -77,7 +77,12 @@ CONFIG_RULES = {
     "i5-7400": lambda th: "i5-7400_s1_smt-off",
     "i5-8500": lambda th: "i5-8500_s1_smt-off",
     "i7-7700": lambda th: "i7-7700_s1_smt-on",
-    "ryzen5-7400f": lambda th: "ryzen5-7400f_s1_smt-on",
+    # Ryzen 5 7400F は6コア。th<=6 なら SMT 無効、th>6（=12）なら SMT 有効。
+    "ryzen5-7400f": lambda th: f"ryzen5-7400f_s1_smt-{'off' if th <= 6 else 'on'}",
+    # Core i3-10100 は4コア。th<=4 なら SMT 無効。
+    "i3-10100": lambda th: f"i3-10100_s1_smt-{'off' if th <= 4 else 'on'}",
+    # Core i7-6900K は8コア。th<=8 なら SMT 無効。
+    "dogwood": lambda th: f"dogwood_s1_smt-{'off' if th <= 8 else 'on'}",
 }
 
 

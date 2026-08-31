@@ -54,6 +54,9 @@ kinds:
       - {config: i5-8500_s1_smt-off,     threads: 6}
       - {config: i7-7700_s1_smt-on,      threads: 8}
       - {config: ryzen5-7400f_s1_smt-on, threads: 12}
+      - {config: ryzen5-7400f_s1_smt-off, threads: 6}
+      - {config: i3-10100_s1_smt-off,    threads: 4}
+      - {config: dogwood_s1_smt-off,     threads: 8}
       - {config: ryzen7-5800x_s1_smt-on, threads: 16, sizes: [2048, 4096]}
 
   ssrfb:
@@ -75,6 +78,7 @@ kinds:
       - {node: calc,         threads: 1}
       - {node: dogwood,      threads: 1}
       - {node: epyc,         threads: 1}
+      - {node: i3-10100,     threads: 1}
       - {node: i5-7400,      threads: 4}
       - {node: i5-8500,      threads: 1}
       - {node: i7-7700,      threads: 1}
