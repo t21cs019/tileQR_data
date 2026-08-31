@@ -370,7 +370,8 @@ configs:
     arch: kabylake-i3-7100
     sockets_used: 1
     smt: on
-    memory_channels: unknown
+    memory_channels: unknown    # 自宅機は DIMM を融通し合っていた。要確認
+    # サーマルドリフトあり、再計測対象（TODO_REMEASURE.md）。
     turbo: unknown
     numactl: null
     note: threads=4（2コア x SMT）。
@@ -379,7 +380,8 @@ configs:
     arch: coffeelake-i3-8100
     sockets_used: 1
     smt: off
-    memory_channels: unknown
+    memory_channels: unknown    # 自宅機は DIMM を融通し合っていた。要確認
+    # 形状が同コア数群の外れ値、再計測対象（TODO_REMEASURE.md）。
     turbo: unknown
     numactl: null
     note: threads=4（4コア、SMT なし）。
@@ -388,16 +390,32 @@ configs:
     arch: kabylake-i5-7400
     sockets_used: 1
     smt: off
-    memory_channels: unknown
-    turbo: unknown
+    memory_channels: 1         # 実測で確定（2026-08-31）。下の note を読むこと
+    turbo: on                  # intel_pstate no_turbo=0、負荷時 3.30 GHz を実測
     numactl: null
-    note: threads=4。
+    note: >
+      threads=4。**現在 raw/ にあるデータはシングルチャネルで計測されており無効。**
+      全サイズ再計測の対象（TODO_REMEASURE.md）。再計測後は memory_channels: 2 に直す。
+
+      実機は 4GB DDR4-2400 single rank x2 を ChannelA-DIMM1 / ChannelB-DIMM1 に
+      搭載できる構成（dmidecode -t 17）。6月の計測時は1枚だけ挿さっていた。
+      DIMM を抜き差しして両構成で計測した結果、6月の値がシングル側で再現した
+      （10点の比が平均 1.003）。デュアル化の効果は nb 依存で nb=32 +5.9%、
+      nb=448 +21.4%。最良 nb も 232 → 320 と動く。
+      詳細: studies/i5-7400_memory_channel/
+
+      実測値（OMP_NUM_THREADS=4）:
+        1ch  TRIAD 15.53 / COPY 15.10 / READ 16.69 GB/s、READ は3スレッドで飽和
+        2ch  TRIAD 29.44 / COPY 29.05 / READ 24.78 GB/s、4スレッドでも未飽和
+        全コア AVX2 クロック 3.30 GHz（両構成とも）、PL1 65W/tau 8s、PL2 81W
+        18分連続負荷でドリフト -0.1%、throttle 0件、パッケージ温度 73℃ で飽和
 
   i5-8500_s1_smt-off:
     arch: coffeelake-i5-8500
     sockets_used: 1
     smt: off
     memory_channels: unknown    # dual channel のはず。nb* に影響するため要確認
+    # 自宅機は DIMM を融通し合っていた。未点検。spotcheck.py で検証すること。
     turbo: unknown
     numactl: null
     note: threads=6。
@@ -406,7 +424,8 @@ configs:
     arch: kabylake-i7-7700
     sockets_used: 1
     smt: on
-    memory_channels: unknown
+    memory_channels: unknown    # 自宅機は DIMM を融通し合っていた。要確認
+    # 未点検。spotcheck.py で検証すること。
     turbo: unknown
     numactl: null
     note: threads=8（4コア x SMT）。
@@ -415,7 +434,8 @@ configs:
     arch: zen4-ryzen5-7400f
     sockets_used: 1
     smt: on
-    memory_channels: unknown
+    memory_channels: unknown    # 自宅機は DIMM を融通し合っていた。要確認
+    # 未点検。spotcheck.py で検証すること。
     turbo: unknown
     numactl: null
     note: threads=12（6コア x SMT）。
