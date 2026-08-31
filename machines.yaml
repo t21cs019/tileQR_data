@@ -430,6 +430,15 @@ configs:
     numactl: null
     note: threads=8（4コア x SMT）。
 
+  i7-7700_s1_smt-off:
+    arch: kabylake-i7-7700
+    sockets_used: 1
+    smt: off
+    memory_channels: unknown    # 自宅機は DIMM を融通し合っていた。要確認
+    turbo: unknown
+    numactl: null
+    note: threads=4（4コア、SMT 無効）。BIOS で SMT を切って計測。
+
   ryzen5-7400f_s1_smt-on:
     arch: zen4-ryzen5-7400f
     sockets_used: 1

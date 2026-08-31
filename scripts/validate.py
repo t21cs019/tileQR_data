@@ -199,8 +199,13 @@ def check_running(placed: list[dict], rep: Report) -> None:
     """
     running.yaml の書式と、済んだ計測の消し忘れ。
 
-    データが raw/ に入ったのに running のままだと、進捗表がいつまでも
-    「計測中」を出し続け、次に何を流せばよいか分からなくなる。
+    「データが1本でもある」で警告してはいけない。計測中の条件は途中まで
+    データが入っているのが普通で（epyc size16384 は 5本のうち3本目を走らせて
+    いる最中）、それを毎回「終わったのでは」と言われると警告が信用されなくなる。
+
+    計画の反復数に届いたときだけ言う。届いているのに走らせ続けているなら、
+    終わったのを消し忘れているか、計画の分母がその計測を捉えていないかの
+    どちらかで、どちらも知りたい。
     """
     try:
         entries = plan.load_running()
@@ -208,16 +213,28 @@ def check_running(placed: list[dict], rep: Report) -> None:
         rep.error(f"running.yaml が読めない — {exc}")
         return
 
-    have = {(i["kind"], i.get("config") or i["node"], i["threads"], i["size"])
-            for i in placed}
+    counts: dict[tuple, int] = defaultdict(int)
+    for i in placed:
+        counts[(i["kind"], i.get("config") or i["node"], i["threads"], i["size"])] += 1
+
+    targets = {
+        (kind, t.get("config") or t.get("node"), t["threads"], t["size"]): t
+        for kind in ("qr_sweep", "ssrfb", "kernel_dtsmqr")
+        for t in plan.targets_for(kind)
+    }
+
     for key, entry in plan.running_keys(entries).items():
-        if key in have:
-            kind, machine, threads, size = key
-            rep.warn(
-                f"running.yaml: {kind} `{machine}` t{threads} size{size} は "
-                f"raw/ にデータがある（{entry.get('since', '?')} 開始）。"
-                "終わった計測なら running から消すこと"
-            )
+        want = targets.get(key)
+        got = counts.get(key, 0)
+        if not want or got < want["trials"]:
+            continue
+        kind, machine, threads, size = key
+        rep.warn(
+            f"running.yaml: {kind} `{machine}` t{threads} size{size} は "
+            f"raw/ に {got}/{want['trials']} 本あり計画に届いている"
+            f"（{entry.get('since', '?')} 開始）。終わったなら running から消す。"
+            "走らせ続けているなら、計画の分母がその計測を捉えていない"
+        )
 
 
 def main() -> int:
@@ -281,15 +298,23 @@ def main() -> int:
     # 1ファイル1トライアルにしたので、同一条件に複数ファイルあるのは
     # 「反復して計測した」という意図どおりの状態。数が並んでいること自体は
     # 異常ではない。異常なのは (a) 計画より多い、(b) 同じ周が二重にある、の2つ。
+    # 鍵に node を入れてはいけない。qr_sweep の計画は config 単位で書くので
+    # plan 側の node は常に None になり、実測側の鍵（node 入り）と噛み合わない。
+    # そのせいでこの検査は一度も発火していなかった。
     targets = {
-        (t["config"], t["node"], t["threads"], t["size"]): t
+        (t["config"], t["threads"], t["size"]): t
         for t in plan.targets_for("qr_sweep")
     }
-    for key, files in sorted(seen.items()):
+    by_plan_key: dict[tuple, list[str]] = defaultdict(list)
+    for (config, _node, threads, size), files in seen.items():
+        by_plan_key[(config, threads, size)] += files
+
+    for key, files in sorted(by_plan_key.items(), key=lambda kv: str(kv[0])):
         target = targets.get(key)
         if target and len(files) > target["trials"]:
+            config, threads, size = key
             rep.warn(
-                f"同一条件 {key} に {len(files)} ファイル。"
+                f"同一条件 `{config}` t{threads} size{size} に {len(files)} ファイル。"
                 f"計画は trials={target['trials']} なので多い"
             )
 

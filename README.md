@@ -64,7 +64,8 @@ tileQR_data/
 │   ├── ssrfb/{node}/*.csv
 │   ├── kernel_dtsmqr/{node}/*.csv
 │   ├── JOINS.md        # 連結の出所。assemble.py が生成
-│   └── CURATION.md     # 除外・置換の適用結果。assemble.py が生成
+│   ├── CURATION.md     # 除外・置換の適用結果。assemble.py が生成
+│   └── ASSEMBLED.txt   # assemble.py が置いたファイルの台帳。掃除の範囲を決める
 ├── derived/            # ingest.py が生成。コミットする
 │   ├── qr_sweep.parquet
 │   ├── ssrfb.parquet
@@ -115,12 +116,16 @@ python scripts/assemble.py raw_data              # dry-run
 python scripts/assemble.py raw_data --apply --clean
 ```
 
-`--clean` は「今回 `raw_data` を読んで出力先が決まったディレクトリ」の中だけを
-掃除する。ディレクトリを丸ごと消さないのは、`raw/qr_sweep` に assemble の
-管轄でないものが混ざっているため。`ryzen7-5800x_s1_smt-on` は学部時代の
-ファイルを `migrate.py` が成形したもので、元ファイルは `SRC_RE` に合わず
-assemble は読まない。`rm -rf raw/qr_sweep` してから書き直すと、
-**この構成のデータは消えたきり戻らない**。
+`--clean` は **`raw/ASSEMBLED.txt`（前回 assemble.py が置いたファイルの台帳）に
+載っていたものだけ**を掃除の対象にする。除外したデータは前回の台帳に載っている
+ので消えるが、自分が置いた覚えのないファイルには触らない。
+
+ディレクトリ単位で持ち物を決めてはいけない。`raw/qr_sweep/ryzen7-5800x_s1_smt-on`
+には `migrate.py` が学部時代のファイルを成形した `..._nodate_r{k}.csv` と、
+いまの計測機が規約どおりの名前で出したものが**同居している**。元ファイル
+（`Ryzen7-5800X_16_2048_trial1.csv` 等）は `SRC_RE` に合わないので assemble は
+読まない。ディレクトリごと消す実装だと、この構成の学部時代のデータは
+**消えたきり戻らない**。
 
 ### `t{N}` はスレッド数ではなくトライアル数だった
 

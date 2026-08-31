@@ -91,7 +91,14 @@ CONFIG_RULES = {
     "i3-8100": lambda th: "i3-8100_s1_smt-off",
     "i5-7400": lambda th: "i5-7400_s1_smt-off",
     "i5-8500": lambda th: "i5-8500_s1_smt-off",
-    "i7-7700": lambda th: "i7-7700_s1_smt-on",
+    # Core i7-7700 は4コア。th<=4 なら SMT 無効。
+    # smt-on 固定にしていると、BIOS で SMT を切って測った threads=4 の
+    # ファイルが smt-on のディレクトリに紛れ込み、別条件が同じ config に混ざる。
+    "i7-7700": lambda th: f"i7-7700_s1_smt-{'off' if th <= 4 else 'on'}",
+    # Ryzen 7 5800X は8コア。th<=8 なら SMT 無効。
+    # 学部時代のぶんは migrate.py が置いたが、いまの計測機は規約どおりの
+    # ファイル名で出すので assemble も読む。
+    "ryzen": lambda th: f"ryzen7-5800x_s1_smt-{'off' if th <= 8 else 'on'}",
     # Ryzen 5 7400F は6コア。th<=6 なら SMT 無効、th>6（=12）なら SMT 有効。
     "ryzen5-7400f": lambda th: f"ryzen5-7400f_s1_smt-{'off' if th <= 6 else 'on'}",
     # Core i3-10100 は4コア。th<=4 なら SMT 無効。
@@ -147,9 +154,6 @@ def scan(
     trials: list[dict] = []
     notes: list[str] = []
     curated: list[str] = []
-    # このスクリプトが面倒を見る出力先。curation で全部落ちた条件も入れる
-    # （空にすべきディレクトリを「所有していない」と誤判定しないため）。
-    owned: set[Path] = set()
 
     for path in sorted(src_dir.glob("*/*.csv")):
         m = SRC_RE.match(path.name)
@@ -200,7 +204,6 @@ def scan(
         # qr_sweep だけ config を持つ。curation.yaml から config 単位で
         # 指定できるように、ここで解決してトライアルに載せておく。
         config = config_for(node, threads) if kind == "qr_sweep" else None
-        owned.add(destination_dir(kind, node, threads))
 
         for k, part in enumerate(parts, start=1):
             trial = {
@@ -230,34 +233,53 @@ def scan(
             trial["span"] = int(nbs[-1]) - int(nbs[0])
             trials.append(trial)
 
-    return trials, notes, curated, owned
+    return trials, notes, curated
 
 
-def stale_files(owned: set[Path], writing: set[Path]) -> list[Path]:
+def load_manifest() -> set[Path]:
+    """前回 assemble.py が書き出したファイルの一覧。無ければ空。"""
+    if not paths.ASSEMBLED_TXT.exists():
+        return set()
+    return {
+        paths.ROOT / line.strip()
+        for line in paths.ASSEMBLED_TXT.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.startswith("#")
+    }
+
+
+def write_manifest(writing: set[Path]) -> None:
+    lines = [
+        "# ASSEMBLED",
+        "# scripts/assemble.py が書き出したファイルの台帳。手で編集しない。",
+        "# 次回の --clean はこの一覧に載っていたファイルだけを掃除の対象にする。",
+        "# ここに無いファイル（migrate.py の生成物など）には触らない。",
+    ]
+    lines += [str(p.relative_to(paths.ROOT)).replace("\\", "/")
+              for p in sorted(writing, key=str)]
+    paths.ASSEMBLED_TXT.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def stale_files(previous: set[Path], writing: set[Path]) -> list[Path]:
     """
-    今回書き出す先のうち、前回の名残として残っている CSV。
+    前回 assemble.py が書き出したが、今回は書かないファイル。
 
-    --- なぜディレクトリを丸ごと消さないか -------------------------------
+    --- なぜ「自分が前に置いたもの」しか消さないか -----------------------
 
     raw/qr_sweep には assemble.py の管轄でないものが混ざっている。
-    `ryzen7-5800x_s1_smt-on` は学部時代のファイルを migrate.py が成形したもので、
-    元ファイル（`Ryzen7-5800X_16_2048_trial1.csv` 等）は SRC_RE に合わないため
-    assemble.py は読まない。`rm -rf raw/qr_sweep` してから書き直すと、
-    この構成のデータは**消えたきり戻らない**。
+    `ryzen7-5800x_s1_smt-on` には、学部時代のファイルを migrate.py が成形した
+    `..._nodate_r{k}.csv` と、いまの計測機が規約どおりの名前で出したものが
+    同居している。元ファイル（`Ryzen7-5800X_16_2048_trial1.csv` 等）は
+    SRC_RE に合わないので assemble.py は読まない。
 
-    そこで「今回 raw_data を読んで出力先が決まったディレクトリ」だけを
-    自分の持ち物とみなし、その中の見覚えのないファイルを消す。
-    curation で全トライアルが落ちた条件（i5-7400）もここに入るので、
-    除外したデータはちゃんと消える。読まなかった構成には触らない。
+    ディレクトリ単位で持ち物を決めると、この構成のように**生成元が2つある
+    ディレクトリ**で migrate.py のぶんを巻き添えに消してしまう
+    （`rm -rf raw/qr_sweep` していた頃と同じ壊れ方）。
+
+    そこで台帳（raw/ASSEMBLED.txt）に載っていたものだけを掃除の対象にする。
+    curation で落ちるようになった条件は前回の台帳に載っているので消えるし、
+    自分が置いた覚えのないファイルには触らない。
     """
-    stale = []
-    for parent in sorted(owned, key=str):
-        if not parent.is_dir():
-            continue
-        for csv in sorted(parent.glob("*.csv")):
-            if csv not in writing:
-                stale.append(csv)
-    return stale
+    return [p for p in sorted(previous - writing, key=str) if p.is_file()]
 
 
 def group_key(t: dict) -> tuple:
@@ -408,7 +430,7 @@ def main() -> int:
         return 1
 
     try:
-        trials, notes, curated, owned = scan(args.src, rules)
+        trials, notes, curated = scan(args.src, rules)
     except curation.CurationError as exc:
         print(f"エラー: curation.yaml — {exc}", file=sys.stderr)
         return 1
@@ -456,7 +478,7 @@ def main() -> int:
 
     # 除外したファイルは「書き出さない」だけでは消えない。前回の assemble が
     # 残したものが raw/ に居座り、除外したつもりのデータが derived まで通る。
-    stale = stale_files(owned, set(collisions))
+    stale = stale_files(load_manifest(), set(collisions))
     if stale:
         print(f"\n=== 前回の名残 ({len(stale)}) ===")
         for csv in stale:
@@ -473,11 +495,12 @@ def main() -> int:
         return 1
 
     if args.clean:
+        emptied = {csv.parent for csv in stale}
         for csv in stale:
             csv.unlink()
         # 除外で空になったディレクトリは残さない。中身が無いのに
         # ディレクトリだけあると「測ったはずだが読めていない」に見える。
-        for parent in sorted(owned, key=str):
+        for parent in sorted(emptied, key=str):
             if parent.is_dir() and not any(parent.iterdir()):
                 parent.rmdir()
 
@@ -499,10 +522,12 @@ def main() -> int:
     paths.JOINS_MD.write_text("\n".join(manifest) + "\n", encoding="utf-8")
 
     write_curation_md(rules, curated)
+    write_manifest(set(collisions))
 
     print(f"\n{len(trials)} ファイルを書き出しました。")
     print(f"連結の記録:   {paths.JOINS_MD.relative_to(paths.ROOT)}")
     print(f"除外の記録:   {paths.CURATION_MD.relative_to(paths.ROOT)}")
+    print(f"置いたものの台帳: {paths.ASSEMBLED_TXT.relative_to(paths.ROOT)}")
     return 0
 
 

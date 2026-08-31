@@ -44,24 +44,71 @@
 
 version: 1
 
-running: []
-  # 書き方の例。実際に流したらコメントを外して使う。
-  #
-  # - kind: qr_sweep
-  #   config: i5-7400_s1_smt-off
-  #   threads: 4
-  #   sizes: [1024, 2048]
-  #   since: 2026-09-01
-  #   host: i5-7400
-  #   command: |
-  #     ./run_sweep.sh --size 1024 --nb 32-512 --trials 5
-  #     ./run_sweep.sh --size 2048 --nb 32-512 --trials 5
-  #   note: サーマル対策で冷却を改善したうえでの再計測1本目
-  #
-  # - kind: ssrfb
-  #   node: i5-7400
-  #   threads: 1
-  #   sizes: [1024, 2048, 4096, 8192]
-  #   since: 2026-09-01
-  #   host: i5-7400
-  #   command: ./run_ssrfb.sh --threads 1 --nb 32-512
+running:
+
+  # --- 研究室のサーバ ---------------------------------------------------
+
+  - kind: qr_sweep
+    config: calc_s1_smt-off
+    threads: 12
+    sizes: [16384]
+    since: 2026-09-01
+    host: calc（研究室）
+    note: 1ソケット固定。現在 2/5 本目
+
+  - kind: qr_sweep
+    config: ryzen7-5800x_s1_smt-on
+    threads: 16
+    sizes: [4096]
+    since: 2026-09-01
+    host: ryzen（研究室）
+    note: >
+      nb 404-512 の残り4本のみ。nb 32-400 は5本揃っている。
+      size2048 の 404-512 は 2026-09-01 に完了して raw/ に入った
+
+  - kind: qr_sweep
+    config: epyc_s1_smt-on
+    threads: 32
+    sizes: [16384]
+    since: 2026-09-01
+    host: epyc（研究室）
+    note: 現在 3/5 本目。1本ごとにジョブを投げている
+
+  - kind: qr_sweep
+    config: dogwood_s1_smt-off
+    threads: 8
+    sizes: [8192]
+    since: 2026-09-01
+    host: dogwood / i7-6900K（研究室）
+    note: size4096 は 2026-08-30 に完了して raw/ に入った
+
+  # --- 自宅の PC --------------------------------------------------------
+
+  - kind: ssrfb
+    node: i5-7400
+    threads: 1
+    sizes: [4096, 8192]
+    since: 2026-09-01
+    host: i5-7400（自宅）
+    note: >
+      threads=4 で撮り直しになったぶんの再計測（curation.yaml の
+      i5-7400-ssrfb-threads）。size 1024/2048 は 2026-08-31 に完了して
+      raw/ に入った。残りは 4096 と 8192
+
+  - kind: qr_sweep
+    config: i7-7700_s1_smt-off
+    threads: 4
+    sizes: [1024, 2048, 4096, 8192, 16384]
+    since: 2026-09-01
+    host: i7-7700（自宅）
+    note: >
+      BIOS で SMT を切っての新規構成。plan.yaml の5サイズすべて。
+      既存の i7-7700_s1_smt-on（threads=8）とは別条件
+
+  - kind: qr_sweep
+    config: ryzen5-7400f_s1_smt-off
+    threads: 6
+    sizes: [16384]
+    since: 2026-09-01
+    host: ryzen5-7400f（自宅）
+    note: 1024-8192 は5本ずつ完了済み。残るは size16384 のみ
