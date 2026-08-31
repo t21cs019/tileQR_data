@@ -78,44 +78,25 @@ SRC_RE = re.compile(
     r"_(?P<date>\d{8})_(?P<time>\d{6})\.csv$"
 )
 
-# ノードごとの計測構成。{短縮名}_s{使用ソケット数}_smt-{on|off}
-# smt は plasma-perf の cpus.toml の threads_per_core が根拠
-# （1 なら off、2 なら on）。
-CONFIG_RULES = {
-    # AOBA-B は 64 スレッドなら片ソケット固定、128 なら両ソケット
-    "aoba": lambda th: f"aoba-b_s{2 if th > 64 else 1}_smt-off",
-    # Xeon Silver 4214, HT off。物理12コア/ソケットなので th<=12 は片ソケット固定。
-    "calc": lambda th: f"calc_s{2 if th > 12 else 1}_smt-off",
-    "epyc": lambda th: "epyc_s1_smt-on",            # EPYC 7543, threads_per_core=2
-    # Core i3-7100 は2コア。th<=2 なら SMT 無効。
-    "i3-7100": lambda th: f"i3-7100_s1_smt-{'off' if th <= 2 else 'on'}",
-    "i3-8100": lambda th: "i3-8100_s1_smt-off",
-    "i5-7400": lambda th: "i5-7400_s1_smt-off",
-    "i5-8500": lambda th: "i5-8500_s1_smt-off",
-    # Core i7-7700 は4コア。th<=4 なら SMT 無効。
-    # smt-on 固定にしていると、BIOS で SMT を切って測った threads=4 の
-    # ファイルが smt-on のディレクトリに紛れ込み、別条件が同じ config に混ざる。
-    "i7-7700": lambda th: f"i7-7700_s1_smt-{'off' if th <= 4 else 'on'}",
-    # Ryzen 7 5800X は8コア。th<=8 なら SMT 無効。
-    # 学部時代のぶんは migrate.py が置いたが、いまの計測機は規約どおりの
-    # ファイル名で出すので assemble も読む。
-    "ryzen": lambda th: f"ryzen7-5800x_s1_smt-{'off' if th <= 8 else 'on'}",
-    # Ryzen 5 7400F は6コア。th<=6 なら SMT 無効、th>6（=12）なら SMT 有効。
-    "ryzen5-7400f": lambda th: f"ryzen5-7400f_s1_smt-{'off' if th <= 6 else 'on'}",
-    # Core i3-10100 は4コア。th<=4 なら SMT 無効。
-    "i3-10100": lambda th: f"i3-10100_s1_smt-{'off' if th <= 4 else 'on'}",
-    # Core i7-6900K は8コア。th<=8 なら SMT 無効。
-    "dogwood": lambda th: f"dogwood_s1_smt-{'off' if th <= 8 else 'on'}",
-}
+# --- 計測構成はディレクトリが決める ------------------------------------
+#
+# raw_data/{config}/ のディレクトリ名が、そのまま machines.yaml の configs の
+# キーであり、raw/qr_sweep/{config}/ の行き先になる。
+#
+# 以前はスレッド数から推測していた（i7-7700 で th<=4 なら smt-off、calc で
+# th<=12 なら s1、など）。これは原理的に当てにならない。SMT を有効にしたまま
+# 4スレッドで走らせれば i7-7700 の th は 4 になるし、2ソケット機で12スレッドを
+# 使えば calc の th は 12 になる。**SMT の有無と使用ソケット数は CSV にも
+# ファイル名にも残らない**。実行時の起動方法の事実であって、データから復元できない。
+#
+# 推測でしのげていたのは「そういう回し方はしない」という暗黙の約束があった
+# からで、smt-on/off と s1/s2 の変種が増えるほどこの約束は破れやすくなる。
+# 計測した人が置き場所で宣言し、こちらは読むだけにする。
 
 
-def config_for(node: str, threads: int) -> str:
-    if node.startswith("par"):
-        return CONFIG_RULES["aoba"](threads)
-    rule = CONFIG_RULES.get(node)
-    if rule is None:
-        raise ValueError(f"config 規則が未定義のノード: {node}")
-    return rule(threads)
+def config_of(csv: Path) -> str:
+    """raw_data/{config}/xxx.csv の {config} を返す。"""
+    return csv.parent.name
 
 
 def split_trials(df: pd.DataFrame) -> list[pd.DataFrame]:
@@ -204,7 +185,7 @@ def scan(
         node = m.group("node")
         # qr_sweep だけ config を持つ。curation.yaml から config 単位で
         # 指定できるように、ここで解決してトライアルに載せておく。
-        config = config_for(node, threads) if kind == "qr_sweep" else None
+        config = config_of(path) if kind == "qr_sweep" else None
 
         for k, part in enumerate(parts, start=1):
             trial = {
@@ -285,7 +266,7 @@ def stale_files(previous: set[Path], writing: set[Path]) -> list[Path]:
 
 def group_key(t: dict) -> tuple:
     if t["kind"] == "qr_sweep":
-        return (t["kind"], config_for(t["node"], t["threads"]), t["threads"], t["size"])
+        return (t["kind"], t["config"], t["threads"], t["size"])
     return (t["kind"], t["node"], t["threads"], t["size"])
 
 
@@ -389,14 +370,13 @@ def _by(items, keyfn):
     return d
 
 
-def destination_dir(kind: str, node: str, threads: int) -> Path:
-    if kind == "qr_sweep":
-        return paths.RAW_SWEEP / config_for(node, threads)
-    return paths.RAW / kind / node
-
-
 def destination(t: dict) -> Path:
-    parent = destination_dir(t["kind"], t["node"], t["threads"])
+    # qr_sweep は config で分ける（raw_data 側のディレクトリがそのまま来る）。
+    # ssrfb / kernel_dtsmqr は config に依存しないので node で分ける。
+    if t["kind"] == "qr_sweep":
+        parent = paths.RAW_SWEEP / t["config"]
+    else:
+        parent = paths.RAW / t["kind"] / t["node"]
 
     suffix = f"_r{t['index']}" if t["of"] > 1 else ""
     name = (

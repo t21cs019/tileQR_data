@@ -110,16 +110,16 @@ assemble が「未使用」として報告するので、そこで気づける�
 
 | node | size | 元ファイル | 症状 |
 |---|---|---|---|
-| `dogwood` (i7-6900K) | 4096 | `raw_data/benchmark_i7-6900k/dogwood_ssrfb_size4096_nb32-512_th1_t1_20260803_080415.csv` | nb=32,ib=8 が 0.057 GFlops（他は9.8以上） |
+| `dogwood` (i7-6900K) | 4096 | `raw_data/dogwood_s1_smt-off/dogwood_ssrfb_size4096_nb32-512_th1_t1_20260803_080415.csv` | nb=32,ib=8 が 0.057 GFlops（他は9.8以上） |
 
 格子自体は完全（欠損・重複なし）で、この1点を除けば異常なし。
 
 解消済み: `i7-7700` size1024 は該当点のみ手動で5回再計測した
-（`raw_data/i7_7700/i7-7700_manual_ssrfb_nb32_ib8.csv`、10.1〜10.7 GFlops で安定）。
+（`raw_data/i7-7700_s1_smt-on/i7-7700_manual_ssrfb_nb32_ib8.csv`、10.1〜10.7 GFlops で安定）。
 平均値（Time_sec/GFlopsとも算術平均）で置き換え。
 
 解消済み: `ryzen` size1024 は該当点のみ手動で10回再計測した
-（`raw_data/benchmark_ryzen/ryzen_manual_ssrfb_nb32_ib8.csv`）。**この再計測でも
+（`raw_data/ryzen7-5800x_s1_smt-on/ryzen_manual_ssrfb_nb32_ib8.csv`）。**この再計測でも
 1回目の呼び出しだけ Time_sec が約10倍に跳ねており（0.52 GFlops、他9回は5.5〜6.2）**、
 同じコールドスタート性ノイズの再現と判断して1回目を除外。残り9回の平均
 （Time_sec/GFlopsとも算術平均、5.85 GFlops）で置き換え。
@@ -154,7 +154,7 @@ size2048 は nb 32-400 が5本（`migrate.py` 生成の `nodate`）、nb 404-512
 
 ## 学部時代の dgeqrf データ：スレッド数不明
 
-`raw_data/benchmark_i7-6900k/Full_search_dgeqrf/benchmark_dtsmqr_4096.csv`
+`raw_data/dogwood_s1_smt-off/Full_search_dgeqrf/benchmark_dtsmqr_4096.csv`
 (実体は `dgeqrf` のフルスイープ、size=4096、nb=20-512/ib=4-nb/2、格子は完全)。
 
 CSV に `threads` 列が無く、当時のスレッド数（8 or 16、SMT有無）を

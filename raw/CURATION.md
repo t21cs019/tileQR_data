@@ -29,7 +29,6 @@ raw_data → raw で実際に適用した結果。理由と再計測の方針は
 
 ## 適用のログ
 
-- [ryzen-ssrfb-coldstart] ryzen_ssrfb_size1024_nb32-512_th1_t1_20260830_081745.csv r1: 1 行を ryzen_manual_ssrfb_nb32_ib8.csv の値で置換
 - [i5-7400-qr_sweep-memory-channels] i5-7400_size1024_nb32-512_t5_20260624_104705.csv r1: 除外（3,963 行）
 - [i5-7400-qr_sweep-memory-channels] i5-7400_size1024_nb32-512_t5_20260624_104705.csv r2: 除外（3,963 行）
 - [i5-7400-qr_sweep-memory-channels] i5-7400_size1024_nb32-512_t5_20260624_104705.csv r3: 除外（3,963 行）
@@ -55,3 +54,4 @@ raw_data → raw で実際に適用した結果。理由と再計測の方針は
 - [i5-7400-ssrfb-threads] i5-7400_ssrfb_size4096_nb32-512_th4_t1_20260801_165117.csv r1: 除外（3,963 行）
 - [i5-7400-ssrfb-threads] i5-7400_ssrfb_size8192_nb32-512_th4_t1_20260801_192452.csv r1: 除外（1,022 行）
 - [i7-7700-ssrfb-coldstart] i7-7700_ssrfb_size1024_nb32-512_th1_t1_20260830_065953.csv r1: 1 行を i7-7700_manual_ssrfb_nb32_ib8.csv の値で置換
+- [ryzen-ssrfb-coldstart] ryzen_ssrfb_size1024_nb32-512_th1_t1_20260830_081745.csv r1: 1 行を ryzen_manual_ssrfb_nb32_ib8.csv の値で置換

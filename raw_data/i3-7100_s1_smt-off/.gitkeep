@@ -1,0 +1,7 @@
+i3-7100_s1_smt-off（threads=2、BIOS で SMT 無効）の計測をここに置く。
+
+ディレクトリ名が計測構成の宣言。machines.yaml の configs のキーと
+一致していること。assemble.py はこの名前を読んで raw/qr_sweep/ の
+行き先を決める（スレッド数からの推測はしない）。
+
+データが入ったらこのファイルは消してよい。

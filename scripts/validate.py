@@ -32,6 +32,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from tileqr_data import console, curation, io, paths, plan  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import assemble  # noqa: E402  SRC_RE を共有する（命名規約の定義を二重に持たない）
+
 console.use_utf8()
 
 
@@ -171,6 +174,69 @@ def check_machines(machines: dict, rep: Report) -> None:
                 )
 
 
+def check_raw_data(machines: dict, rep: Report) -> None:
+    """
+    raw_data/{config}/ のディレクトリ名と、中のファイルの整合。
+
+    ディレクトリが計測構成の唯一の宣言になったので、ここが間違っていると
+    そのまま raw/ の置き場所が間違う。スレッド数からの推測をやめた代わりに、
+    宣言が正しいことは検査で担保する。
+
+    実際に起きた事故: dogwood（i7-6900K）のファイルが benchmark_epyc/ に
+    置かれていた。ディレクトリ名を誰も見ていなかったので誰も気づかなかった。
+    """
+    if not paths.RAW_DATA.is_dir():
+        return
+
+    configs = machines.get("configs") or {}
+    nodes = machines.get("nodes") or {}
+    plan_threads = {
+        t["config"]: t["threads"] for t in plan.targets_for("qr_sweep") if t.get("config")
+    }
+
+    for config_dir in sorted(p for p in paths.RAW_DATA.glob("*") if p.is_dir()):
+        config = configs.get(config_dir.name)
+        if config is None:
+            rep.error(
+                f"raw_data/{config_dir.name}/: machines.yaml の configs に無い。"
+                "ディレクトリ名は計測構成の宣言なので、configs のキーと一致させること"
+            )
+            continue
+
+        for csv in sorted(config_dir.glob("*.csv")):
+            m = assemble.SRC_RE.match(csv.name)
+            if not m:
+                continue  # 命名規約外は assemble も読まない（migrate.py の管轄）
+            node = m.group("node")
+
+            # ノードとディレクトリが同じ CPU を指しているか。
+            entry = nodes.get(node)
+            if entry is None:
+                rep.error(
+                    f"raw_data/{config_dir.name}/{csv.name}: "
+                    f"node `{node}` が machines.yaml の nodes に無い"
+                )
+            elif entry.get("arch") != config.get("arch"):
+                rep.error(
+                    f"raw_data/{config_dir.name}/{csv.name}: "
+                    f"node `{node}` は {entry.get('arch')} だが、"
+                    f"ディレクトリは {config.get('arch')} の構成。置き場所が違う"
+                )
+
+            # qr_sweep なら、その構成で回すはずのスレッド数と合っているか。
+            # ssrfb は th=1 で構成に依存しないので見ない。
+            if m.group("ssrfb"):
+                continue
+            want = plan_threads.get(config_dir.name)
+            th = int(m.group("th")) if m.group("th") else None
+            if want and th and th != want:
+                rep.warn(
+                    f"raw_data/{config_dir.name}/{csv.name}: "
+                    f"threads={th} だが、この構成の計画は threads={want}。"
+                    "置き場所か計測条件のどちらかが違う"
+                )
+
+
 def check_curation(placed: list[dict], rep: Report) -> None:
     """
     除外したはずのデータが raw/ に残っていないか。
@@ -241,6 +307,7 @@ def main() -> int:
     rep = Report()
     machines = io.load_machines()
     check_machines(machines, rep)
+    check_raw_data(machines, rep)
     known_configs = set((machines.get("configs") or {}).keys())
     known_nodes = set((machines.get("nodes") or {}).keys())
 

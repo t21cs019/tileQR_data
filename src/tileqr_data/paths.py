@@ -12,6 +12,7 @@ from pathlib import Path
 # src/tileqr_data/paths.py → リポジトリルートは2つ上
 ROOT = Path(__file__).resolve().parents[2]
 
+RAW_DATA = ROOT / "raw_data"   # 計測機から回収したままの原本。触らない
 RAW = ROOT / "raw"
 RAW_SWEEP = RAW / "qr_sweep"
 RAW_KERNEL = RAW / "kernel_dtsmqr"

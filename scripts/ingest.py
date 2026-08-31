@@ -332,9 +332,12 @@ def running_section(entries: list[dict]) -> list[str]:
     for e in sorted(entries, key=lambda e: (e["kind"], str(e.get("config") or e.get("node")))):
         machine = e.get("config") or e.get("node")
         sizes = ", ".join(str(s) for s in e["sizes"])
+        # note は yaml の折り返し（`>`）で改行が残る。表のセルに改行を入れると
+        # 行が途中で切れて表が崩れるので、空白に畳んでから入れる。
+        note = " ".join(str(e.get("note", "")).split())
         lines.append(
             f"| {e['kind']} | `{machine}` | {e['threads']} | {sizes} | "
-            f"{e['since']} | {e.get('host', '—')} | {e.get('note', '')} |"
+            f"{e['since']} | {e.get('host', '—')} | {note} |"
         )
 
     with_cmd = [e for e in entries if e.get("command")]
