@@ -59,12 +59,10 @@ running:
   - kind: qr_sweep
     config: ryzen7-5800x_s1_smt-on
     threads: 16
-    sizes: [4096]
+    sizes: [8192]
     since: 2026-09-01
     host: ryzen（研究室）
-    note: >
-      nb 404-512 の残り4本のみ。nb 32-400 は5本揃っている。
-      size2048 の 404-512 は 2026-09-01 に完了して raw/ に入った
+    note: size4096 は 2026-09-01 に完了して raw/ に入った
 
   - kind: qr_sweep
     config: epyc_s1_smt-on

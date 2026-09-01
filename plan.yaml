@@ -43,23 +43,23 @@ kinds:
 
     # config ごとにスレッド数だけ書く。size は上の sizes を全部展開する。
     targets:
-      - {config: aoba-b_s2_smt-off,      threads: 128}
+      - {config: aoba-b_s2_smt-off,      threads: 128, sizes: [1024, 2048, 4096, 8192]}
       - {config: aoba-b_s1_smt-off,      threads: 64}
-      - {config: calc_s2_smt-off,        threads: 24}
+      - {config: calc_s2_smt-off,        threads: 24, sizes: [1024, 2048, 4096, 8192]}
       - {config: calc_s1_smt-off,        threads: 12}
       - {config: epyc_s1_smt-on,         threads: 32}
-      - {config: i3-7100_s1_smt-on,      threads: 4}
-      - {config: i3-7100_s1_smt-off,     threads: 2}
+      - {config: i3-7100_s1_smt-on,      threads: 4, sizes: [1024, 2048, 4096, 8192]}
+      - {config: i3-7100_s1_smt-off,     threads: 2, sizes: [1024, 2048, 4096, 8192]}
       - {config: i3-8100_s1_smt-off,     threads: 4}
-      - {config: i5-7400_s1_smt-off,     threads: 4}
+      - {config: i5-7400_s1_smt-off,     threads: 4, sizes: [1024, 2048, 4096, 8192]}
       - {config: i5-8500_s1_smt-off,     threads: 6}
-      - {config: i7-7700_s1_smt-on,      threads: 8}
+      - {config: i7-7700_s1_smt-on,      threads: 8, sizes: [1024, 2048, 4096, 8192]}
       - {config: i7-7700_s1_smt-off,     threads: 4}
       - {config: ryzen5-7400f_s1_smt-on, threads: 12}
       - {config: ryzen5-7400f_s1_smt-off, threads: 6}
-      - {config: i3-10100_s1_smt-off,    threads: 4}
-      - {config: dogwood_s1_smt-off,     threads: 8}
-      - {config: ryzen7-5800x_s1_smt-on, threads: 16, sizes: [2048, 4096]}
+      - {config: i3-10100_s1_smt-off,    threads: 4, sizes: [1024, 2048, 4096, 8192]}
+      - {config: dogwood_s1_smt-off,     threads: 8, sizes: [1024, 2048, 4096, 8192]}
+      - {config: ryzen7-5800x_s1_smt-on, threads: 16, sizes: [1024, 2048, 4096, 8192]}
 
   ssrfb:
     label: ssrfb カーネル単体の nb×ib スイープ
