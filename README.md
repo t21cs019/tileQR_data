@@ -26,7 +26,7 @@
 「この図はどのデータコミットから作ったか」の記録。これらが全部いらなくなる。
 
 同一リポジトリなら図とデータが同じコミットに入るので、
-出典は `git log -- out/fig_xxx.png` を見るだけで分かる。
+出典は `git log -- figures_final/卒論/fig_xxx.png` を見るだけで分かる。
 
 データが数百 MB 規模に育って「図を書くだけなのに clone が重い」となったら、
 その時点で分ければよい。今の規模（数 MB）では統合side が明らかに楽。
@@ -74,12 +74,17 @@ tileQR_data/
 │   ├── ssrfb.parquet
 │   ├── kernel_dtsmqr.parquet
 │   └── optima.csv
-├── figures/            # 図1つにつきスクリプト1本
-├── out/                # 生成した図。コミットする
+├── figures_src/        # 図の生成コード。1図につきスクリプト1本
+├── figures/            # 探索用の図。**Git 管理外**（parquet + コードから復元可能）
+├── figures_final/      # 発表に使った確定版。コミットする
+│   ├── README.md       # figures/ との使い分け
+│   └── 卒論/PROVENANCE.md
+├── instructions/       # 作業指示書
 ├── scripts/
 │   ├── assemble.py     # raw_data → raw（分割・連結・命名）
 │   ├── migrate.py      # 旧命名 → 新命名への移行
 │   ├── ingest.py       # raw → derived + COVERAGE.md
+│   ├── generate_figures.py  # 全 config の図を一括生成
 │   └── validate.py     # 命名規則・スキーマ・machines.yaml の検証
 ├── src/tileqr_data/
 │   ├── paths.py        # パス定義
@@ -348,7 +353,7 @@ uv sync
 make assemble    # raw_data → raw（新しい計測を回収したとき）
 make validate    # push 前の健全性チェック
 make ingest      # raw → derived + COVERAGE.md
-make figures     # out/ に図を生成
+make figures     # figures/ に図を生成（Git 管理外）
 make all         # validate → ingest → figures
 ```
 
@@ -612,18 +617,61 @@ AOBA はバッチ計算機でジョブごとにノードが変わるので、nod
 
 ### 図は1ファイル1図
 
-スクリプト名と出力名を一致させる（`fig_nb_curve_aoba.py` → `out/fig_nb_curve_aoba.png`）。
+スクリプト名と出力名を一致させる
+（`figures_src/fig_nb_curve_aoba.py` → `figures/fig_nb_curve_aoba.png`）。
+
+### 探索用は Git に入れない
+
+図には性質の違う2種類がある。使い分けは `figures_final/README.md` にある。
+
+| | `figures/` | `figures_final/` |
+|---|---|---|
+| 性質 | 探索用・使い捨て | 発表に使った確定版 |
+| Git | **管理外** | コミットする |
+| 復元 | parquet + `figures_src/` から常に作り直せる | `PROVENANCE.md` で担保 |
+
+解析のたびに数十枚が入れ替わるので、探索用まで追跡すると履歴が図の
+バイナリで埋まる。入力と生成コードがリポジトリにある限り復元できるため、
+成果物を持つ必要がない。
+
+### 一括生成
+
+```bash
+uv run python scripts/generate_figures.py                        # 全 config
+uv run python scripts/generate_figures.py --config aoba-b_s2_smt-off
+uv run python scripts/generate_figures.py --outdir figures_final/卒論
+uv run python scripts/generate_figures.py --force                # キャッシュ無視
+```
+
+出力は `figures/heatmap/`（(config, size) ごと）、`figures/sweep/`
+（config × 集約方法ごと、95% バンド付き）、`figures/comparison/`（比較表）。
+
+**試行の集約を argmax より先にやる。** 生データの argmax を直接取ると
+「5回のうち一番高く出た回」を拾い、上振れを選び取ることになる
+（`ingest.py` と同じ理由）。測定ノイズは遅くなる方向にしか出ないため、
+外れ値が混ざると平均は下方に引っぱられる。プラトー領域の隣接 nb 間の
+真の差は 1〜3% しかないので、この偏りが `nb*` とバンド境界を左右しうる。
+
+中央値と平均のどちらを既定にするかは決め打ちにせず、両方で図を出して
+`figures/comparison/aggregator_comparison.csv` に差分を出す。
+**実測では 57 条件中 15 条件で `nb*` が変わり、最大 40 ずれた。**
+確定版を置くときは、採用した集約方法を `PROVENANCE.md` に必ず記載する。
 
 ---
 
-## derived/ と out/ をコミットする理由
+## derived/ と figures_final/ をコミットする理由
 
 どちらも生成物だが、
 
 - `derived/` … ダッシュボードが `git pull` 直後に読める
-- `out/` … `tileQR_research` の散文から図を参照でき、資料を組み直すときに再計算がいらない
+- `figures_final/` … `tileQR_research` の散文から図を参照でき、資料を組み直すときに再計算がいらない
 
 ため、コミットする。合計で数 MB 程度なので履歴肥大の心配はない。
+
+**探索用の `figures/` は追跡しない。** 解析のたびに数十枚が入れ替わるので、
+こちらまでコミットすると履歴が図のバイナリで埋まる。入力（parquet）と
+生成コード（`figures_src/`, `scripts/generate_figures.py`）がリポジトリに
+ある限りいつでも復元できるため、成果物を持つ理由がない。
 
 ---
 
