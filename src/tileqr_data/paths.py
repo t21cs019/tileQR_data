@@ -19,7 +19,13 @@ RAW_KERNEL = RAW / "kernel_dtsmqr"
 RAW_SSRFB = RAW / "ssrfb"
 
 DERIVED = ROOT / "derived"
-OUT = ROOT / "out"
+# 探索用の図の出力先。Git 管理外（.gitignore の /figures/*）。
+# parquet と figures_src/ の生成コードから常に作り直せるため追跡しない。
+FIGURES = ROOT / "figures"
+# 発表・論文に使った確定版。こちらは追跡する。
+FIGURES_FINAL = ROOT / "figures_final"
+# 旧名。figures/ に役割を移したが、古い呼び出しが落ちないよう残す。
+OUT = FIGURES
 
 MACHINES_YAML = ROOT / "machines.yaml"
 PLAN_YAML = ROOT / "plan.yaml"

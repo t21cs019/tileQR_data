@@ -106,12 +106,16 @@ def save(fig, stem: str, outdir=None, preset: str = "slide") -> list:
     """
     スライド用は PNG、論文用は PDF + SVG で出す。
     出力パスのリストを返す。
+
+    既定の出力先は figures/（Git 管理外の探索用）。確定版を作るときは
+    outdir に figures_final/{発表単位}/ を渡す。ハードコードしないのは、
+    同じスクリプトで探索用と確定版の両方を出せるようにするため。
     """
     from pathlib import Path
 
     from . import paths
 
-    outdir = Path(outdir) if outdir is not None else paths.OUT
+    outdir = Path(outdir) if outdir is not None else paths.FIGURES
     outdir.mkdir(parents=True, exist_ok=True)
 
     exts = ["png"] if preset == "slide" else ["pdf", "svg"]
