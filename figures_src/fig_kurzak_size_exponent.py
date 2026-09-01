@@ -13,7 +13,7 @@ nb と size の指数の絶対値が等しい（sigma = kappa、すなわち del
 右パネルはモデルに依存しないので、delta<1 の主張の土台になる。
 
 使い方:
-    python figures/fig_kurzak_size_exponent.py --preset slide
+    python figures_src/fig_kurzak_size_exponent.py --preset slide
 """
 
 from __future__ import annotations
@@ -61,6 +61,9 @@ def pooled_slope(df):
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--preset", default="slide", choices=["slide", "paper"])
+    # 既定は figures/（管理外）。確定版は --outdir figures_final/卒論 のように渡す。
+    ap.add_argument("--outdir", default=None,
+                    help="出力先。既定は figures/（Git 管理外の探索用）")
     args = ap.parse_args()
     style.use(args.preset)
 
@@ -132,7 +135,7 @@ def main() -> int:
     fig.suptitle("崖位置のサイズ指数: Kurzak のタイル比 $(nb/N)$ と本研究 $\\delta<1$", y=1.0)
     fig.tight_layout(rect=(0, 0, 1, 0.95))
 
-    for p in style.save(fig, STEM, preset=args.preset):
+    for p in style.save(fig, STEM, outdir=args.outdir, preset=args.preset):
         print(f"生成: {p}")
     return 0
 

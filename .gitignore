@@ -7,3 +7,16 @@ __pycache__/
 
 # derived/ と out/ は意図的にコミットする（README 参照）
 # ダッシュボードが即座に読めること、資料から図を参照できることを優先する
+
+# 探索用の図（parquet + 生成コードから再現可能なため管理外）
+# 先頭スラッシュ必須。`figures/` だと任意の階層の figures にマッチしてしまう。
+# 生成コードは figures_src/、確定版は figures_final/ にある（どちらも追跡する）。
+# ディレクトリ自体（`/figures/`）を無視すると git は中に降りないため、
+# `!/figures/.gitkeep` の例外が効かない。中身を無視する形にする。
+/figures/*
+!/figures/.gitkeep
+
+# out/ は figures/ に役割を移した。過去のコミット済み図は追跡から外し、
+# 探索用は figures/、確定版は figures_final/ に置く。
+/out/*
+!/out/.gitkeep
