@@ -14,7 +14,7 @@ ingest:
 	python scripts/ingest.py
 
 figures:
-	@for f in figures/fig_*.py; do echo "--- $$f"; python $$f --preset slide; done
+	@for f in figures_src/fig_*.py; do echo "--- $$f"; python $$f --preset slide; done
 
 clean:
-	rm -rf derived/*.parquet derived/optima.csv out/* COVERAGE.md
+	rm -rf derived/*.parquet derived/optima.csv figures/* COVERAGE.md
