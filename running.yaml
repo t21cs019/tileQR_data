@@ -87,17 +87,12 @@ running:
       撮り直し）は4サイズとも 2026-09-01 に完了して raw/ に入った。
 
   - kind: qr_sweep
-    config: i7-7700_s1_smt-off
-    threads: 4
-    sizes: [16384]
-    since: 2026-09-01
-    host: i7-7700（自宅）
-    note: >
-      BIOS で SMT を切っての新規構成。既存の i7-7700_s1_smt-on（threads=8）
-      とは別条件。size 1024/2048/4096/8192 は 2026-08-30〜31 に5本ずつ
-      完了して raw/ に入ったが、**nb が 64 から始まっており計画の 32-512 に
-      届いていない**（COVERAGE で `!`）。nb 32-60 を埋めるか、
-      走査の開始点を 32 にして取り直すかは別途判断する
+    config: i3-7100_s1_smt-off
+    threads: 2
+    sizes: [1024, 2048, 4096, 8192]
+    since: 2026-09-03
+    host: i3-7100（自宅）
+    note: BIOS で SMT を切っての新規構成。既存の i3-7100_s1_smt-on（threads=4） とは別条件。
 
   - kind: qr_sweep
     config: ryzen5-7400f_s1_smt-off

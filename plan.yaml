@@ -54,7 +54,7 @@ kinds:
       - {config: i5-7400_s1_smt-off,     threads: 4, sizes: [1024, 2048, 4096, 8192]}
       - {config: i5-8500_s1_smt-off,     threads: 6}
       - {config: i7-7700_s1_smt-on,      threads: 8, sizes: [1024, 2048, 4096, 8192]}
-      - {config: i7-7700_s1_smt-off,     threads: 4}
+      - {config: i7-7700_s1_smt-off,     threads: 4, sizes: [1024, 2048, 4096, 8192]}
       - {config: ryzen5-7400f_s1_smt-on, threads: 12}
       - {config: ryzen5-7400f_s1_smt-off, threads: 6}
       - {config: i3-10100_s1_smt-off,    threads: 4, sizes: [1024, 2048, 4096, 8192]}
