@@ -296,7 +296,11 @@ def progress_section(
                 frozen = bool(target.get("frozen"))
                 # 凍結条件は「計画に対する完了」の分母から外す。もう埋まらない
                 # ものを分母に残すと、達成率が永遠に 100% にならず指標が死ぬ。
-                if not frozen:
+                # kernel_dtsmqr はカーネル単体の別系統の計測で、qr_sweep /
+                # ssrfb（全体QR分解の主計画）と混ぜると達成率の意味が薄まる
+                # ため、見出しの分母には含めない（kernel_dtsmqr 自身の表と
+                # サマリの内訳には引き続き出る）。
+                if not frozen and kind != "kernel_dtsmqr":
                     plan_all += 1
                 in_flight = (kind, machine, threads, size) in running
                 running_hits += bool(in_flight)
@@ -314,7 +318,8 @@ def progress_section(
                     continue
                 if enough_trials and enough_nb:
                     done_row += 1
-                    done_all += 1
+                    if kind != "kernel_dtsmqr":
+                        done_all += 1
                 elif enough_trials and not enough_nb:
                     cell += " !"          # 反復は足りているが nb が計画に届かない
                 cells.append(cell + mark)
