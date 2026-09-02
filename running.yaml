@@ -74,26 +74,16 @@ running:
 
   # --- 自宅の PC --------------------------------------------------------
 
-  - kind: ssrfb
-    node: i3-7100
-    threads: 1
-    sizes: [1024, 2048, 4096, 8192]
-    since: 2026-08-31
-    host: i3-7100（自宅）
-    note: >
-      i3-7100_s1_smt-off 計測の一環。plan.yaml 既定は trials=1 だが、
-      今回はサイズ非依存という前提そのものを検証するため4サイズとも trials=5 で計測。
-      taskset -c 0 で固定。beta が揃うか確認してから qr_sweep(smt-off) に進む。
-
   - kind: qr_sweep
     config: i5-7400_s1_smt-off
     threads: 4
-    sizes: [1024, 2048, 4096, 8192]
+    sizes: [8192]
     since: 2026-09-01
     host: i5-7400（自宅）
     note: >
       デュアルチャネル構成での再計測（curation.yaml の
-      i5-7400-qr_sweep-memory-channels）。ssrfb（同じく threads=1 への
+      i5-7400-qr_sweep-memory-channels）。size 1024/2048/4096 は
+      2026-09-01 に完了して raw/ に入った。ssrfb（同じく threads=1 への
       撮り直し）は4サイズとも 2026-09-01 に完了して raw/ に入った。
 
   - kind: qr_sweep
