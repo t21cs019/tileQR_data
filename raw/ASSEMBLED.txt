@@ -84,6 +84,9 @@ raw/qr_sweep/epyc_s1_smt-on/epyc_size1024_t32_nb32-512_20260725-110847_r4.csv
 raw/qr_sweep/epyc_s1_smt-on/epyc_size1024_t32_nb32-512_20260725-110847_r5.csv
 raw/qr_sweep/epyc_s1_smt-on/epyc_size16384_t32_nb32-512_20260629-143700.csv
 raw/qr_sweep/epyc_s1_smt-on/epyc_size16384_t32_nb32-512_20260830-195747.csv
+raw/qr_sweep/epyc_s1_smt-on/epyc_size16384_t32_nb32-512_20260901-051858_r1.csv
+raw/qr_sweep/epyc_s1_smt-on/epyc_size16384_t32_nb32-512_20260901-051858_r2.csv
+raw/qr_sweep/epyc_s1_smt-on/epyc_size16384_t32_nb32-512_20260901-051858_r3.csv
 raw/qr_sweep/epyc_s1_smt-on/epyc_size2048_t32_nb32-500_20260726-011720_r5.csv
 raw/qr_sweep/epyc_s1_smt-on/epyc_size2048_t32_nb32-512_20260726-011720_r1.csv
 raw/qr_sweep/epyc_s1_smt-on/epyc_size2048_t32_nb32-512_20260726-011720_r2.csv
@@ -309,11 +312,11 @@ raw/ssrfb/i7-7700/i7-7700_size1024_t1_nb32-512_20260830-065953.csv
 raw/ssrfb/i7-7700/i7-7700_size2048_t1_nb32-512_20260830-071731.csv
 raw/ssrfb/i7-7700/i7-7700_size4096_t1_nb32-512_20260725-105711.csv
 raw/ssrfb/i7-7700/i7-7700_size8192_t1_nb32-512_20260830-073829.csv
-raw/ssrfb/ryzen/ryzen_size1024_t1_nb32-512_20260830-081745.csv
-raw/ssrfb/ryzen/ryzen_size2048_t1_nb32-512_20260830-083637.csv
-raw/ssrfb/ryzen/ryzen_size4096_t1_nb32-512_20260830-085722.csv
-raw/ssrfb/ryzen/ryzen_size8192_t1_nb32-276_20260830-092542.csv
 raw/ssrfb/ryzen5-7400f/ryzen5-7400f_size1024_t1_nb32-512_20260727-185706.csv
 raw/ssrfb/ryzen5-7400f/ryzen5-7400f_size2048_t1_nb32-512_20260727-191302.csv
 raw/ssrfb/ryzen5-7400f/ryzen5-7400f_size4096_t1_nb32-512_20260727-182633.csv
 raw/ssrfb/ryzen5-7400f/ryzen5-7400f_size8192_t1_nb32-512_20260727-193232.csv
+raw/ssrfb/ryzen/ryzen_size1024_t1_nb32-512_20260830-081745.csv
+raw/ssrfb/ryzen/ryzen_size2048_t1_nb32-512_20260830-083637.csv
+raw/ssrfb/ryzen/ryzen_size4096_t1_nb32-512_20260830-085722.csv
+raw/ssrfb/ryzen/ryzen_size8192_t1_nb32-276_20260830-092542.csv

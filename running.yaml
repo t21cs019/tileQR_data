@@ -65,14 +65,6 @@ running:
     note: size4096 は 2026-09-01 に完了して raw/ に入った
 
   - kind: qr_sweep
-    config: epyc_s1_smt-on
-    threads: 32
-    sizes: [16384]
-    since: 2026-09-01
-    host: epyc（研究室）
-    note: 現在 3/5 本目。1本ごとにジョブを投げている
-
-  - kind: qr_sweep
     config: dogwood_s1_smt-off
     threads: 8
     sizes: [8192]
