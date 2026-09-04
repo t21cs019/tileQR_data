@@ -27,6 +27,7 @@
 - par007_size4096_nb256-256_t1_20260607_225907.csv: nb が1点のみ（256）。プローブとみなし除外
 - par009_size16384_nb256-256_t1_20260615_070514.csv: nb が1点のみ（256）。プローブとみなし除外
 - par009_size8192_nb256-256_t1_20260615_061027.csv: nb が1点のみ（256）。プローブとみなし除外
+- i3-10100_ssrfb_size4096_nb32-512_th1_t1_20260829_171442 copy.csv: 命名にマッチせず スキップ
 - i7-7700_manual_ssrfb_nb32_ib8.csv: 命名にマッチせず スキップ
 - Ryzen7-5800X-16_benchmark_dtsmqr-trial2.csv: 命名にマッチせず スキップ
 - Ryzen7-5800X-16_benchmark_dtsmqr-trial3.csv: 命名にマッチせず スキップ

@@ -64,14 +64,6 @@ running:
     host: ryzen（研究室）
     note: size4096 は 2026-09-01 に完了して raw/ に入った
 
-  - kind: qr_sweep
-    config: dogwood_s1_smt-off
-    threads: 8
-    sizes: [8192]
-    since: 2026-09-01
-    host: dogwood / i7-6900K（研究室）
-    note: size4096 は 2026-08-30 に完了して raw/ に入った
-
   # --- 自宅の PC --------------------------------------------------------
 
   - kind: qr_sweep
