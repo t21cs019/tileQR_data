@@ -137,6 +137,17 @@ nb 32-400）と揃え、新規に測った nb 404-512 の5本と1本ずつ連結
 `assemble.py` の管轄外（`raw/ASSEMBLED.txt` に載らない）なので、
 `make assemble --clean` を回しても消えない。
 
+### raw_data 側の nb404-512 元ファイルは連結後も残っている
+
+`raw_data/ryzen7-5800x_s1_smt-on/ryzen_size{2048,4096}_nb404-512_..._t5_...csv`
+自体は削除していない。これは `SRC_RE` にマッチするので、何も対策しないと
+`make assemble` のたびに単独の nb404-512 トライアルとして raw/ に復活し、
+上の連結済み nb32-512 と二重取り込みになる（`10/5` として validate に
+検出される。2026-09-04 に実際発生）。`curation.yaml` の
+`ryzen7-5800x-qr_sweep-nb404-512-merged` で除外することで対処した。
+raw_data からこの2ファイルを削除すれば curation.yaml のルールごと不要に
+なるが、連結の出所を追える形で残しておく方を優先し、削除はしていない。
+
 ## corei5-13400F（kernel_dtsmqr）：もう測れない
 
 友人の PC で、2026-09 以降アクセスできない。在庫は

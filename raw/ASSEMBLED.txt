@@ -298,16 +298,6 @@ raw/qr_sweep/ryzen7-5800x_s1_smt-on/ryzen_size1024_t16_nb32-512_20260830-195246_
 raw/qr_sweep/ryzen7-5800x_s1_smt-on/ryzen_size1024_t16_nb32-512_20260830-195246_r3.csv
 raw/qr_sweep/ryzen7-5800x_s1_smt-on/ryzen_size1024_t16_nb32-512_20260830-195246_r4.csv
 raw/qr_sweep/ryzen7-5800x_s1_smt-on/ryzen_size1024_t16_nb32-512_20260830-195246_r5.csv
-raw/qr_sweep/ryzen7-5800x_s1_smt-on/ryzen_size2048_t16_nb404-512_20260901-015640_r1.csv
-raw/qr_sweep/ryzen7-5800x_s1_smt-on/ryzen_size2048_t16_nb404-512_20260901-015640_r2.csv
-raw/qr_sweep/ryzen7-5800x_s1_smt-on/ryzen_size2048_t16_nb404-512_20260901-015640_r3.csv
-raw/qr_sweep/ryzen7-5800x_s1_smt-on/ryzen_size2048_t16_nb404-512_20260901-015640_r4.csv
-raw/qr_sweep/ryzen7-5800x_s1_smt-on/ryzen_size2048_t16_nb404-512_20260901-015640_r5.csv
-raw/qr_sweep/ryzen7-5800x_s1_smt-on/ryzen_size4096_t16_nb404-512_20260901-030638_r1.csv
-raw/qr_sweep/ryzen7-5800x_s1_smt-on/ryzen_size4096_t16_nb404-512_20260901-030638_r2.csv
-raw/qr_sweep/ryzen7-5800x_s1_smt-on/ryzen_size4096_t16_nb404-512_20260901-030638_r3.csv
-raw/qr_sweep/ryzen7-5800x_s1_smt-on/ryzen_size4096_t16_nb404-512_20260901-030638_r4.csv
-raw/qr_sweep/ryzen7-5800x_s1_smt-on/ryzen_size4096_t16_nb404-512_20260901-030638_r5.csv
 raw/ssrfb/calc/calc_size1024_t1_nb32-512_20260830-043212.csv
 raw/ssrfb/calc/calc_size2048_t1_nb32-512_20260830-062354.csv
 raw/ssrfb/calc/calc_size4096_t1_nb32-512_20260803-064712.csv

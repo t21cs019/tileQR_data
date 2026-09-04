@@ -101,6 +101,29 @@ exclude:
       COVERAGE の size8192 の `!`（step=8 で格子51%・計画26%）も
       同じキャンペーンで解消する。
 
+  - id: ryzen7-5800x-qr_sweep-nb404-512-merged
+    match:
+      kind: qr_sweep
+      node: ryzen
+      src:
+        - ryzen_size2048_nb404-512_t5_20260901_015640.csv
+        - ryzen_size4096_nb404-512_t5_20260901_030638.csv
+    since: 2026-09-04
+    reason: >
+      学部時代データ（nb 32-400、migrate.py 生成、raw_data 上は
+      Ryzen7-5800X_16_{2048,4096}_trial{1-5}.csv）の nb 404-512 の穴を
+      埋めるために計測したもの。assemble.py は migrate.py 側の元ファイルを
+      読まないため両者を自動連結できず（TODO_REMEASURE.md 参照）、
+      2026-09-01 に raw/ 上で手作業により
+      ryzen_size{2048,4096}_t16_nb32-512_{stamp}_r{1-5}.csv へ連結済み。
+      この raw_data ファイル自体は連結後も残っているので、除外しないと
+      make assemble のたびに単独の nb404-512 トライアルとして raw/ に
+      復活し、ryzen7-5800x_s1_smt-on の size2048/4096 が「同じ計測を
+      二重に取り込んでいる」と validate に怒られる（2026-09-04 に発生）。
+    remeasure: >
+      不要。連結済みの nb32-512 が正。この rule は raw_data の掃除（削除）を
+      するまでの暫定措置。
+
 # --- 別ファイルの値で置き換えるもの ------------------------------------
 #
 # match には nb / ib が要る。トライアル丸ごとの置換は、連結の出所が
