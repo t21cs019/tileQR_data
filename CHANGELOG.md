@@ -55,6 +55,20 @@ th=4 / th=8 は在庫が1本ずつしか無く、`1/5` のまま永久に埋ま�
 kernel_dtsmqr / ssrfb の反復不足はそちらに出てこないので、
 この節が唯一の警告になることを明記した。
 
+### epyc の config 名が smt-on だったが、実際は SMT 無効だった
+
+`epyc_s1_smt-on` という config 名・ディレクトリ名で `raw_data/` `raw/` に
+入っていたが、計測時は SMT が無効だったことが判明した。`machines.yaml`
+の note には「SMT が有効なまま物理コア数と同じスレッド数（32）で回している」
+と書いてあったが、これ自体が誤りだった（threads=32 は単に1ソケット全32
+コアを使っているだけで、SMT の有無とは無関係）。
+
+`raw_data/epyc_s1_smt-on/` → `raw_data/epyc_s1_smt-off/`、
+`raw/qr_sweep/epyc_s1_smt-on/` → `raw/qr_sweep/epyc_s1_smt-off/` に
+git mv でリネームし、`machines.yaml` のキーと note、`plan.yaml` の
+target、`src/tileqr_data/kurzak.py` の `EXCLUDE_POINTS` を追従。
+`COVERAGE.md` / `derived/` は assemble → ingest で再生成した。
+
 ---
 
 ## 0.8.0 — 表示順の宣言（display_order）と attic の新設

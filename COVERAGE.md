@@ -14,7 +14,7 @@ nb の刻みは size 4096 までが 4、それ以上が 8。反復は各 5 回�
 |---|---|---|---|---|---|---|---|
 | `aoba-b_s1_smt-off` | 64 | — | 5/5 | 5/5 | 5/5 | 5/5 | 4/5 |
 | `aoba-b_s2_smt-off` | 128 | — | — | 5/5 | 5/5 ! | · | 1/4 |
-| `epyc_s1_smt-on` | 32 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 |
+| `epyc_s1_smt-off` | 32 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 | 5/5 |
 | `calc_s1_smt-off` | 12 | 5/5 | 5/5 | 5/5 | 5/5 | — ▶ | 4/5 |
 | `calc_s2_smt-off` | 24 | 5/5 | — | 5/5 | — | · | 2/4 |
 | `ryzen7-5800x_s1_smt-on` | 16 | 5/5 | 5/5 | 5/5 | — ▶ | · | 3/4 |
@@ -111,11 +111,11 @@ nb の刻みは size 4096 までが 4、それ以上が 8。反復は各 5 回�
 | `aoba-b_s1_smt-off` | 64 | 16384 | 24-640 | 8 | 78 | 8-320/8 | 1,599 | 100% | 100% | 5/5 | done | 2026-06-15 |
 | `aoba-b_s2_smt-off` | 128 | 4096 | 20-512 | 4 | 124 | 8-256/4 | 3,968 | 100% | 100% | 5/5 | done | 2026-06-07 |
 | `aoba-b_s2_smt-off` | 128 | 8192 | 20-508 | 8 | 62 | 8-248/8 | 992 | 100% | 97% | 5/5 | partial | 2026-06-15 |
-| `epyc_s1_smt-on` | 32 | 1024 | 32-512 | 4 | 121 | 8-256/4 | 3,963 | 100% | 100% | 5/5 | done | 2026-07-25 |
-| `epyc_s1_smt-on` | 32 | 2048 | 32-512 | 4 | 121 | 8-256/4 | 3,963 | 100% | 100% | 5/5 | done | 2026-07-26 |
-| `epyc_s1_smt-on` | 32 | 4096 | 32-512 | 4 | 121 | 8-256/4 | 3,963 | 100% | 100% | 5/5 | done | 2025-01-01〜2026-06-29 |
-| `epyc_s1_smt-on` | 32 | 8192 | 32-512 | 8 | 61 | 8-256/8 | 1,022 | 100% | 100% | 5/5 | done | 2026-06-17 |
-| `epyc_s1_smt-on` | 32 | 16384 | 32-512 | 8 | 61 | 8-256/8 | 1,022 | 100% | 100% | 5/5 | done | 2026-06-29〜2026-09-01 |
+| `epyc_s1_smt-off` | 32 | 1024 | 32-512 | 4 | 121 | 8-256/4 | 3,963 | 100% | 100% | 5/5 | done | 2026-07-25 |
+| `epyc_s1_smt-off` | 32 | 2048 | 32-512 | 4 | 121 | 8-256/4 | 3,963 | 100% | 100% | 5/5 | done | 2026-07-26 |
+| `epyc_s1_smt-off` | 32 | 4096 | 32-512 | 4 | 121 | 8-256/4 | 3,963 | 100% | 100% | 5/5 | done | 2025-01-01〜2026-06-29 |
+| `epyc_s1_smt-off` | 32 | 8192 | 32-512 | 8 | 61 | 8-256/8 | 1,022 | 100% | 100% | 5/5 | done | 2026-06-17 |
+| `epyc_s1_smt-off` | 32 | 16384 | 32-512 | 8 | 61 | 8-256/8 | 1,022 | 100% | 100% | 5/5 | done | 2026-06-29〜2026-09-01 |
 | `calc_s1_smt-off` | 12 | 1024 | 32-512 | 4 | 121 | 8-256/4 | 3,963 | 100% | 100% | 5/5 | done | 2026-08-26 |
 | `calc_s1_smt-off` | 12 | 2048 | 32-512 | 4 | 121 | 8-256/4 | 3,963 | 100% | 100% | 5/5 | done | 2026-08-26 |
 | `calc_s1_smt-off` | 12 | 4096 | 32-512 | 4 | 121 | 8-256/4 | 3,963 | 100% | 100% | 5/5 | done | 2026-08-26 |
@@ -211,11 +211,11 @@ AOBA は同一構成でも物理ノードが複数あるので、その個体差
 | `aoba-b_s1_smt-off` | 64 | 16384 | 392-456 | 312-432 | 16 | 1 | — | ok |
 | `aoba-b_s2_smt-off` | 128 | 4096 | 156-208 | 156-156 | 1 | 1 | — | **退化 3/5** |
 | `aoba-b_s2_smt-off` | 128 | 8192 | 268-316 | 268-276 | 2 | 1 | — | ok |
-| `epyc_s1_smt-on` | 32 | 1024 | 172 | 88-248 | 41 | 5 | 0.02 | ok |
-| `epyc_s1_smt-on` | 32 | 2048 | 232 | 168-312 | 37 | 5 | 0.02 | ok |
-| `epyc_s1_smt-on` | 32 | 4096 | 168 | 144-228 | 22 | 5 | 0.06 | ok |
-| `epyc_s1_smt-on` | 32 | 8192 | 328 | 216-440 | 29 | 5 | 0.06 | ok |
-| `epyc_s1_smt-on` | 32 | 16384 | 504 | 328-504 | 23 | 5 | 0.16 | ok |
+| `epyc_s1_smt-off` | 32 | 1024 | 172 | 88-248 | 41 | 5 | 0.02 | ok |
+| `epyc_s1_smt-off` | 32 | 2048 | 232 | 168-312 | 37 | 5 | 0.02 | ok |
+| `epyc_s1_smt-off` | 32 | 4096 | 168 | 144-228 | 22 | 5 | 0.06 | ok |
+| `epyc_s1_smt-off` | 32 | 8192 | 328 | 216-440 | 29 | 5 | 0.06 | ok |
+| `epyc_s1_smt-off` | 32 | 16384 | 504 | 328-504 | 23 | 5 | 0.16 | ok |
 | `calc_s1_smt-off` | 12 | 1024 | 88 | 80-108 | 8 | 5 | 0.71 | ok |
 | `calc_s1_smt-off` | 12 | 2048 | 152 | 104-200 | 25 | 5 | 0.25 | ok |
 | `calc_s1_smt-off` | 12 | 4096 | 232 | 160-252 | 24 | 5 | 0.03 | ok |
@@ -331,4 +331,4 @@ qr_sweep とは ib の上限規則が違う（`ib <= nb - step`）。
 
 - 定義済みだが未計測のノード (9): `i3-6100`, `i3-9100`, `i5-7500`, `par008`, `par029`, `par030`, `par035`, `par045`, `xeon-e3-1220v3`
 - 計測されたが machines.yaml に無いノード (0): なし
-- 交絡要因が未確認の構成 (15): `aoba-b_s2_smt-off` (turbo), `aoba-b_s1_smt-off` (turbo), `calc_s2_smt-off` (turbo, memory_channels), `calc_s1_smt-off` (turbo, memory_channels), `epyc_s1_smt-on` (turbo, memory_channels), `i3-7100_s1_smt-on` (turbo, memory_channels), `i3-8100_s1_smt-off` (turbo, memory_channels), `i5-8500_s1_smt-off` (turbo, memory_channels), `i7-7700_s1_smt-on` (turbo, memory_channels), `i7-7700_s1_smt-off` (turbo, memory_channels), `ryzen5-7400f_s1_smt-on` (turbo, memory_channels), `ryzen5-7400f_s1_smt-off` (turbo, memory_channels), `i3-10100_s1_smt-off` (turbo, memory_channels), `dogwood_s1_smt-off` (turbo, memory_channels), `ryzen7-5800x_s1_smt-on` (turbo, memory_channels)
+- 交絡要因が未確認の構成 (15): `aoba-b_s2_smt-off` (turbo), `aoba-b_s1_smt-off` (turbo), `calc_s2_smt-off` (turbo, memory_channels), `calc_s1_smt-off` (turbo, memory_channels), `epyc_s1_smt-off` (turbo, memory_channels), `i3-7100_s1_smt-on` (turbo, memory_channels), `i3-8100_s1_smt-off` (turbo, memory_channels), `i5-8500_s1_smt-off` (turbo, memory_channels), `i7-7700_s1_smt-on` (turbo, memory_channels), `i7-7700_s1_smt-off` (turbo, memory_channels), `ryzen5-7400f_s1_smt-on` (turbo, memory_channels), `ryzen5-7400f_s1_smt-off` (turbo, memory_channels), `i3-10100_s1_smt-off` (turbo, memory_channels), `dogwood_s1_smt-off` (turbo, memory_channels), `ryzen7-5800x_s1_smt-on` (turbo, memory_channels)

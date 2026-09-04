@@ -55,8 +55,8 @@ S0 = 4096.0
 #   i5-8500 8192   … サーマルスロットリング
 EXCLUDE_CONFIG = ("i3-7100",)
 EXCLUDE_POINTS = (
-    ("epyc_s1_smt-on", 1024),
-    ("epyc_s1_smt-on", 2048),
+    ("epyc_s1_smt-off", 1024),
+    ("epyc_s1_smt-off", 2048),
     ("i5-8500_s1_smt-off", 8192),
 )
 

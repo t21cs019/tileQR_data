@@ -47,7 +47,7 @@ kinds:
       - {config: aoba-b_s1_smt-off,      threads: 64}
       - {config: calc_s2_smt-off,        threads: 24, sizes: [1024, 2048, 4096, 8192]}
       - {config: calc_s1_smt-off,        threads: 12}
-      - {config: epyc_s1_smt-on,         threads: 32}
+      - {config: epyc_s1_smt-off,        threads: 32}
       - {config: i3-7100_s1_smt-on,      threads: 4, sizes: [1024, 2048, 4096, 8192]}
       - {config: i3-7100_s1_smt-off,     threads: 2, sizes: [1024, 2048, 4096, 8192]}
       - {config: i3-8100_s1_smt-off,     threads: 4}

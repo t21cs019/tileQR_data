@@ -377,17 +377,14 @@ configs:
     numactl: "--cpunodebind=0 --membind=0"
     note: 片ソケットにピン留め。threads=12（1ソケット全12コア）の系列。
 
-  epyc_s1_smt-on:
+  epyc_s1_smt-off:
     arch: epyc-7543
     sockets_used: 1
-    smt: on                     # cpus.toml threads_per_core = 2
+    smt: off
     memory_channels: unknown
     turbo: unknown
     numactl: null
-    note: >
-      threads=32。SMT が有効なまま物理コア数と同じスレッド数で回している。
-      SMT 有効時のスケジューリング次第で兄弟スレッドへの割り当てが変わるため、
-      交絡要因として要確認。
+    note: threads=32（1ソケット全32コア）。SMT 無効。
 
   # --- 自宅デスクトップ群 ---
 
