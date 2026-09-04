@@ -2,26 +2,6 @@
 # scripts/assemble.py が書き出したファイルの台帳。手で編集しない。
 # 次回の --clean はこの一覧に載っていたファイルだけを掃除の対象にする。
 # ここに無いファイル（migrate.py の生成物など）には触らない。
-raw/qr_sweep/aoba-b_s1_smt-off/par001_size4096_t64_nb20-512_20260608-021637.csv
-raw/qr_sweep/aoba-b_s1_smt-off/par002_size4096_t64_nb20-512_20260608-021922.csv
-raw/qr_sweep/aoba-b_s1_smt-off/par002_size8192_t64_nb20-512_20260615-070910.csv
-raw/qr_sweep/aoba-b_s1_smt-off/par003_size2048_t64_nb20-512_20260618-081153.csv
-raw/qr_sweep/aoba-b_s1_smt-off/par003_size2048_t64_nb20-512_20260618-092052.csv
-raw/qr_sweep/aoba-b_s1_smt-off/par003_size2048_t64_nb20-512_20260618-102952.csv
-raw/qr_sweep/aoba-b_s1_smt-off/par003_size2048_t64_nb20-512_20260618-113852.csv
-raw/qr_sweep/aoba-b_s1_smt-off/par003_size4096_t64_nb20-512_20260607-235622.csv
-raw/qr_sweep/aoba-b_s1_smt-off/par004_size4096_t64_nb20-512_20260608-022037.csv
-raw/qr_sweep/aoba-b_s1_smt-off/par005_size16384_t64_nb24-640_20260615-153636.csv
-raw/qr_sweep/aoba-b_s1_smt-off/par006_size16384_t64_nb24-640_20260615-154758.csv
-raw/qr_sweep/aoba-b_s1_smt-off/par006_size4096_t64_nb20-512_20260608-021922.csv
-raw/qr_sweep/aoba-b_s1_smt-off/par009_size16384_t64_nb24-640_20260615-162843.csv
-raw/qr_sweep/aoba-b_s1_smt-off/par009_size8192_t64_nb20-512_20260615-070959.csv
-raw/qr_sweep/aoba-b_s1_smt-off/par010_size16384_t64_nb24-640_20260615-162237.csv
-raw/qr_sweep/aoba-b_s1_smt-off/par013_size8192_t64_nb20-512_20260615-070617.csv
-raw/qr_sweep/aoba-b_s1_smt-off/par018_size8192_t64_nb20-512_20260615-070617.csv
-raw/qr_sweep/aoba-b_s1_smt-off/par023_size2048_t64_nb20-512_20260618-065952.csv
-raw/qr_sweep/aoba-b_s1_smt-off/par032_size8192_t64_nb20-512_20260615-070617.csv
-raw/qr_sweep/aoba-b_s1_smt-off/par058_size16384_t64_nb24-640_20260615-173823.csv
 raw/qr_sweep/aoba-b_s2_smt-off/par001_size4096_t128_nb20-512_20260607-235252.csv
 raw/qr_sweep/aoba-b_s2_smt-off/par002_size4096_t128_nb20-512_20260607-235522.csv
 raw/qr_sweep/aoba-b_s2_smt-off/par004_size4096_t128_nb20-512_20260607-235552.csv
