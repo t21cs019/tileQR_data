@@ -45,7 +45,11 @@ architectures:
     physical_cores_per_socket: 64
     smt_capable: true
     smt_default: off          # cpus.toml threads_per_core = 1
-    numa_nodes_total: 8       # 2 socket x NPS4
+    numa_nodes_total: 8       # 2 socket x NPS4。計算ノードの構成。
+    # 注意（2026-09-05）: ログインノードは NPS1（lscpu.txt 保存分はこちら）。
+    # 計算ノードと構成が違うので、lscpu.txt を計算ノードの諸元と誤読しないこと。
+    # この取り違えが aoba-b_s1_smt-off の 16 コア発覚を遅らせた
+    # （configs.aoba-b_s1_smt-off の note、quarantine/aoba-b_s1_oversubscribed_2026-06/ 参照）。
     l1d_kb_per_core: 32
     l2_kb_per_core: 512
     l3_mb_per_ccx: 16
@@ -334,6 +338,18 @@ configs:
   # memory_channels / turbo は「メモリチャネル構成が最適 nb そのものを変える」
   # 「ターボの有無で再現性が崩れる」ため必ず埋める。unknown のまま残っている
   # ものは COVERAGE.md の「交絡要因が未確認の構成」に出る。
+  #
+  # cores_effective（2026-09-05 追加）: 実際に使用した物理コア数。
+  # `threads`（起動したスレッド数、plan.yaml 側にある）とは別概念として持たせる。
+  # 通常は cores_effective = threads / (smt: on ? 2 : 1) だが、これは
+  # 「割り当てたコア数と起動したスレッド数が一致している」という前提の上に
+  # 成り立つ式であって、その前提自体が崩れることがある
+  # （aoba-b_s1_smt-off が 2026-06〜09 まさにこれで、numactl の
+  # cpunodebind が NPS4 で 16 コアしか掴んでおらず、smt:off でも
+  # threads=64 と cores_effective=16 が一致しなかった。検証は
+  # quarantine/aoba-b_s1_oversubscribed_2026-06/README.md）。
+  # この区別が無かったことが見落としの直接原因なので、実効コア数は
+  # 計算式に頼らずここに明示の値として持つ。
 
   aoba-b_s2_smt-off:
     arch: aoba-b
@@ -342,6 +358,8 @@ configs:
     memory_channels: 8          # per socket。EPYC 7702 の最大構成と同値。要実機確認
     turbo: unknown              # 要確認
     numactl: null
+    nps: NPS4                   # 計算ノードの構成。ログインノード(NPS1)と混同しないこと
+    cores_effective: 128
     scheduler: nqsv
     queue: lx
     note: 両ソケット使用。threads=128 の系列。
@@ -352,10 +370,21 @@ configs:
     smt: off
     memory_channels: 8
     turbo: unknown
-    numactl: "--cpunodebind=0 --membind=0"
+    numactl: "--cpunodebind=0-3 --membind=0"   # 2026-09-05 訂正。旧: --cpunodebind=0
+    nps: NPS4                   # 計算ノードの構成。ログインノード(NPS1)と混同しないこと
+    cores_effective: 64
     scheduler: nqsv
     queue: lx
-    note: 片ソケットにピン留め。threads=64 の系列。
+    note: >
+      片ソケット（NPS4 の4ノード分 = 64コア）にピン留め。threads=64 の系列。
+
+      2026-09-05 訂正: 2026-06〜09 に計測した分は `--cpunodebind=0` を使っており、
+      NPS4 環境では NUMA ノード 0 = 16 コアしか掴んでいなかった（64スレッドを
+      16コアに載せた4倍オーバーサブスクリプション）。par057 での検証
+      （--cpunodebind=0 のピーク 316.2 GFlops、正しい --cpunodebind=0-3 で
+      461.0 GFlops）で発覚。該当データは `quarantine/aoba-b_s1_oversubscribed_2026-06/`
+      へ退避し、numactl を `--cpunodebind=0-3` に訂正して `TODO_REMEASURE.md`
+      に再計測を積んだ。詳細は quarantine 側の README。
 
   # --- 研究室サーバ ---
 
@@ -366,6 +395,7 @@ configs:
     memory_channels: unknown    # 要確認
     turbo: unknown
     numactl: null
+    cores_effective: 24
     note: threads=24（2ソケット全24コア）。
 
   calc_s1_smt-off:
@@ -375,6 +405,7 @@ configs:
     memory_channels: unknown    # 要確認
     turbo: unknown
     numactl: "--cpunodebind=0 --membind=0"
+    cores_effective: 12
     note: 片ソケットにピン留め。threads=12（1ソケット全12コア）の系列。
 
   epyc_s1_smt-off:
@@ -384,6 +415,7 @@ configs:
     memory_channels: unknown
     turbo: unknown
     numactl: null
+    cores_effective: 32
     note: threads=32（1ソケット全32コア）。SMT 無効。
 
   # --- 自宅デスクトップ群 ---
@@ -396,6 +428,7 @@ configs:
     # サーマルドリフトあり、再計測対象（TODO_REMEASURE.md）。
     turbo: unknown
     numactl: null
+    cores_effective: 2
     note: threads=4（2コア x SMT）。
 
   i3-7100_s1_smt-off:
@@ -405,6 +438,7 @@ configs:
     memory_channels: 2          # 実測で確定（2026-08-31、dmidecode）。下の note を読むこと
     turbo: off                  # intel_pstate no_turbo=1 を実測（2026-08-31）
     numactl: null
+    cores_effective: 2
     note: >
       threads=2（2コア、SMT無効）。sysfs（/sys/devices/system/cpu/smt/control）で無効化して計測。
 
@@ -422,6 +456,7 @@ configs:
     # 形状が同コア数群の外れ値、再計測対象（TODO_REMEASURE.md）。
     turbo: unknown
     numactl: null
+    cores_effective: 4
     note: threads=4（4コア、SMT なし）。
 
   i5-7400_s1_smt-off:
@@ -431,6 +466,7 @@ configs:
     memory_channels: 1         # 実測で確定（2026-08-31）。下の note を読むこと
     turbo: on                  # intel_pstate no_turbo=0、負荷時 3.30 GHz を実測
     numactl: null
+    cores_effective: 4
     note: >
       threads=4。**現在 raw/ にあるデータはシングルチャネルで計測されており無効。**
       全サイズ再計測の対象（TODO_REMEASURE.md）。再計測後は memory_channels: 2 に直す。
@@ -456,6 +492,7 @@ configs:
     # 自宅機は DIMM を融通し合っていた。未点検。spotcheck.py で検証すること。
     turbo: unknown
     numactl: null
+    cores_effective: 6
     note: threads=6。
 
   i7-7700_s1_smt-on:
@@ -466,6 +503,7 @@ configs:
     # 未点検。spotcheck.py で検証すること。
     turbo: unknown
     numactl: null
+    cores_effective: 4
     note: threads=8（4コア x SMT）。
 
   i7-7700_s1_smt-off:
@@ -475,6 +513,7 @@ configs:
     memory_channels: unknown    # 自宅機は DIMM を融通し合っていた。要確認
     turbo: unknown
     numactl: null
+    cores_effective: 4
     note: threads=4（4コア、SMT 無効）。BIOS で SMT を切って計測。
 
   ryzen5-7400f_s1_smt-on:
@@ -485,6 +524,7 @@ configs:
     # 未点検。spotcheck.py で検証すること。
     turbo: unknown
     numactl: null
+    cores_effective: 6
     note: threads=12（6コア x SMT）。
 
   ryzen5-7400f_s1_smt-off:
@@ -494,6 +534,7 @@ configs:
     memory_channels: unknown
     turbo: unknown
     numactl: null
+    cores_effective: 6
     note: threads=6（6コア、SMT 無効）。BIOS で SMT を切って再計測。
 
   i3-10100_s1_smt-off:
@@ -503,6 +544,7 @@ configs:
     memory_channels: unknown
     turbo: unknown
     numactl: null
+    cores_effective: 4
     note: threads=4（4コア、SMT 無効。lscpu 実機確認済み）。
 
   dogwood_s1_smt-off:
@@ -512,6 +554,7 @@ configs:
     memory_channels: unknown
     turbo: unknown
     numactl: null
+    cores_effective: 8
     note: threads=8（8コア、SMT 無効）。
 
   ryzen7-5800x_s1_smt-on:
@@ -521,6 +564,7 @@ configs:
     memory_channels: unknown
     turbo: unknown
     numactl: null
+    cores_effective: 8
     note: >
       threads=16（8コア x SMT）。学部生時代に計測した旧データ。nb=4/ib=2刻みの
       フルスキャンから、他機材と同じ nb>=32・ib>=8・4刻みの部分だけを抽出して
