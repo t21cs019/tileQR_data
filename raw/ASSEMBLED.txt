@@ -2,6 +2,21 @@
 # scripts/assemble.py が書き出したファイルの台帳。手で編集しない。
 # 次回の --clean はこの一覧に載っていたファイルだけを掃除の対象にする。
 # ここに無いファイル（migrate.py の生成物など）には触らない。
+raw/qr_sweep/aoba-b_s1_smt-off/par007_size4096_t64_nb32-512_20260905-113513.csv
+raw/qr_sweep/aoba-b_s1_smt-off/par008_size4096_t64_nb32-512_20260905-114241.csv
+raw/qr_sweep/aoba-b_s1_smt-off/par014_size1024_t64_nb32-512_20260905-092404.csv
+raw/qr_sweep/aoba-b_s1_smt-off/par014_size2048_t64_nb32-512_20260905-095622.csv
+raw/qr_sweep/aoba-b_s1_smt-off/par014_size4096_t64_nb32-512_20260905-085700.csv
+raw/qr_sweep/aoba-b_s1_smt-off/par014_size4096_t64_nb32-512_20260905-114534.csv
+raw/qr_sweep/aoba-b_s1_smt-off/par022_size1024_t64_nb32-512_20260905-092645.csv
+raw/qr_sweep/aoba-b_s1_smt-off/par022_size2048_t64_nb32-512_20260905-095858.csv
+raw/qr_sweep/aoba-b_s1_smt-off/par039_size2048_t64_nb32-512_20260905-094852.csv
+raw/qr_sweep/aoba-b_s1_smt-off/par043_size1024_t64_nb32-512_20260905-092432.csv
+raw/qr_sweep/aoba-b_s1_smt-off/par043_size2048_t64_nb32-512_20260905-095904.csv
+raw/qr_sweep/aoba-b_s1_smt-off/par047_size1024_t64_nb32-512_20260905-092656.csv
+raw/qr_sweep/aoba-b_s1_smt-off/par047_size4096_t64_nb32-512_20260905-111612.csv
+raw/qr_sweep/aoba-b_s1_smt-off/par048_size1024_t64_nb32-512_20260905-092625.csv
+raw/qr_sweep/aoba-b_s1_smt-off/par048_size2048_t64_nb32-512_20260905-095818.csv
 raw/qr_sweep/aoba-b_s2_smt-off/par001_size4096_t128_nb20-512_20260607-235252.csv
 raw/qr_sweep/aoba-b_s2_smt-off/par002_size4096_t128_nb20-512_20260607-235522.csv
 raw/qr_sweep/aoba-b_s2_smt-off/par004_size4096_t128_nb20-512_20260607-235552.csv
@@ -102,6 +117,21 @@ raw/qr_sweep/i3-10100_s1_smt-off/i3-10100_size8192_t4_nb32-512_20260830-181540_r
 raw/qr_sweep/i3-10100_s1_smt-off/i3-10100_size8192_t4_nb32-512_20260830-181540_r3.csv
 raw/qr_sweep/i3-10100_s1_smt-off/i3-10100_size8192_t4_nb32-512_20260830-181540_r4.csv
 raw/qr_sweep/i3-10100_s1_smt-off/i3-10100_size8192_t4_nb32-512_20260830-181540_r5.csv
+raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size1024_t2_nb32-512_20260902-115503_r1.csv
+raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size1024_t2_nb32-512_20260902-115503_r2.csv
+raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size1024_t2_nb32-512_20260902-115503_r3.csv
+raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size1024_t2_nb32-512_20260902-115503_r4.csv
+raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size1024_t2_nb32-512_20260902-115503_r5.csv
+raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size2048_t2_nb32-512_20260902-125340_r1.csv
+raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size2048_t2_nb32-512_20260902-125340_r2.csv
+raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size2048_t2_nb32-512_20260902-125340_r3.csv
+raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size2048_t2_nb32-512_20260902-125340_r4.csv
+raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size2048_t2_nb32-512_20260902-125340_r5.csv
+raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size4096_t2_nb32-512_20260902-184301_r1.csv
+raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size4096_t2_nb32-512_20260902-184301_r2.csv
+raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size4096_t2_nb32-512_20260902-184301_r3.csv
+raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size4096_t2_nb32-512_20260902-184301_r4.csv
+raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size4096_t2_nb32-512_20260902-184301_r5.csv
 raw/qr_sweep/i3-7100_s1_smt-on/i3-7100_size1024_t4_nb32-512_20260628-203230_r1.csv
 raw/qr_sweep/i3-7100_s1_smt-on/i3-7100_size1024_t4_nb32-512_20260628-203230_r2.csv
 raw/qr_sweep/i3-7100_s1_smt-on/i3-7100_size1024_t4_nb32-512_20260628-203230_r3.csv
@@ -158,6 +188,11 @@ raw/qr_sweep/i5-7400_s1_smt-off/i5-7400_size4096_t4_nb32-512_20260901-092219_r2.
 raw/qr_sweep/i5-7400_s1_smt-off/i5-7400_size4096_t4_nb32-512_20260901-092219_r3.csv
 raw/qr_sweep/i5-7400_s1_smt-off/i5-7400_size4096_t4_nb32-512_20260901-092219_r4.csv
 raw/qr_sweep/i5-7400_s1_smt-off/i5-7400_size4096_t4_nb32-512_20260901-092219_r5.csv
+raw/qr_sweep/i5-7400_s1_smt-off/i5-7400_size8192_t4_nb32-512_20260902-092613_r1.csv
+raw/qr_sweep/i5-7400_s1_smt-off/i5-7400_size8192_t4_nb32-512_20260902-092613_r2.csv
+raw/qr_sweep/i5-7400_s1_smt-off/i5-7400_size8192_t4_nb32-512_20260902-092613_r3.csv
+raw/qr_sweep/i5-7400_s1_smt-off/i5-7400_size8192_t4_nb32-512_20260902-092613_r4.csv
+raw/qr_sweep/i5-7400_s1_smt-off/i5-7400_size8192_t4_nb32-512_20260902-092613_r5.csv
 raw/qr_sweep/i5-8500_s1_smt-off/i5-8500_size1024_t6_nb32-512_20260629-175739_r1.csv
 raw/qr_sweep/i5-8500_s1_smt-off/i5-8500_size1024_t6_nb32-512_20260629-175739_r2.csv
 raw/qr_sweep/i5-8500_s1_smt-off/i5-8500_size1024_t6_nb32-512_20260629-175739_r3.csv
@@ -208,6 +243,8 @@ raw/qr_sweep/i7-7700_s1_smt-on/i7-7700_size1024_t8_nb32-512_20260623-121731_r2.c
 raw/qr_sweep/i7-7700_s1_smt-on/i7-7700_size1024_t8_nb32-512_20260623-121731_r3.csv
 raw/qr_sweep/i7-7700_s1_smt-on/i7-7700_size1024_t8_nb32-512_20260623-121731_r4.csv
 raw/qr_sweep/i7-7700_s1_smt-on/i7-7700_size1024_t8_nb32-512_20260623-121731_r5.csv
+raw/qr_sweep/i7-7700_s1_smt-on/i7-7700_size16384_t8_nb32-296_20260728-215809_r2.csv
+raw/qr_sweep/i7-7700_s1_smt-on/i7-7700_size16384_t8_nb32-512_20260728-215809_r1.csv
 raw/qr_sweep/i7-7700_s1_smt-on/i7-7700_size2048_t8_nb32-512_20260623-130849_r1.csv
 raw/qr_sweep/i7-7700_s1_smt-on/i7-7700_size2048_t8_nb32-512_20260623-130849_r2.csv
 raw/qr_sweep/i7-7700_s1_smt-on/i7-7700_size2048_t8_nb32-512_20260623-130849_r3.csv
