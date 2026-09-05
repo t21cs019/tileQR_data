@@ -386,6 +386,9 @@ configs:
       へ退避し、numactl を `--cpunodebind=0-3` に訂正して `docs/TODO_REMEASURE.md`
       に再計測を積んだ。詳細は quarantine 側の README。
 
+      2026-09-05: size1024/2048/4096 は正しい構成（--cpunodebind=0-3、
+      64コア）で再計測完了。size8192/16384 は再計測待ち。
+
   # --- 研究室サーバ ---
 
   calc_s2_smt-off:
@@ -594,14 +597,20 @@ nodes:
   par009: { arch: aoba-b, source_key: aoba_b }
   par010: { arch: aoba-b, source_key: aoba_b }
   par013: { arch: aoba-b, source_key: aoba_b }
+  par014: { arch: aoba-b, source_key: aoba_b }
   par018: { arch: aoba-b, source_key: aoba_b }
+  par022: { arch: aoba-b, source_key: aoba_b }
   par023: { arch: aoba-b, source_key: aoba_b }
   par029: { arch: aoba-b, source_key: aoba_b }
   par030: { arch: aoba-b, source_key: aoba_b }
   par032: { arch: aoba-b, source_key: aoba_b }
   par034: { arch: aoba-b, source_key: aoba_b }
   par035: { arch: aoba-b, source_key: aoba_b }
+  par039: { arch: aoba-b, source_key: aoba_b }
+  par043: { arch: aoba-b, source_key: aoba_b }
   par045: { arch: aoba-b, source_key: aoba_b }
+  par047: { arch: aoba-b, source_key: aoba_b }
+  par048: { arch: aoba-b, source_key: aoba_b }
   par057: { arch: aoba-b, source_key: aoba_b }
   par058: { arch: aoba-b, source_key: aoba_b }
 

@@ -67,28 +67,15 @@ running:
   # --- 自宅の PC --------------------------------------------------------
 
   - kind: qr_sweep
-    config: i5-7400_s1_smt-off
-    threads: 4
-    sizes: [8192]
-    since: 2026-09-01
-    host: i5-7400（自宅）
-    note: >
-      デュアルチャネル構成での再計測（旧シングルチャネルデータは
-      archive/quarantine/i5-7400_single_channel_2026-06/ に退避済み）。
-      size 1024/2048/4096 は 2026-09-01 に完了して raw/ に入った。
-      size 8192 は 2026-09-02 に取得済みだが raw_data/ に未取り込みのまま
-      （2026-09-05 の構成整理では意図的に対象外にした）。ssrfb（同じく
-      threads=1 への撮り直し。旧 threads=4 データは
-      archive/quarantine/i5-7400_ssrfb_threads4_2026-08/ に退避済み）は
-      4サイズとも 2026-09-01 に完了して raw/ に入った。
-
-  - kind: qr_sweep
     config: i3-7100_s1_smt-off
     threads: 2
-    sizes: [1024, 2048, 4096, 8192]
+    sizes: [8192]
     since: 2026-09-03
     host: i3-7100（自宅）
-    note: BIOS で SMT を切っての新規構成。既存の i3-7100_s1_smt-on（threads=4） とは別条件。
+    note: >
+      BIOS で SMT を切っての新規構成。既存の i3-7100_s1_smt-on（threads=4）
+      とは別条件。size 1024/2048/4096 は 2026-09-05 に raw/ へ取り込み済み。
+      残るは size8192 のみ。
 
   - kind: qr_sweep
     config: ryzen5-7400f_s1_smt-off
