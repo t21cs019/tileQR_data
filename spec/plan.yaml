@@ -77,11 +77,20 @@ kinds:
       ib_step: 4
       ib_cap: half_nb
     targets:
+      # AOBA-B s2 は node: par043（2026-09-05計測時にジョブが割り当たった
+      # 物理ノード）で登録する。AOBAはバッチスケジューラでジョブごとに
+      # 割り当てノードが変わるため、次にAOBAのssrfbを測ると別のpar0XXが
+      # 付き、この行とは別の「計画に無い」ノードとして扱われる。
+      # qr_sweep はこの問題を config（machines.yaml の configs）という
+      # 物理ノードに依存しない抽象化で解決しているが、ssrfb の plan/ingest
+      # はまだ node 単位のままなので、node を跨いだ集計はできない。
+      # とりあえず実測ノードをそのまま登録する暫定対応（2026-09-05）。
       - {node: calc,         threads: 1}
       - {node: dogwood,      threads: 1}
       - {node: epyc,         threads: 1}
       - {node: i3-10100,     threads: 1}
       - {node: i3-7100,      threads: 1}
+      - {node: par043,       threads: 1}
       # 他の全ノードと同じ threads=1。2026-08-01 に threads=4 で誤って
       # 計測したものが一時あった（1台だけ条件が違うと機種間で beta を
       # 比べられない）。2026-08-31 に threads=1 で再計測済み。旧
