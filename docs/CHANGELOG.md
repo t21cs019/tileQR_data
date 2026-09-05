@@ -4,10 +4,84 @@
 
 コードを読めば「何をしているか」は分かる。ここに書くのは「なぜそうしたか」と
 「そうしなかった場合に何が壊れるか」に限る。数値の出典や計測の進捗は
-`COVERAGE.md`（自動生成）、連結の出所は `raw/JOINS.md`（自動生成）にある。
+`docs/COVERAGE.md`（自動生成）、連結の出所は `raw/JOINS.md`（自動生成）にある。
 
 版は `pyproject.toml` の `version` と対応する。発表・投稿の節目では
 `tileQR_research` のタグ運用（例: `2026-W24`）に合わせてスナップショットを取る。
+
+---
+
+## 0.11.0 — 除外データの置き場を quarantine 方式へ統一
+
+### i5-7400 の除外を curation.yaml から archive/quarantine/ へ移行
+
+i5-7400 のメモリチャネル問題（qr_sweep、旧 `i5-7400-qr_sweep-memory-channels`）と
+ssrfb threads 取り違え（旧 `i5-7400-ssrfb-threads`）は、対象ファイルが
+特定できているのに `curation.yaml` の `src:` にファイル名を列挙する方式を
+取っていた。AOBA-B s1（0.10.0）で採用した「ディレクトリ移動で退避する」
+方式に統一し、両ルールを `curation.yaml` から削除した。
+
+移行先は `archive/quarantine/i5-7400_single_channel_2026-06/` と
+`archive/quarantine/i5-7400_ssrfb_threads4_2026-08/`。curation.yaml に頼ると
+「当たらなくなったルールの消し忘れ」を常に気にする必要があるが、
+ディレクトリ移動なら対象が `raw_data/` に無い時点で判断が済んでいる。
+`curation.yaml` の `exclude` は、元ファイルを `raw_data/` に残す積極的な
+理由がある場合（例: ryzen7-5800x の nb404-512 二重取り込み）か、行単位
+（nb/ib）で絞る場合に限ることにした（`docs/design/excluded-data.md`）。
+
+このタイミングで `spec/machines.yaml` の `i5-7400_s1_smt-off` の
+`memory_channels` を、実態（size1024/2048/4096 は既にデュアルチャネルで
+再計測済み）に合わせて `1` → `2` に訂正した。旧い値のまま放置されていた。
+
+### AOBA-B s2 size8192 を隔離（不完全データ）
+
+`aoba-b_s2_smt-off` の size8192（2026-06-15計測）は、nb の走査が計画の
+32-512 に届かず 20-508 で止まっていた（格子充填率97%）。**計測条件そのものは
+無効ではない**（5トライアル完備、95%帯の判定も健全）が、格子の穴がある
+状態で `done` 扱いになるのを避けるため `archive/quarantine/aoba-b_s2_size8192_incomplete_2026-06/`
+へ退避した。i5-7400 や aoba-b_s1 の「計測条件が無効」なケースとは性質が
+異なる隔離理由であることを README に明記した。
+
+---
+
+## 0.10.0 — ルート直下の整理（spec / docs / archive の新設、out/ の廃止）
+
+### 背景
+
+ルート直下にYAML4本・文書3本・`instructions/`・`out/` が並び、
+ドキュメントの所在が散らばっていた。除外した計測データの置き場も
+`curation.yaml`（i5-7400）と手作業の直接編集（過去の raw/ 編集）の
+2通りに割れかけていた。
+
+### 宣言層（machines.yaml / plan.yaml / curation.yaml / running.yaml）を spec/ へ
+
+`config/` という名前にしなかったのは、このリポジトリで `config` が
+計測構成を指すドメイン語として既に使われているため（`machines.yaml` の
+`configs` キー、`raw_data/{config}/`、`assemble.config_of()`）。
+`paths.py` のパス定義4行を直すだけで済み、コード docstring 内の
+ファイル名言及（約50箇所）はファイル名自体が変わっていないので
+書き換えなかった。
+
+### 文書（COVERAGE.md / TODO_REMEASURE.md / CHANGELOG.md）を docs/ へ
+
+`docs/design/` に設計判断の詳細4本（data-pipeline / excluded-data /
+coverage-and-plan / figures）を新設し、README.md を697行から146行に
+圧縮した。本文はそのまま移設し、書き直していない。
+
+### attic/ と quarantine/ を archive/ へ統合
+
+`excluded/` という名前にしなかったのは、`curation.yaml` の `exclude` で
+落としたデータは `raw_data/` に残ったままで `archive/` には来ないため。
+「除外したものは excluded/ にある」が偽になってしまう。
+
+### out/ の廃止
+
+2026-09-01 の図ディレクトリ再編（0.8.0 以前、`figures/` への移行）で
+既に役割を失っていた残骸。`paths.py` の `OUT = FIGURES` 別名の使用箇所は
+コード中に0件だった。削除前に `figures_src/fig_*.py` を実行し `figures/`
+に3枚とも生成されることを確認済み。vault（`tileQR_research`）側で
+`tileQR_data/out/...` を参照していた2箇所は `figures/` を指すよう修正
+（別リポジトリなのでコミットは別）。
 
 ---
 
