@@ -11,6 +11,15 @@
 
 ---
 
+## 0.16.0 — ryzen5-7400f_s1_smt-off が全5サイズ解消
+
+size16384（`ryzen5-7400f_size16384_nb32-512_th6_t5_20260831_034701.csv`、
+標準命名のためリネーム不要）を取り込み、5トライアル・欠測なしを確認。
+`docs/COVERAGE.md` で `ryzen5-7400f_s1_smt-off` が5/5になった。
+`spec/running.yaml` の対応エントリを削除。
+
+---
+
 ## 0.15.0 — AOBA-B s1が全5サイズ解消、s2も残りsize8192のみに
 
 ### aoba-b_s1_smt-off: size16384を取り込み、全サイズ解消
