@@ -387,7 +387,7 @@ configs:
       に再計測を積んだ。詳細は quarantine 側の README。
 
       2026-09-05: size1024/2048/4096/8192 は正しい構成（--cpunodebind=0-3、
-      64コア）で再計測完了。残るは size16384 のみ。
+      64コア）で再計測完了。2026-09-06、size16384 も完了し全5サイズ解消。
 
   # --- 研究室サーバ ---
 
@@ -599,14 +599,18 @@ nodes:
   par013: { arch: aoba-b, source_key: aoba_b }
   par014: { arch: aoba-b, source_key: aoba_b }
   par018: { arch: aoba-b, source_key: aoba_b }
+  par019: { arch: aoba-b, source_key: aoba_b }
+  par020: { arch: aoba-b, source_key: aoba_b }
   par022: { arch: aoba-b, source_key: aoba_b }
   par023: { arch: aoba-b, source_key: aoba_b }
+  par026: { arch: aoba-b, source_key: aoba_b }
   par029: { arch: aoba-b, source_key: aoba_b }
   par030: { arch: aoba-b, source_key: aoba_b }
   par032: { arch: aoba-b, source_key: aoba_b }
   par034: { arch: aoba-b, source_key: aoba_b }
   par035: { arch: aoba-b, source_key: aoba_b }
   par039: { arch: aoba-b, source_key: aoba_b }
+  par042: { arch: aoba-b, source_key: aoba_b }
   par043: { arch: aoba-b, source_key: aoba_b }
   par044: { arch: aoba-b, source_key: aoba_b }
   par045: { arch: aoba-b, source_key: aoba_b }
