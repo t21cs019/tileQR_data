@@ -41,7 +41,9 @@ SWEEP_PARQUET = DERIVED / "qr_sweep.parquet"
 KERNEL_PARQUET = DERIVED / "kernel_dtsmqr.parquet"
 SSRFB_PARQUET = DERIVED / "ssrfb.parquet"
 OPTIMA_CSV = DERIVED / "optima.csv"
-COVERAGE_MD = ROOT / "COVERAGE.md"
+
+DOCS = ROOT / "docs"
+COVERAGE_MD = DOCS / "COVERAGE.md"
 JOINS_MD = RAW / "JOINS.md"
 CURATION_MD = RAW / "CURATION.md"
 # assemble.py が前回書き出したファイルの台帳。掃除の対象をこれで限る。

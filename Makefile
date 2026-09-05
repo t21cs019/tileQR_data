@@ -17,4 +17,4 @@ figures:
 	@for f in figures_src/fig_*.py; do echo "--- $$f"; python $$f --preset slide; done
 
 clean:
-	rm -rf derived/*.parquet derived/optima.csv figures/* COVERAGE.md
+	rm -rf derived/*.parquet derived/optima.csv figures/* docs/COVERAGE.md

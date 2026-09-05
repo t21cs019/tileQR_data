@@ -50,8 +50,8 @@ DATA_ROOT = Path(__file__).resolve().parent.parent
 # (ファイル名, タイトル, 生成元での作り方)
 # 生成元での作り方が None のものは手書き（ingest.py 等の自動生成ではない）。
 FILES = [
-    ("COVERAGE.md", "計測カバレッジ", "scripts/ingest.py の自動生成"),
-    ("TODO_REMEASURE.md", "再計測が必要な項目", None),
+    ("docs/COVERAGE.md", "計測カバレッジ", "scripts/ingest.py の自動生成"),
+    ("docs/TODO_REMEASURE.md", "再計測が必要な項目", None),
 ]
 
 
@@ -83,7 +83,7 @@ def sync_one(name: str, title: str, how: str | None, dst_dir: Path, commit: str,
         print(f"[ERROR] 生成元が見つかりません: {src}")
         return False
 
-    dst = dst_dir / name
+    dst = dst_dir / Path(name).name
     origin = f"tileQR_data/{name}"
     made_by = f"{how}。" if how else "tileQR_data 側で手書き更新。"
     header = f"""---
