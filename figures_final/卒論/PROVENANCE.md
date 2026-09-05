@@ -20,7 +20,7 @@
 - `derived/qr_sweep.parquet`（更新日：）
 - `derived/ssrfb.parquet`（更新日：）
 - `derived/optima.csv`（更新日：）
-- `machines.yaml`（更新日：）
+- `spec/machines.yaml`（更新日：）
 
 ## 採用した集約方法
 
@@ -33,7 +33,7 @@
 
 ## 除外したデータ
 
-`curation.yaml` で `raw/` に上げていない条件は、この図にも入っていない。
+`spec/curation.yaml` で `raw/` に上げていない条件は、この図にも入っていない。
 発表時点で除外されていたものを記録する（あとから復活した場合に
 「あの図は除外前か後か」を判別するため）。
 
