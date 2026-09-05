@@ -90,11 +90,3 @@ running:
       BIOS で SMT を切っての新規構成。既存の i3-7100_s1_smt-on（threads=4）
       とは別条件。size 1024/2048/4096 は 2026-09-05 に raw/ へ取り込み済み。
       残るは size8192 のみ。
-
-  - kind: qr_sweep
-    config: ryzen5-7400f_s1_smt-off
-    threads: 6
-    sizes: [16384]
-    since: 2026-09-01
-    host: ryzen5-7400f（自宅）
-    note: 1024-8192 は5本ずつ完了済み。残るは size16384 のみ
