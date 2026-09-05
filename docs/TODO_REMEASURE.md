@@ -22,7 +22,7 @@
 |---|---|---|---|---|
 | `i3-7100_s1_smt-on` size2048/4096/8192 | trial が進むほど遅くなる（size2048 で trial5 が -2.1%） | サーマルドリフト | **未** | 下記 |
 | `i3-8100_s1_smt-off` 全サイズ | 形状が同コア数群の外れ値。trial1→2 のウォームアップ癖 | 未特定 | **未** | 下記 |
-| `aoba-b_s1_smt-off` qr_sweep size8192/16384 | （size1024/2048/4096は解消済み） | `--cpunodebind=0` が NPS4 で16コアしか掴んでおらず、64スレッドを16コアに載せた4倍オーバーサブスクリプション | 済（`raw_data` ごと `archive/quarantine/` へ退避） | `archive/quarantine/aoba-b_s1_oversubscribed_2026-06/README.md` |
+| `aoba-b_s1_smt-off` qr_sweep size16384 | （size1024/2048/4096/8192は解消済み） | `--cpunodebind=0` が NPS4 で16コアしか掴んでおらず、64スレッドを16コアに載せた4倍オーバーサブスクリプション | 済（`raw_data` ごと `archive/quarantine/` へ退避） | `archive/quarantine/aoba-b_s1_oversubscribed_2026-06/README.md` |
 | `aoba-b_s2_smt-off` qr_sweep size8192 | nb 走査が計画（32-512）に届かず 20-508 止まり（格子97%） | 走査範囲が途中で打ち切られた（原因未特定。測定条件自体は無効ではない） | 済（`archive/quarantine/` へ退避） | `archive/quarantine/aoba-b_s2_size8192_incomplete_2026-06/README.md` |
 
 ### 解消済み: i5-7400 qr_sweep（シングルチャネルで計測されていた）
@@ -113,21 +113,19 @@ par057 での検証（size=4096, threads=64, nb=264）:
 `aoba-b_s1_smt-off` は `numactl: "--cpunodebind=0-3 --membind=0"` に訂正済み。
 詳細・再利用条件は `archive/quarantine/aoba-b_s1_oversubscribed_2026-06/README.md`。
 
-**2026-09-05: size1024/2048/4096 は再計測完了・解消済み。** NQSVジョブ
-（jobid 271745, 271752-271765）を par007/008/014/022/039/043/047/048 で
+**2026-09-05: size1024/2048/4096/8192 は再計測完了・解消済み。** NQSVジョブ
+（jobid 271745, 271752-271770）を par007/008/014/022/039/043/044/047/048 で
 実行し、`--cpunodebind=0-3`（64コア）で各サイズ5トライアルを取得。
 欠測0点を確認のうえ `raw_data/aoba-b_s1_smt-off/` へ
 `{node}_size{N}_nb32-512_t1_{日付}_{時刻}.csv` の命名で配置し、
-`raw/` に反映した（`docs/COVERAGE.md` で該当3サイズが `done`）。
-新規に登場したノード（par014/022/039/043/047/048）は `spec/machines.yaml`
-の `nodes` に追加登録した。**size8192/16384 は計測ログ（ジョブ実行済み）が
-あるものの結果CSVが未取得のため、引き続き再計測待ち。**
+`raw/` に反映した（`docs/COVERAGE.md` で該当4サイズが `done`）。
+新規に登場したノード（par014/022/039/043/044/047/048）は
+`spec/machines.yaml` の `nodes` に追加登録した。**残るは size16384 のみ。**
 
 #### AOBA-B 再計測まとめ
 
 | config | threads | size | 理由 |
 |---|---|---|---|
-| `aoba-b_s1_smt-off` | 64 | 8192 | 16コアで計測・隔離済み。正しいログは取得済みだがCSV未取得。要再取得 |
 | `aoba-b_s1_smt-off` | 64 | 16384 | 未計測（ジョブ投入のみ、未実行） |
 | `aoba-b_s2_smt-off` | 128 | 1024 | 未計測 |
 | `aoba-b_s2_smt-off` | 128 | 2048 | 未計測 |
@@ -136,16 +134,31 @@ par057 での検証（size=4096, threads=64, nb=264）:
 s2側の穴は今回のオーバーサブスクリプションとは無関係の既存の穴だが、
 どのみちAOBAのバッチジョブを立てるならまとめて手当てする。
 
-#### AOBA-B s2 ssrfb（未取り込み）
+#### AOBA-B s2 ssrfb: 解消済み（size1024/2048/4096）、size8192はジョブがSIGKILLされ再計測待ち
 
 `raw_data/aoba-b_s2_smt-off/aoba_s2_smt-off_ssrfb_size{1024,2048,4096,8192}_nb32-512_t1.csv`
-の4ファイルが2026-09-05に到着したが、ファイル名が `assemble.py` の
-命名規則（`{node}_size{N}_nb{lo}-{hi}_t{trials}_{日付}_{時刻}.csv`）に
-合わず未取り込み。中身を見ると `(nb,ib)` の組が正確に5回ずつ繰り返されており
-（5トライアル分が1ファイルに積まれている）、ファイル名末尾の `_t1` は
-トライアル数ではない。物理ノード名・タイムスタンプも不明。
-取り込むにはリネームが必要（aoba-b_s1 と同様、ジョブログから
-ノード名・完了時刻が分かればそれを使う）。
+の4ファイルが2026-09-05に到着した際は、ファイル名が `assemble.py` の
+命名規則に合わず（ノード・タイムスタンプ不明、末尾 `_t1` もトライアル数
+ではない）未取り込みだった。ジョブログ `~/research/ssrfb/ssrfb_aoba_s2.o271737`
+で解決: par043の1ノード上でNUMAサブ領域ごとに4サイズを並行実行しており
+（`cpu=0/node=0`〜`cpu=96/node=6`）、size1024/2048/4096は完走
+（`[DONE] rc=0`）、size8192のみ
+
+```
+%NQSV(INFO): Batch job received signal SIGKILL. (Exceeded per-req elapse time limit)
+```
+
+でジョブごと強制終了されていた。実際 size8192 のCSVは12,940行しかなく、
+完走した他3サイズ（いずれも19,816行=5トライアル×3963点+header）の
+約65%で打ち切られている。
+
+完走した3サイズは `par043_ssrfb_size{N}_nb32-512_t5_{日付}_{完了時刻}.csv`
+にリネームして取り込んだ（`docs/COVERAGE.md` の ssrfb セクションに反映済み。
+AOBA は `spec/plan.yaml` の ssrfb 計画対象に無いため計画達成率には算入されない）。
+未完走の size8192 は `archive/quarantine/aoba-b_s2_ssrfb_size8192_killed_2026-09/`
+へ退避（削除ではない）。同じ4サイズ並行構成のまま size8192 だけ時間切れに
+なったと見られるため、再計測時は size8192 を別ジョブに分けるか時間制限を
+緩めること。
 
 #### 計測側（plasma-bench）への要求として issue 化すること
 

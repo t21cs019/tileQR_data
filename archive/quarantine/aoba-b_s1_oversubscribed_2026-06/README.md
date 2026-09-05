@@ -76,8 +76,7 @@ m ≈ 0.235、size 4096 で m ≈ 0.32 となり、現行フィット値 0.240 �
 - 起票: 2026-09-05
 - 訂正後の `aoba-b_s1_smt-off`（`spec/machines.yaml`）は `numactl: "--cpunodebind=0-3 --membind=0"`、
   `cores_effective: 64` に更新済み。
-- **2026-09-05: size1024/2048/4096 の再計測完了。** 正しい構成
+- **2026-09-05: size1024/2048/4096/8192 の再計測完了。** 正しい構成
   （`--cpunodebind=0-3`、64コア）でNQSVジョブを実行し、`raw/` に反映済み
-  （`docs/COVERAGE.md` で該当3サイズが `done`）。size8192/16384 は
-  ジョブは投入・一部実行済みだが結果CSVが未取得のため再計測待ち。
+  （`docs/COVERAGE.md` で該当4サイズが `done`）。残るは size16384 のみ。
 - 再計測項目は `docs/TODO_REMEASURE.md` を参照。

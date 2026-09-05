@@ -12,7 +12,8 @@
   場合もある）。理由と再利用条件は各サブディレクトリの README。例:
   `quarantine/aoba-b_s1_oversubscribed_2026-06/README.md`、
   `quarantine/i5-7400_single_channel_2026-06/README.md`、
-  `quarantine/aoba-b_s2_size8192_incomplete_2026-06/README.md`。
+  `quarantine/aoba-b_s2_size8192_incomplete_2026-06/README.md`、
+  `quarantine/aoba-b_s2_ssrfb_size8192_killed_2026-09/README.md`。
 
 ## どちらに置くか、あるいは `spec/curation.yaml` で足りるかの判断
 
