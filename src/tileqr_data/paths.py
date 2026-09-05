@@ -27,13 +27,15 @@ FIGURES_FINAL = ROOT / "figures_final"
 # 旧名。figures/ に役割を移したが、古い呼び出しが落ちないよう残す。
 OUT = FIGURES
 
-MACHINES_YAML = ROOT / "machines.yaml"
-PLAN_YAML = ROOT / "plan.yaml"
+# 宣言層。人が書き、コードが読む入力。derived/（コードが書く出力）と対になる。
+SPEC = ROOT / "spec"
+MACHINES_YAML = SPEC / "machines.yaml"
+PLAN_YAML = SPEC / "plan.yaml"
 
 # raw_data → raw の取捨選択（除外・置換）。assemble.py が読む。
-CURATION_YAML = ROOT / "curation.yaml"
+CURATION_YAML = SPEC / "curation.yaml"
 # いま走らせている計測。COVERAGE.md の進捗表に出る。
-RUNNING_YAML = ROOT / "running.yaml"
+RUNNING_YAML = SPEC / "running.yaml"
 
 SWEEP_PARQUET = DERIVED / "qr_sweep.parquet"
 KERNEL_PARQUET = DERIVED / "kernel_dtsmqr.parquet"
