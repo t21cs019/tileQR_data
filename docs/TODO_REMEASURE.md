@@ -23,7 +23,7 @@
 | `i5-7400_s1_smt-off` qr_sweep 全サイズ | 他機比で大 nb が不当に低い。nb\* が左に寄る | 2026-06-24 分はシングルチャネルで計測 | 済 `i5-7400-qr_sweep-memory-channels` | `studies/i5-7400_memory_channel/` |
 | `i3-7100_s1_smt-on` size2048/4096/8192 | trial が進むほど遅くなる（size2048 で trial5 が -2.1%） | サーマルドリフト | **未** | 下記 |
 | `i3-8100_s1_smt-off` 全サイズ | 形状が同コア数群の外れ値。trial1→2 のウォームアップ癖 | 未特定 | **未** | 下記 |
-| `aoba-b_s1_smt-off` qr_sweep size2048/4096/8192/16384 | ピーク性能が正しい64コア版の1.5〜1.6倍低い | `--cpunodebind=0` が NPS4 で16コアしか掴んでおらず、64スレッドを16コアに載せた4倍オーバーサブスクリプション | 済（`raw_data` ごと `quarantine/` へ退避。curation.yaml ではなくディレクトリ移動で対処） | `quarantine/aoba-b_s1_oversubscribed_2026-06/README.md` |
+| `aoba-b_s1_smt-off` qr_sweep size2048/4096/8192/16384 | ピーク性能が正しい64コア版の1.5〜1.6倍低い | `--cpunodebind=0` が NPS4 で16コアしか掴んでおらず、64スレッドを16コアに載せた4倍オーバーサブスクリプション | 済（`raw_data` ごと `quarantine/` へ退避。curation.yaml ではなくディレクトリ移動で対処） | `archive/quarantine/aoba-b_s1_oversubscribed_2026-06/README.md` |
 
 ### i5-7400 qr_sweep: シングルチャネルで計測されていた
 
@@ -92,13 +92,13 @@ par057 での検証（size=4096, threads=64, nb=264）:
 今日の16コア版 316.2 と一致し、64コア版とは1.5〜1.6倍離れている。
 
 該当データ（`raw_data/aoba-b_s1_smt-off/` にあったもの）は削除せず
-`quarantine/aoba-b_s1_oversubscribed_2026-06/` へ退避した。`raw_data/` は
+`archive/quarantine/aoba-b_s1_oversubscribed_2026-06/` へ退避した。`raw_data/` は
 `make assemble` の入力側なので、`raw/` を直接編集するのではなく `raw_data/`
 側のディレクトリごと動かす形で対処している（curation.yaml の `src:` に
 20ファイル分を列挙するより、専用ディレクトリへ退避する方が管理しやすい
 ため。i5-7400 とは違う方式）。`machines.yaml` の `aoba-b_s1_smt-off` は
 `numactl: "--cpunodebind=0-3 --membind=0"` に訂正済み。詳細・再利用条件は
-`quarantine/aoba-b_s1_oversubscribed_2026-06/README.md`。
+`archive/quarantine/aoba-b_s1_oversubscribed_2026-06/README.md`。
 
 #### AOBA-B 再計測まとめ
 
@@ -210,20 +210,20 @@ raw_data からこの2ファイルを削除すれば curation.yaml のルール�
 ## corei5-13400F（kernel_dtsmqr）：もう測れない
 
 友人の PC で、2026-09 以降アクセスできない。在庫は
-`attic/Full_search/intel_corei5_13400F/` にあるものが全て。
+`archive/attic/Full_search/intel_corei5_13400F/` にあるものが全て。
 
 | threads | 在庫 | 状況 |
 |---|---|---|
 | 16 | 5本（nb 4-400） | **5本すべて raw/ に昇格済み**（2026-09-01） |
-| 10 | 5本（nb 4-400） | attic のまま。計画に無い条件 |
-| 12 | 1本（nb 4-400） | attic のまま |
+| 10 | 5本（nb 4-400） | archive/attic のまま。計画に無い条件 |
+| 12 | 1本（nb 4-400） | archive/attic のまま |
 | 8 | 1本（nb 4-350） | `plan.yaml` で `frozen`。永久に 1/5 |
 | 4 | 1本（nb 4-350） | `plan.yaml` で `frozen`。永久に 1/5 |
 
 ### th=16 は1本目だけが外れ値だった
 
 `raw/` にあったのは trial1 を nb 350 で切ったものだけで、残り4本は
-attic に眠っていた。trial1 は他4本と傾向が違う。
+archive/attic に眠っていた。trial1 は他4本と傾向が違う。
 
 | trial | peak GFlops | その trial の nb_opt |
 |---|---|---|
@@ -256,9 +256,9 @@ th=16（全論理コア）との対比になるため、モデル上は意味の
 5本揃っているので取り込めば `5/5` になる。ただし `plan.yaml` の
 kernel_dtsmqr に threads=10 を足す必要があり、いまは見送っている。
 
-## 学部時代の dgeqrf データ：スレッド数不明 → attic へ
+## 学部時代の dgeqrf データ：スレッド数不明 → archive/attic へ
 
-`attic/Full_search_dgeqrf/benchmark_dtsmqr_4096.csv`
+`archive/attic/Full_search_dgeqrf/benchmark_dtsmqr_4096.csv`
 (実体は `dgeqrf` のフルスイープ、size=4096、nb=20-512/ib=4-nb/2、格子は完全)。
 
 CSV に `threads` 列が無く、生成スクリプト（同ディレクトリの
@@ -271,5 +271,5 @@ th=8 を示唆するが、水準が旧 +16% で、SMT ともビルド差とも�
 **決定打は dogwood smt-on th=16 の size4096 を1本測ること**（3963 点）。
 どちらの水準に乗るかで切り分けられる。
 
-学部時代のフルスイープ一式（6機種、140 CSV）も `attic/Full_search/` にある。
-昇格の基準と目録は `attic/README.md`。
+学部時代のフルスイープ一式（6機種、140 CSV）も `archive/attic/Full_search/` にある。
+昇格の基準と目録は `archive/attic/README.md`。

@@ -102,7 +102,7 @@ kinds:
       ib_step: 2
       ib_cap: nb_minus_step
     # corei5-13400F は友人の PC で、2026-09 以降アクセスできない。
-    # 手元の attic/Full_search/intel_corei5_13400F/ が全ての在庫で、
+    # 手元の archive/attic/Full_search/intel_corei5_13400F/ が全ての在庫で、
     # th=16 は5トライアル揃っているが th=4 / th=8 は1本ずつしか無い。
     #
     # frozen を書いた条件は「これ以上データが来ない」の宣言。COVERAGE の

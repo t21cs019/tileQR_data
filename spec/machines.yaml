@@ -49,7 +49,7 @@ architectures:
     # 注意（2026-09-05）: ログインノードは NPS1（lscpu.txt 保存分はこちら）。
     # 計算ノードと構成が違うので、lscpu.txt を計算ノードの諸元と誤読しないこと。
     # この取り違えが aoba-b_s1_smt-off の 16 コア発覚を遅らせた
-    # （configs.aoba-b_s1_smt-off の note、quarantine/aoba-b_s1_oversubscribed_2026-06/ 参照）。
+    # （configs.aoba-b_s1_smt-off の note、archive/quarantine/aoba-b_s1_oversubscribed_2026-06/ 参照）。
     l1d_kb_per_core: 32
     l2_kb_per_core: 512
     l3_mb_per_ccx: 16
@@ -347,7 +347,7 @@ configs:
   # （aoba-b_s1_smt-off が 2026-06〜09 まさにこれで、numactl の
   # cpunodebind が NPS4 で 16 コアしか掴んでおらず、smt:off でも
   # threads=64 と cores_effective=16 が一致しなかった。検証は
-  # quarantine/aoba-b_s1_oversubscribed_2026-06/README.md）。
+  # archive/quarantine/aoba-b_s1_oversubscribed_2026-06/README.md）。
   # この区別が無かったことが見落としの直接原因なので、実効コア数は
   # 計算式に頼らずここに明示の値として持つ。
 
@@ -382,8 +382,8 @@ configs:
       NPS4 環境では NUMA ノード 0 = 16 コアしか掴んでいなかった（64スレッドを
       16コアに載せた4倍オーバーサブスクリプション）。par057 での検証
       （--cpunodebind=0 のピーク 316.2 GFlops、正しい --cpunodebind=0-3 で
-      461.0 GFlops）で発覚。該当データは `quarantine/aoba-b_s1_oversubscribed_2026-06/`
-      へ退避し、numactl を `--cpunodebind=0-3` に訂正して `TODO_REMEASURE.md`
+      461.0 GFlops）で発覚。該当データは `archive/quarantine/aoba-b_s1_oversubscribed_2026-06/`
+      へ退避し、numactl を `--cpunodebind=0-3` に訂正して `docs/TODO_REMEASURE.md`
       に再計測を積んだ。詳細は quarantine 側の README。
 
   # --- 研究室サーバ ---

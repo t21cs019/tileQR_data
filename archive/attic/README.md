@@ -27,7 +27,7 @@ threads=16 のファイルは `migrate.py` 経由で `raw/qr_sweep/ryzen7-5800x_
   基準（`studies/i5-7400_memory_channel/`）に照らすと、
   ここのデータは研究の主張には使えず、使うなら参考扱いに留める。
 
-昇格させる場合は `TODO_REMEASURE.md` で議論し、`migrate.py` 系の成形を
+昇格させる場合は `docs/TODO_REMEASURE.md` で議論し、`migrate.py` 系の成形を
 経て入れること。**このディレクトリ内のファイルは改名も編集もしない**（原本）。
 
 ## 目録

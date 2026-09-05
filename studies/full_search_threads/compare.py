@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-attic/Full_search_dgeqrf/（学部時代・スレッド数不明）を
+archive/attic/Full_search_dgeqrf/（学部時代・スレッド数不明）を
 2026-08-30 の dogwood th=8 実測と突き合わせ、当時のスレッド数を推定する。
 
 --- 位置づけ ----------------------------------------------------------
@@ -8,7 +8,7 @@ attic/Full_search_dgeqrf/（学部時代・スレッド数不明）を
 **参考情報であって証明ではない。** 当時の PLASMA ビルド・BLAS・メモリ構成が
 違う可能性があり、GFlops の水準比較はそれらと交絡する。i5-7400 で
 「形状は健全に見えるが記録が無いので落とす」とした基準はここでも変えない。
-この結果がどちらに転んでも、attic のデータを raw/ に上げる根拠にはしない。
+この結果がどちらに転んでも、archive/attic のデータを raw/ に上げる根拠にはしない。
 
 --- 判定の材料 --------------------------------------------------------
 
@@ -37,7 +37,7 @@ from tileqr_data import console  # noqa: E402
 
 console.use_utf8()
 
-OLD = ROOT / "attic" / "Full_search_dgeqrf" / "benchmark_dtsmqr_4096.csv"
+OLD = ROOT / "archive" / "attic" / "Full_search_dgeqrf" / "benchmark_dtsmqr_4096.csv"
 NEW_DIR = ROOT / "raw" / "qr_sweep" / "dogwood_s1_smt-off"
 
 

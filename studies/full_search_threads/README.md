@@ -1,12 +1,12 @@
 # full_search_threads — 学部時代の dogwood フルスイープのスレッド数推定
 
-`attic/Full_search_dgeqrf/`（i7-6900K、dgeqrf size4096、threads 列なし・
+`archive/attic/Full_search_dgeqrf/`（i7-6900K、dgeqrf size4096、threads 列なし・
 スレッド数不明）を、2026-08-30 の `dogwood_s1_smt-off` th=8 実測
 （size4096、5反復の平均）と突き合わせた。
 
 **位置づけ: 参考情報。** 当時の PLASMA ビルド / BLAS / メモリ構成の記録が
 無く、水準の比較はそれらと交絡する。この結果がどちらに転んでも
-attic のデータを raw/ に上げる根拠にはしない
+archive/attic のデータを raw/ に上げる根拠にはしない
 （i5-7400 で「形状は健全でも記録が無ければ落とす」とした基準と同じ）。
 
 再現: `python studies/full_search_threads/compare.py`
@@ -44,4 +44,4 @@ th=8 と th=16 の実測が両方揃えば、旧データの水準がどちら�
 1本 = 3963 点なので手間は小さい。
 
 それでも「当時のビルドが違う」交絡は残るため、判明後も扱いは
-参考データ止まり。`attic/README.md` の昇格の基準を参照。
+参考データ止まり。`archive/attic/README.md` の昇格の基準を参照。
