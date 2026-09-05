@@ -20,13 +20,12 @@
 
 | 対象 | 症状 | 原因 | 除外 | 根拠 |
 |---|---|---|---|---|
-| `i5-7400_s1_smt-off` qr_sweep size8192 | 他機比で大 nb が不当に低い。nb\* が左に寄る | 2026-06-30 分はシングルチャネルで計測 | 済（`archive/quarantine/i5-7400_single_channel_2026-06/` へ退避） | `studies/i5-7400_memory_channel/` |
 | `i3-7100_s1_smt-on` size2048/4096/8192 | trial が進むほど遅くなる（size2048 で trial5 が -2.1%） | サーマルドリフト | **未** | 下記 |
 | `i3-8100_s1_smt-off` 全サイズ | 形状が同コア数群の外れ値。trial1→2 のウォームアップ癖 | 未特定 | **未** | 下記 |
-| `aoba-b_s1_smt-off` qr_sweep size2048/4096/8192/16384 | ピーク性能が正しい64コア版の1.5〜1.6倍低い | `--cpunodebind=0` が NPS4 で16コアしか掴んでおらず、64スレッドを16コアに載せた4倍オーバーサブスクリプション | 済（`raw_data` ごと `archive/quarantine/` へ退避） | `archive/quarantine/aoba-b_s1_oversubscribed_2026-06/README.md` |
+| `aoba-b_s1_smt-off` qr_sweep size8192/16384 | （size1024/2048/4096は解消済み） | `--cpunodebind=0` が NPS4 で16コアしか掴んでおらず、64スレッドを16コアに載せた4倍オーバーサブスクリプション | 済（`raw_data` ごと `archive/quarantine/` へ退避） | `archive/quarantine/aoba-b_s1_oversubscribed_2026-06/README.md` |
 | `aoba-b_s2_smt-off` qr_sweep size8192 | nb 走査が計画（32-512）に届かず 20-508 止まり（格子97%） | 走査範囲が途中で打ち切られた（原因未特定。測定条件自体は無効ではない） | 済（`archive/quarantine/` へ退避） | `archive/quarantine/aoba-b_s2_size8192_incomplete_2026-06/README.md` |
 
-### i5-7400 qr_sweep: シングルチャネルで計測されていた
+### 解消済み: i5-7400 qr_sweep（シングルチャネルで計測されていた）
 
 DIMM を1枚抜いた状態で 2026-06-24 の値が再現した（10点の比が平均 1.003、
 範囲 0.979〜1.016）。デュアル化の効果は nb 依存で、nb=32 で +5.9%、
@@ -35,18 +34,17 @@ nb=448 で +21.4%。一様なオフセットではないため後から補正で
 
 size 8192 のみ 2026-06-30 の別セッションで、形状指標では健全に見える
 （448/peak = 0.994）。ただし当日の DIMM 構成を裏付ける記録が無いため、
-証明できない以上あわせて再計測する。
+証明できない以上あわせて再計測した。
 
 詳細と再現手順は `studies/i5-7400_memory_channel/`。
 
-**現在の状況（2026-09-05）**: size 1024/2048/4096 は 2026-09-01 に
-デュアルチャネル構成で再計測済み・`raw/` に反映済み。**size 8192 のみ
-再計測待ち。** 旧シングルチャネルデータ（4サイズぶん）は
-`spec/curation.yaml` の `src:` 列挙による除外から、AOBA-B s1 の隔離作業に
-合わせて `archive/quarantine/i5-7400_single_channel_2026-06/` への物理退避に
-切り替えた（該当 curation ルールは削除済み）。size8192 のデュアルチャネル
-再計測は2026-09-02に取得済みだが、この構成整理の時点では意図的に
-`raw_data/` へ未取り込みのまま残してある。
+**2026-09-05: 全サイズ解消済み。** size 1024/2048/4096 は2026-09-01、
+size 8192 は2026-09-02にデュアルチャネル構成で再計測し、4サイズとも
+`raw/` に反映済み（`docs/COVERAGE.md` で `i5-7400_s1_smt-off` は4/4）。
+旧シングルチャネルデータ（4サイズぶん）は `spec/curation.yaml` の `src:`
+列挙による除外から、AOBA-B s1 の隔離作業に合わせて
+`archive/quarantine/i5-7400_single_channel_2026-06/` への物理退避に
+切り替えた（該当 curation ルールは削除済み）。
 
 ssrfb の threads=4 取り違え（`i5-7400_ssrfb_size*_th4_*.csv`、4サイズ）も
 同時に `archive/quarantine/i5-7400_ssrfb_threads4_2026-08/` へ退避した
@@ -115,21 +113,39 @@ par057 での検証（size=4096, threads=64, nb=264）:
 `aoba-b_s1_smt-off` は `numactl: "--cpunodebind=0-3 --membind=0"` に訂正済み。
 詳細・再利用条件は `archive/quarantine/aoba-b_s1_oversubscribed_2026-06/README.md`。
 
+**2026-09-05: size1024/2048/4096 は再計測完了・解消済み。** NQSVジョブ
+（jobid 271745, 271752-271765）を par007/008/014/022/039/043/047/048 で
+実行し、`--cpunodebind=0-3`（64コア）で各サイズ5トライアルを取得。
+欠測0点を確認のうえ `raw_data/aoba-b_s1_smt-off/` へ
+`{node}_size{N}_nb32-512_t1_{日付}_{時刻}.csv` の命名で配置し、
+`raw/` に反映した（`docs/COVERAGE.md` で該当3サイズが `done`）。
+新規に登場したノード（par014/022/039/043/047/048）は `spec/machines.yaml`
+の `nodes` に追加登録した。**size8192/16384 は計測ログ（ジョブ実行済み）が
+あるものの結果CSVが未取得のため、引き続き再計測待ち。**
+
 #### AOBA-B 再計測まとめ
 
 | config | threads | size | 理由 |
 |---|---|---|---|
-| `aoba-b_s1_smt-off` | 64 | 1024 | 未計測 |
-| `aoba-b_s1_smt-off` | 64 | 2048 | 16コアで計測。要再計測 |
-| `aoba-b_s1_smt-off` | 64 | 4096 | 同上 |
-| `aoba-b_s1_smt-off` | 64 | 8192 | 同上 |
-| `aoba-b_s1_smt-off` | 64 | 16384 | 同上 |
+| `aoba-b_s1_smt-off` | 64 | 8192 | 16コアで計測・隔離済み。正しいログは取得済みだがCSV未取得。要再取得 |
+| `aoba-b_s1_smt-off` | 64 | 16384 | 未計測（ジョブ投入のみ、未実行） |
 | `aoba-b_s2_smt-off` | 128 | 1024 | 未計測 |
 | `aoba-b_s2_smt-off` | 128 | 2048 | 未計測 |
 | `aoba-b_s2_smt-off` | 128 | 8192 | nb 範囲不足（20-508、step8。計画の格子に届いていない）。2026-09-05に `archive/quarantine/aoba-b_s2_size8192_incomplete_2026-06/` へ退避 |
 
 s2側の穴は今回のオーバーサブスクリプションとは無関係の既存の穴だが、
 どのみちAOBAのバッチジョブを立てるならまとめて手当てする。
+
+#### AOBA-B s2 ssrfb（未取り込み）
+
+`raw_data/aoba-b_s2_smt-off/aoba_s2_smt-off_ssrfb_size{1024,2048,4096,8192}_nb32-512_t1.csv`
+の4ファイルが2026-09-05に到着したが、ファイル名が `assemble.py` の
+命名規則（`{node}_size{N}_nb{lo}-{hi}_t{trials}_{日付}_{時刻}.csv`）に
+合わず未取り込み。中身を見ると `(nb,ib)` の組が正確に5回ずつ繰り返されており
+（5トライアル分が1ファイルに積まれている）、ファイル名末尾の `_t1` は
+トライアル数ではない。物理ノード名・タイムスタンプも不明。
+取り込むにはリネームが必要（aoba-b_s1 と同様、ジョブログから
+ノード名・完了時刻が分かればそれを使う）。
 
 #### 計測側（plasma-bench）への要求として issue 化すること
 
