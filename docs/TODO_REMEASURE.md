@@ -20,10 +20,11 @@
 
 | 対象 | 症状 | 原因 | 除外 | 根拠 |
 |---|---|---|---|---|
-| `i5-7400_s1_smt-off` qr_sweep 全サイズ | 他機比で大 nb が不当に低い。nb\* が左に寄る | 2026-06-24 分はシングルチャネルで計測 | 済 `i5-7400-qr_sweep-memory-channels` | `studies/i5-7400_memory_channel/` |
+| `i5-7400_s1_smt-off` qr_sweep size8192 | 他機比で大 nb が不当に低い。nb\* が左に寄る | 2026-06-30 分はシングルチャネルで計測 | 済（`archive/quarantine/i5-7400_single_channel_2026-06/` へ退避） | `studies/i5-7400_memory_channel/` |
 | `i3-7100_s1_smt-on` size2048/4096/8192 | trial が進むほど遅くなる（size2048 で trial5 が -2.1%） | サーマルドリフト | **未** | 下記 |
 | `i3-8100_s1_smt-off` 全サイズ | 形状が同コア数群の外れ値。trial1→2 のウォームアップ癖 | 未特定 | **未** | 下記 |
-| `aoba-b_s1_smt-off` qr_sweep size2048/4096/8192/16384 | ピーク性能が正しい64コア版の1.5〜1.6倍低い | `--cpunodebind=0` が NPS4 で16コアしか掴んでおらず、64スレッドを16コアに載せた4倍オーバーサブスクリプション | 済（`raw_data` ごと `quarantine/` へ退避。curation.yaml ではなくディレクトリ移動で対処） | `archive/quarantine/aoba-b_s1_oversubscribed_2026-06/README.md` |
+| `aoba-b_s1_smt-off` qr_sweep size2048/4096/8192/16384 | ピーク性能が正しい64コア版の1.5〜1.6倍低い | `--cpunodebind=0` が NPS4 で16コアしか掴んでおらず、64スレッドを16コアに載せた4倍オーバーサブスクリプション | 済（`raw_data` ごと `archive/quarantine/` へ退避） | `archive/quarantine/aoba-b_s1_oversubscribed_2026-06/README.md` |
+| `aoba-b_s2_smt-off` qr_sweep size8192 | nb 走査が計画（32-512）に届かず 20-508 止まり（格子97%） | 走査範囲が途中で打ち切られた（原因未特定。測定条件自体は無効ではない） | 済（`archive/quarantine/` へ退避） | `archive/quarantine/aoba-b_s2_size8192_incomplete_2026-06/README.md` |
 
 ### i5-7400 qr_sweep: シングルチャネルで計測されていた
 
@@ -37,6 +38,20 @@ size 8192 のみ 2026-06-30 の別セッションで、形状指標では健全�
 証明できない以上あわせて再計測する。
 
 詳細と再現手順は `studies/i5-7400_memory_channel/`。
+
+**現在の状況（2026-09-05）**: size 1024/2048/4096 は 2026-09-01 に
+デュアルチャネル構成で再計測済み・`raw/` に反映済み。**size 8192 のみ
+再計測待ち。** 旧シングルチャネルデータ（4サイズぶん）は
+`spec/curation.yaml` の `src:` 列挙による除外から、AOBA-B s1 の隔離作業に
+合わせて `archive/quarantine/i5-7400_single_channel_2026-06/` への物理退避に
+切り替えた（該当 curation ルールは削除済み）。size8192 のデュアルチャネル
+再計測は2026-09-02に取得済みだが、この構成整理の時点では意図的に
+`raw_data/` へ未取り込みのまま残してある。
+
+ssrfb の threads=4 取り違え（`i5-7400_ssrfb_size*_th4_*.csv`、4サイズ）も
+同時に `archive/quarantine/i5-7400_ssrfb_threads4_2026-08/` へ退避した
+（`i5-7400-ssrfb-threads` ルールを削除）。こちらは4サイズとも
+2026-08-31にthreads=1で再計測済み・解消済み。
 
 ### i3-7100: サーマルドリフト
 
@@ -96,9 +111,9 @@ par057 での検証（size=4096, threads=64, nb=264）:
 `make assemble` の入力側なので、`raw/` を直接編集するのではなく `raw_data/`
 側のディレクトリごと動かす形で対処している（curation.yaml の `src:` に
 20ファイル分を列挙するより、専用ディレクトリへ退避する方が管理しやすい
-ため。i5-7400 とは違う方式）。`machines.yaml` の `aoba-b_s1_smt-off` は
-`numactl: "--cpunodebind=0-3 --membind=0"` に訂正済み。詳細・再利用条件は
-`archive/quarantine/aoba-b_s1_oversubscribed_2026-06/README.md`。
+ため。2026-09-05 に i5-7400 の除外もこの方式へ統一した）。`machines.yaml` の
+`aoba-b_s1_smt-off` は `numactl: "--cpunodebind=0-3 --membind=0"` に訂正済み。
+詳細・再利用条件は `archive/quarantine/aoba-b_s1_oversubscribed_2026-06/README.md`。
 
 #### AOBA-B 再計測まとめ
 
@@ -111,7 +126,7 @@ par057 での検証（size=4096, threads=64, nb=264）:
 | `aoba-b_s1_smt-off` | 64 | 16384 | 同上 |
 | `aoba-b_s2_smt-off` | 128 | 1024 | 未計測 |
 | `aoba-b_s2_smt-off` | 128 | 2048 | 未計測 |
-| `aoba-b_s2_smt-off` | 128 | 8192 | nb 範囲不足（20-508、step8。計画の格子に届いていない） |
+| `aoba-b_s2_smt-off` | 128 | 8192 | nb 範囲不足（20-508、step8。計画の格子に届いていない）。2026-09-05に `archive/quarantine/aoba-b_s2_size8192_incomplete_2026-06/` へ退避 |
 
 s2側の穴は今回のオーバーサブスクリプションとは無関係の既存の穴だが、
 どのみちAOBAのバッチジョブを立てるならまとめて手当てする。
