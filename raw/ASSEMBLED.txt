@@ -286,6 +286,11 @@ raw/qr_sweep/ryzen5-7400f_s1_smt-off/ryzen5-7400f_size1024_t6_nb32-512_20260829-
 raw/qr_sweep/ryzen5-7400f_s1_smt-off/ryzen5-7400f_size1024_t6_nb32-512_20260829-202808_r3.csv
 raw/qr_sweep/ryzen5-7400f_s1_smt-off/ryzen5-7400f_size1024_t6_nb32-512_20260829-202808_r4.csv
 raw/qr_sweep/ryzen5-7400f_s1_smt-off/ryzen5-7400f_size1024_t6_nb32-512_20260829-202808_r5.csv
+raw/qr_sweep/ryzen5-7400f_s1_smt-off/ryzen5-7400f_size16384_t6_nb32-512_20260831-034701_r1.csv
+raw/qr_sweep/ryzen5-7400f_s1_smt-off/ryzen5-7400f_size16384_t6_nb32-512_20260831-034701_r2.csv
+raw/qr_sweep/ryzen5-7400f_s1_smt-off/ryzen5-7400f_size16384_t6_nb32-512_20260831-034701_r3.csv
+raw/qr_sweep/ryzen5-7400f_s1_smt-off/ryzen5-7400f_size16384_t6_nb32-512_20260831-034701_r4.csv
+raw/qr_sweep/ryzen5-7400f_s1_smt-off/ryzen5-7400f_size16384_t6_nb32-512_20260831-034701_r5.csv
 raw/qr_sweep/ryzen5-7400f_s1_smt-off/ryzen5-7400f_size2048_t6_nb32-512_20260829-205539_r1.csv
 raw/qr_sweep/ryzen5-7400f_s1_smt-off/ryzen5-7400f_size2048_t6_nb32-512_20260829-205539_r2.csv
 raw/qr_sweep/ryzen5-7400f_s1_smt-off/ryzen5-7400f_size2048_t6_nb32-512_20260829-205539_r3.csv
