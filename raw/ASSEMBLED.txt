@@ -2,18 +2,23 @@
 # scripts/assemble.py が書き出したファイルの台帳。手で編集しない。
 # 次回の --clean はこの一覧に載っていたファイルだけを掃除の対象にする。
 # ここに無いファイル（migrate.py の生成物など）には触らない。
+raw/qr_sweep/aoba-b_s1_smt-off/par007_size16384_t64_nb32-512_20260906-002133.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par007_size4096_t64_nb32-512_20260905-113513.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par007_size8192_t64_nb32-512_20260905-133320.csv
+raw/qr_sweep/aoba-b_s1_smt-off/par008_size16384_t64_nb32-512_20260906-003224.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par008_size4096_t64_nb32-512_20260905-114241.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par008_size8192_t64_nb32-512_20260905-133957.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par014_size1024_t64_nb32-512_20260905-092404.csv
+raw/qr_sweep/aoba-b_s1_smt-off/par014_size16384_t64_nb32-512_20260905-232643.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par014_size2048_t64_nb32-512_20260905-095622.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par014_size4096_t64_nb32-512_20260905-085700.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par014_size4096_t64_nb32-512_20260905-114534.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par022_size1024_t64_nb32-512_20260905-092645.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par022_size2048_t64_nb32-512_20260905-095858.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par022_size8192_t64_nb32-512_20260905-115722.csv
+raw/qr_sweep/aoba-b_s1_smt-off/par026_size16384_t64_nb32-512_20260906-000201.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par039_size2048_t64_nb32-512_20260905-094852.csv
+raw/qr_sweep/aoba-b_s1_smt-off/par042_size16384_t64_nb32-512_20260906-000854.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par043_size1024_t64_nb32-512_20260905-092432.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par043_size2048_t64_nb32-512_20260905-095904.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par043_size8192_t64_nb32-512_20260905-120029.csv
@@ -25,8 +30,19 @@ raw/qr_sweep/aoba-b_s1_smt-off/par048_size2048_t64_nb32-512_20260905-095818.csv
 raw/qr_sweep/aoba-b_s2_smt-off/par001_size4096_t128_nb20-512_20260607-235252.csv
 raw/qr_sweep/aoba-b_s2_smt-off/par002_size4096_t128_nb20-512_20260607-235522.csv
 raw/qr_sweep/aoba-b_s2_smt-off/par004_size4096_t128_nb20-512_20260607-235552.csv
+raw/qr_sweep/aoba-b_s2_smt-off/par005_size1024_t128_nb32-512_20260905-155133.csv
+raw/qr_sweep/aoba-b_s2_smt-off/par005_size2048_t128_nb32-512_20260905-163549.csv
+raw/qr_sweep/aoba-b_s2_smt-off/par005_size2048_t128_nb32-512_20260905-172008.csv
+raw/qr_sweep/aoba-b_s2_smt-off/par005_size2048_t128_nb32-512_20260905-180412.csv
+raw/qr_sweep/aoba-b_s2_smt-off/par005_size2048_t128_nb32-512_20260905-184834.csv
+raw/qr_sweep/aoba-b_s2_smt-off/par005_size2048_t128_nb32-512_20260905-193259.csv
 raw/qr_sweep/aoba-b_s2_smt-off/par006_size4096_t128_nb20-512_20260607-235537.csv
 raw/qr_sweep/aoba-b_s2_smt-off/par007_size4096_t128_nb20-512_20260607-235622.csv
+raw/qr_sweep/aoba-b_s2_smt-off/par019_size8192_t128_nb32-512_20260905-141327.csv
+raw/qr_sweep/aoba-b_s2_smt-off/par020_size1024_t128_nb32-512_20260905-143229.csv
+raw/qr_sweep/aoba-b_s2_smt-off/par043_size1024_t128_nb32-512_20260905-145226.csv
+raw/qr_sweep/aoba-b_s2_smt-off/par043_size1024_t128_nb32-512_20260905-151235.csv
+raw/qr_sweep/aoba-b_s2_smt-off/par043_size1024_t128_nb32-512_20260905-153237.csv
 raw/qr_sweep/calc_s1_smt-off/calc_size1024_t12_nb32-512_20260826-092836_r1.csv
 raw/qr_sweep/calc_s1_smt-off/calc_size1024_t12_nb32-512_20260826-092836_r2.csv
 raw/qr_sweep/calc_s1_smt-off/calc_size1024_t12_nb32-512_20260826-092836_r3.csv
