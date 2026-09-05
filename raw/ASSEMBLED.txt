@@ -3,16 +3,21 @@
 # 次回の --clean はこの一覧に載っていたファイルだけを掃除の対象にする。
 # ここに無いファイル（migrate.py の生成物など）には触らない。
 raw/qr_sweep/aoba-b_s1_smt-off/par007_size4096_t64_nb32-512_20260905-113513.csv
+raw/qr_sweep/aoba-b_s1_smt-off/par007_size8192_t64_nb32-512_20260905-133320.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par008_size4096_t64_nb32-512_20260905-114241.csv
+raw/qr_sweep/aoba-b_s1_smt-off/par008_size8192_t64_nb32-512_20260905-133957.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par014_size1024_t64_nb32-512_20260905-092404.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par014_size2048_t64_nb32-512_20260905-095622.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par014_size4096_t64_nb32-512_20260905-085700.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par014_size4096_t64_nb32-512_20260905-114534.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par022_size1024_t64_nb32-512_20260905-092645.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par022_size2048_t64_nb32-512_20260905-095858.csv
+raw/qr_sweep/aoba-b_s1_smt-off/par022_size8192_t64_nb32-512_20260905-115722.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par039_size2048_t64_nb32-512_20260905-094852.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par043_size1024_t64_nb32-512_20260905-092432.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par043_size2048_t64_nb32-512_20260905-095904.csv
+raw/qr_sweep/aoba-b_s1_smt-off/par043_size8192_t64_nb32-512_20260905-120029.csv
+raw/qr_sweep/aoba-b_s1_smt-off/par044_size8192_t64_nb32-512_20260905-131812.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par047_size1024_t64_nb32-512_20260905-092656.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par047_size4096_t64_nb32-512_20260905-111612.csv
 raw/qr_sweep/aoba-b_s1_smt-off/par048_size1024_t64_nb32-512_20260905-092625.csv
@@ -362,6 +367,21 @@ raw/ssrfb/i7-7700/i7-7700_size1024_t1_nb32-512_20260830-065953.csv
 raw/ssrfb/i7-7700/i7-7700_size2048_t1_nb32-512_20260830-071731.csv
 raw/ssrfb/i7-7700/i7-7700_size4096_t1_nb32-512_20260725-105711.csv
 raw/ssrfb/i7-7700/i7-7700_size8192_t1_nb32-512_20260830-073829.csv
+raw/ssrfb/par043/par043_size1024_t1_nb32-512_20260905-055501_r1.csv
+raw/ssrfb/par043/par043_size1024_t1_nb32-512_20260905-055501_r2.csv
+raw/ssrfb/par043/par043_size1024_t1_nb32-512_20260905-055501_r3.csv
+raw/ssrfb/par043/par043_size1024_t1_nb32-512_20260905-055501_r4.csv
+raw/ssrfb/par043/par043_size1024_t1_nb32-512_20260905-055501_r5.csv
+raw/ssrfb/par043/par043_size2048_t1_nb32-512_20260905-060423_r1.csv
+raw/ssrfb/par043/par043_size2048_t1_nb32-512_20260905-060423_r2.csv
+raw/ssrfb/par043/par043_size2048_t1_nb32-512_20260905-060423_r3.csv
+raw/ssrfb/par043/par043_size2048_t1_nb32-512_20260905-060423_r4.csv
+raw/ssrfb/par043/par043_size2048_t1_nb32-512_20260905-060423_r5.csv
+raw/ssrfb/par043/par043_size4096_t1_nb32-512_20260905-064123_r1.csv
+raw/ssrfb/par043/par043_size4096_t1_nb32-512_20260905-064123_r2.csv
+raw/ssrfb/par043/par043_size4096_t1_nb32-512_20260905-064123_r3.csv
+raw/ssrfb/par043/par043_size4096_t1_nb32-512_20260905-064123_r4.csv
+raw/ssrfb/par043/par043_size4096_t1_nb32-512_20260905-064123_r5.csv
 raw/ssrfb/ryzen5-7400f/ryzen5-7400f_size1024_t1_nb32-512_20260727-185706.csv
 raw/ssrfb/ryzen5-7400f/ryzen5-7400f_size2048_t1_nb32-512_20260727-191302.csv
 raw/ssrfb/ryzen5-7400f/ryzen5-7400f_size4096_t1_nb32-512_20260727-182633.csv

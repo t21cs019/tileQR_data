@@ -11,10 +11,6 @@
 
 ## 取り込み時の注意
 
-- aoba_s2_smt-off_ssrfb_size1024_nb32-512_t1.csv: 命名にマッチせず スキップ
-- aoba_s2_smt-off_ssrfb_size2048_nb32-512_t1.csv: 命名にマッチせず スキップ
-- aoba_s2_smt-off_ssrfb_size4096_nb32-512_t1.csv: 命名にマッチせず スキップ
-- aoba_s2_smt-off_ssrfb_size8192_nb32-512_t1.csv: 命名にマッチせず スキップ
 - par007_size4096_nb128-128_t1_20260607_231854.csv: nb が1点のみ（128）。プローブとみなし除外
 - par007_size4096_nb256-256_t1_20260607_225907.csv: nb が1点のみ（256）。プローブとみなし除外
 - par009_size16384_nb256-256_t1_20260615_070514.csv: nb が1点のみ（256）。プローブとみなし除外
