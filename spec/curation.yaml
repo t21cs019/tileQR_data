@@ -47,59 +47,13 @@ version: 1
 
 exclude:
 
-  - id: i5-7400-qr_sweep-memory-channels
-    match:
-      kind: qr_sweep
-      node: i5-7400
-      # 元ファイルを名指しする。node だけで絞ると、デュアルチャネルでの
-      # 再計測が届いたときにそれまで黙って除外してしまう。
-      # threads は再計測でも 4 のままなので、判別に使えない。
-      src:
-        - i5-7400_size1024_nb32-512_t5_20260624_104705.csv
-        - i5-7400_size2048_nb32-512_t5_20260624_114156.csv
-        - i5-7400_size4096_nb32-512_t5_20260624_162515.csv
-        - i5-7400_size8192_nb32-512_t5_20260630_003200.csv
-    since: 2026-09-01
-    reason: >
-      2026-06-24 分はシングルチャネルで計測されていた。DIMM を1枚抜くと
-      当時の値が再現する（代表10点の比が平均 1.003、範囲 0.979-1.016）。
-      クロック・ターボ・熱条件は両構成で同一（3.30 GHz、throttle 0件）
-      なので、変数はチャネル構成だけ。デュアル化の効果は nb 依存で
-      nb=32 が +5.9%、nb=448 が +21.4%。一様なオフセットではないため
-      後から補正できず、最良 nb も 232 -> 320 と動く。
-      size 8192 のみ 2026-06-30 の別セッションで形状指標は健全に見えるが、
-      当日の DIMM 構成を裏付ける記録が無いのであわせて落とす。
-      根拠は studies/i5-7400_memory_channel/。
-    remeasure: >
-      デュアルチャネル構成で size 1024/2048/4096/8192 を各5反復。
-      machines.yaml の memory_channels を計測前に確認すること。
-
-  - id: i5-7400-ssrfb-threads
-    match:
-      kind: ssrfb
-      node: i5-7400
-      # threads=4 のものだけ。これを書かないと、threads=1 で取り直した
-      # 正しいデータまで黙って除外される（2026-08-31 に実際に起きかけた）。
-      threads: 4
-    since: 2026-09-01
-    reason: >
-      threads=4 で計測されているが、ssrfb は他の全ノード（calc / dogwood /
-      epyc / i3-10100 / i5-8500 / i7-7700 / ryzen / ryzen5-7400f）を
-      threads=1 で測っている。NoFlush は libgomp にリンクされていて
-      OMP_NUM_THREADS が効き、しかも効き方が nb で大きく違う
-      （th4/th1 が nb=64 で 0.92、nb=384 で 3.09）。曲線の形が別物なので、
-      ここから出した nb* は他機と比較できない。bench ssrfb の既定は
-      threads=1 で、ファイル名に th4 が付くのは --threads 4 を明示した
-      ときだけなので、この1台だけの取り違え。
-      メモリ構成の影響は受けていない（NoFlush はキャッシュ常駐で回るため
-      DRAM に触らない。デュアル構成での再計測との比が 1.00±0.01）。
-      plan.yaml の i5-7400 が threads: 4 になっていたのは、この計測に
-      合わせて後から書いたもので、計画側が間違っていた。
-    remeasure: >
-      threads=1 で size 1024/2048/4096/8192 を1本ずつ。
-      （ssrfb は1回の呼び出しの中で50回計測して平均するため trials: 1 でよい）
-      COVERAGE の size8192 の `!`（step=8 で格子51%・計画26%）も
-      同じキャンペーンで解消する。
+  # 2026-09-05: i5-7400 の qr_sweep メモリチャネル問題（旧
+  # i5-7400-qr_sweep-memory-channels）と ssrfb threads 取り違え（旧
+  # i5-7400-ssrfb-threads）は、AOBA-B s1 の隔離作業に合わせて
+  # curation.yaml の src 列挙ではなくディレクトリ移動方式に統一した。
+  # データは archive/quarantine/i5-7400_single_channel_2026-06/ と
+  # archive/quarantine/i5-7400_ssrfb_threads4_2026-08/ に退避済み
+  # （raw_data からは既に居ない。raw_data 側の該当ルールは不要になった）。
 
   - id: ryzen7-5800x-qr_sweep-nb404-512-merged
     match:

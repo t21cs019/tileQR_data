@@ -82,9 +82,11 @@ kinds:
       - {node: epyc,         threads: 1}
       - {node: i3-10100,     threads: 1}
       - {node: i3-7100,      threads: 1}
-      # 他の全ノードと同じ threads=1。既存の i5-7400 の計測は threads=4 で
-      # 回っており、1台だけ条件が違うと機種間で beta を比べられないため
-      # curation.yaml で除外してある（i5-7400-ssrfb-threads）。
+      # 他の全ノードと同じ threads=1。2026-08-01 に threads=4 で誤って
+      # 計測したものが一時あった（1台だけ条件が違うと機種間で beta を
+      # 比べられない）。2026-08-31 に threads=1 で再計測済み。旧
+      # threads=4 データは archive/quarantine/i5-7400_ssrfb_threads4_2026-08/
+      # に退避してある。
       - {node: i5-7400,      threads: 1}
       - {node: i5-8500,      threads: 1}
       - {node: i7-7700,      threads: 1}

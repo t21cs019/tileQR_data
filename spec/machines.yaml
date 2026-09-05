@@ -463,13 +463,17 @@ configs:
     arch: kabylake-i5-7400
     sockets_used: 1
     smt: off
-    memory_channels: 1         # 実測で確定（2026-08-31）。下の note を読むこと
+    memory_channels: 2         # 2026-09-01 訂正。旧: 1（2026-06計測分はシングルチャネル）
     turbo: on                  # intel_pstate no_turbo=0、負荷時 3.30 GHz を実測
     numactl: null
     cores_effective: 4
     note: >
-      threads=4。**現在 raw/ にあるデータはシングルチャネルで計測されており無効。**
-      全サイズ再計測の対象（TODO_REMEASURE.md）。再計測後は memory_channels: 2 に直す。
+      threads=4。2026-06-24（size8192のみ06-30）の計測はシングルチャネルで
+      行われており無効だった。2026-09-01 にデュアルチャネル構成で
+      size 1024/2048/4096 を再計測済み（raw/ に反映済み）。**size 8192 の
+      デュアルチャネル再計測は 2026-09-02 に取得済みだが、この構成整理の
+      時点では意図的に未取り込み。** 旧シングルチャネルデータは
+      archive/quarantine/i5-7400_single_channel_2026-06/ に退避してある。
 
       実機は 4GB DDR4-2400 single rank x2 を ChannelA-DIMM1 / ChannelB-DIMM1 に
       搭載できる構成（dmidecode -t 17）。6月の計測時は1枚だけ挿さっていた。

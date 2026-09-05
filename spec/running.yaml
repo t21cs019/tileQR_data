@@ -73,10 +73,14 @@ running:
     since: 2026-09-01
     host: i5-7400（自宅）
     note: >
-      デュアルチャネル構成での再計測（curation.yaml の
-      i5-7400-qr_sweep-memory-channels）。size 1024/2048/4096 は
-      2026-09-01 に完了して raw/ に入った。ssrfb（同じく threads=1 への
-      撮り直し）は4サイズとも 2026-09-01 に完了して raw/ に入った。
+      デュアルチャネル構成での再計測（旧シングルチャネルデータは
+      archive/quarantine/i5-7400_single_channel_2026-06/ に退避済み）。
+      size 1024/2048/4096 は 2026-09-01 に完了して raw/ に入った。
+      size 8192 は 2026-09-02 に取得済みだが raw_data/ に未取り込みのまま
+      （2026-09-05 の構成整理では意図的に対象外にした）。ssrfb（同じく
+      threads=1 への撮り直し。旧 threads=4 データは
+      archive/quarantine/i5-7400_ssrfb_threads4_2026-08/ に退避済み）は
+      4サイズとも 2026-09-01 に完了して raw/ に入った。
 
   - kind: qr_sweep
     config: i3-7100_s1_smt-off
