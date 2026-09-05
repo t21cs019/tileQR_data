@@ -382,6 +382,9 @@ raw/ssrfb/par043/par043_size4096_t1_nb32-512_20260905-064123_r2.csv
 raw/ssrfb/par043/par043_size4096_t1_nb32-512_20260905-064123_r3.csv
 raw/ssrfb/par043/par043_size4096_t1_nb32-512_20260905-064123_r4.csv
 raw/ssrfb/par043/par043_size4096_t1_nb32-512_20260905-064123_r5.csv
+raw/ssrfb/par043/par043_size8192_t1_nb32-512_20260905-071857_r1.csv
+raw/ssrfb/par043/par043_size8192_t1_nb32-512_20260905-071857_r2.csv
+raw/ssrfb/par043/par043_size8192_t1_nb32-512_20260905-071857_r3.csv
 raw/ssrfb/ryzen5-7400f/ryzen5-7400f_size1024_t1_nb32-512_20260727-185706.csv
 raw/ssrfb/ryzen5-7400f/ryzen5-7400f_size2048_t1_nb32-512_20260727-191302.csv
 raw/ssrfb/ryzen5-7400f/ryzen5-7400f_size4096_t1_nb32-512_20260727-182633.csv
