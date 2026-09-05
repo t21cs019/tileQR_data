@@ -11,6 +11,37 @@
 
 ---
 
+## 0.14.0 — SIGKILLされたssrfbから完全なトライアルだけを救出、AOBAをssrfb計画に追加
+
+### aoba-b_s2 ssrfb size8192: 完全な3トライアルを救出
+
+0.13.0 で隔離した size8192（SIGKILLで打ち切り、12,940行）について、
+`(nb,ib)` の再出現境界で判定したところ、完全なトライアルが3本
+（0-3963, 3963-7926, 7926-11889 行）、4本目は1050行で打ち切られていた
+ことを確認。**完全な3本だけを切り出して** `raw_data/` に取り込んだ
+（`par043_ssrfb_size8192_nb32-512_t3_20260905_071857.csv`）。打ち切られた
+元ファイルは `archive/quarantine/aoba-b_s2_ssrfb_size8192_killed_2026-09/`
+に残したまま。タイムスタンプはファイルの更新時刻を使用（SIGKILLの正確な
+時刻がログに残らないための代替。誤差がありうる）。
+
+### spec/plan.yaml の ssrfb targets に AOBA を追加（暫定対応）
+
+AOBA-B s2 ssrfb を計測してもこれまで `spec/plan.yaml` に対応する target が
+無く、`docs/COVERAGE.md` で計画達成率が出せていなかった
+（`par043` の行だけ「計画」列が `—`）。`{node: par043, threads: 1}` を
+targets に追加して解消。
+
+**ただし構造的な制約が残る。** AOBA はバッチスケジューラでジョブごとに
+割り当てノードが変わるため、次にAOBAのssrfbを測ると別の `par0XX` が付き、
+今回の `par043` エントリとは別の「計画に無いノード」として扱われてしまう。
+qr_sweep は `config`（`spec/machines.yaml` の configs）という物理ノードに
+依存しない抽象化でこの問題を既に解決しているが、ssrfb の `plan.py` /
+`ingest.py` は今なお node 単位の集計のままで、config 化するには
+コード変更が要る。AOBAのssrfb計測を今後も継続するなら着手を検討すること
+（`docs/TODO_REMEASURE.md` に記録済み）。
+
+---
+
 ## 0.13.0 — AOBA-B s1 size8192・s2 ssrfb を取り込み（1件はSIGKILLで隔離）
 
 ### aoba-b_s1_smt-off size8192 を再計測・取り込み
