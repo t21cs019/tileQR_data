@@ -78,5 +78,7 @@ m ≈ 0.235、size 4096 で m ≈ 0.32 となり、現行フィット値 0.240 �
   `cores_effective: 64` に更新済み。
 - **2026-09-05: size1024/2048/4096/8192 の再計測完了。** 正しい構成
   （`--cpunodebind=0-3`、64コア）でNQSVジョブを実行し、`raw/` に反映済み
-  （`docs/COVERAGE.md` で該当4サイズが `done`）。残るは size16384 のみ。
+  （`docs/COVERAGE.md` で該当4サイズが `done`）。
+- **2026-09-06: size16384 も完了。** `aoba-b_s1_smt-off` は全5サイズ
+  解消済み（正しい構成で再計測しdocs/COVERAGE.mdで5/5）。
 - 再計測項目は `docs/TODO_REMEASURE.md` を参照。

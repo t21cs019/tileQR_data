@@ -11,6 +11,25 @@
 
 ---
 
+## 0.15.0 — AOBA-B s1が全5サイズ解消、s2も残りsize8192のみに
+
+### aoba-b_s1_smt-off: size16384を取り込み、全サイズ解消
+
+jobid 271784-271788（par014/026/042/007/008、`--cpunodebind=0-3`）を
+2026-09-05〜06に実行、各5トライアル・欠測0点を確認して取り込んだ。
+`aoba-b_s1_smt-off` は size1024/2048/4096/8192/16384 の全5サイズが
+`docs/COVERAGE.md` で `done`（5/5）になった。新規ノード par026/par042 を
+`spec/machines.yaml` に追加登録。
+
+### aoba-b_s2_smt-off: size1024/2048を取り込み
+
+jobid 271797-271806（par020/043/005、`numactl`なし・128スレッド）を実行、
+各5トライアル・欠測0点を確認して取り込んだ。新規ノード par019/par020 を
+`spec/machines.yaml` に追加登録。size8192 は5本中1本（par019、jobid 271771）
+のみ取得済みで `spec/running.yaml` に計測中として記録した。
+
+---
+
 ## 0.14.0 — SIGKILLされたssrfbから完全なトライアルだけを救出、AOBAをssrfb計画に追加
 
 ### aoba-b_s2 ssrfb size8192: 完全な3トライアルを救出

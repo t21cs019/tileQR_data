@@ -22,7 +22,6 @@
 |---|---|---|---|---|
 | `i3-7100_s1_smt-on` size2048/4096/8192 | trial が進むほど遅くなる（size2048 で trial5 が -2.1%） | サーマルドリフト | **未** | 下記 |
 | `i3-8100_s1_smt-off` 全サイズ | 形状が同コア数群の外れ値。trial1→2 のウォームアップ癖 | 未特定 | **未** | 下記 |
-| `aoba-b_s1_smt-off` qr_sweep size16384 | （size1024/2048/4096/8192は解消済み） | `--cpunodebind=0` が NPS4 で16コアしか掴んでおらず、64スレッドを16コアに載せた4倍オーバーサブスクリプション | 済（`raw_data` ごと `archive/quarantine/` へ退避） | `archive/quarantine/aoba-b_s1_oversubscribed_2026-06/README.md` |
 | `aoba-b_s2_smt-off` qr_sweep size8192 | nb 走査が計画（32-512）に届かず 20-508 止まり（格子97%） | 走査範囲が途中で打ち切られた（原因未特定。測定条件自体は無効ではない） | 済（`archive/quarantine/` へ退避） | `archive/quarantine/aoba-b_s2_size8192_incomplete_2026-06/README.md` |
 
 ### 解消済み: i5-7400 qr_sweep（シングルチャネルで計測されていた）
@@ -83,7 +82,7 @@ size 4096→8192 で nb\* が 208→224 とほぼ動かないのも他機と違�
 入れてよいが、i3-8100 は原因未特定のまま除外すると「何を直せば戻せるか」が
 残らない。どう扱うか決めてからルールを足すこと。
 
-### aoba-b_s1_smt-off: NPS4 で16コアにオーバーサブスクライブしていた
+### 解消済み: aoba-b_s1_smt-off（NPS4 で16コアにオーバーサブスクライブしていた）
 
 2026-06〜09 の計測は `numactl --cpunodebind=0 --membind=0` を使っていたが、
 AOBA-B の計算ノードは NPS4（2ソケット x 8 NUMAノード、1ノード=16コア）
@@ -113,26 +112,26 @@ par057 での検証（size=4096, threads=64, nb=264）:
 `aoba-b_s1_smt-off` は `numactl: "--cpunodebind=0-3 --membind=0"` に訂正済み。
 詳細・再利用条件は `archive/quarantine/aoba-b_s1_oversubscribed_2026-06/README.md`。
 
-**2026-09-05: size1024/2048/4096/8192 は再計測完了・解消済み。** NQSVジョブ
-（jobid 271745, 271752-271770）を par007/008/014/022/039/043/044/047/048 で
-実行し、`--cpunodebind=0-3`（64コア）で各サイズ5トライアルを取得。
+**2026-09-05〜06: 全5サイズ再計測完了・解消済み。** NQSVジョブ
+（jobid 271745, 271752-271770, 271784-271788）を
+par007/008/014/022/026/039/042/043/044/047/048 で実行し、
+`--cpunodebind=0-3`（64コア）で各サイズ5トライアルを取得。
 欠測0点を確認のうえ `raw_data/aoba-b_s1_smt-off/` へ
 `{node}_size{N}_nb32-512_t1_{日付}_{時刻}.csv` の命名で配置し、
-`raw/` に反映した（`docs/COVERAGE.md` で該当4サイズが `done`）。
-新規に登場したノード（par014/022/039/043/044/047/048）は
-`spec/machines.yaml` の `nodes` に追加登録した。**残るは size16384 のみ。**
+`raw/` に反映した（`docs/COVERAGE.md` で `aoba-b_s1_smt-off` は5/5）。
+新規に登場したノード（par014/022/026/039/042/043/044/047/048）は
+`spec/machines.yaml` の `nodes` に追加登録した。**この項目は解消済み。**
 
-#### AOBA-B 再計測まとめ
+#### AOBA-B s2 の残り
+
+`aoba-b_s1_smt-off` の隔離とは無関係の既存の穴（`aoba-b_s2_smt-off` は
+`numactl` を使わないため今回のオーバーサブスクリプション問題の対象外）。
 
 | config | threads | size | 理由 |
 |---|---|---|---|
-| `aoba-b_s1_smt-off` | 64 | 16384 | 未計測（ジョブ投入のみ、未実行） |
-| `aoba-b_s2_smt-off` | 128 | 1024 | 未計測 |
-| `aoba-b_s2_smt-off` | 128 | 2048 | 未計測 |
-| `aoba-b_s2_smt-off` | 128 | 8192 | nb 範囲不足（20-508、step8。計画の格子に届いていない）。2026-09-05に `archive/quarantine/aoba-b_s2_size8192_incomplete_2026-06/` へ退避 |
+| `aoba-b_s2_smt-off` | 128 | 8192 | 2026-09-05に旧データ（nb範囲不足）を`archive/quarantine/aoba-b_s2_size8192_incomplete_2026-06/`へ退避。再計測進行中（5本中1本取得済み、`spec/running.yaml`参照） |
 
-s2側の穴は今回のオーバーサブスクリプションとは無関係の既存の穴だが、
-どのみちAOBAのバッチジョブを立てるならまとめて手当てする。
+size1024/2048 は2026-09-05に解消済み（`docs/COVERAGE.md` で `done`）。
 
 #### AOBA-B s2 ssrfb: 解消済み（size1024/2048/4096）、size8192はジョブがSIGKILLされ再計測待ち
 
