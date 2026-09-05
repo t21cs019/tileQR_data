@@ -5,7 +5,7 @@ __pycache__/
 .ipynb_checkpoints/
 .DS_Store
 
-# derived/ と out/ は意図的にコミットする（README 参照）
+# derived/ は意図的にコミットする（README 参照）
 # ダッシュボードが即座に読めること、資料から図を参照できることを優先する
 
 # 探索用の図（parquet + 生成コードから再現可能なため管理外）
@@ -15,8 +15,3 @@ __pycache__/
 # `!/figures/.gitkeep` の例外が効かない。中身を無視する形にする。
 /figures/*
 !/figures/.gitkeep
-
-# out/ は figures/ に役割を移した。過去のコミット済み図は追跡から外し、
-# 探索用は figures/、確定版は figures_final/ に置く。
-/out/*
-!/out/.gitkeep

@@ -24,8 +24,6 @@ DERIVED = ROOT / "derived"
 FIGURES = ROOT / "figures"
 # 発表・論文に使った確定版。こちらは追跡する。
 FIGURES_FINAL = ROOT / "figures_final"
-# 旧名。figures/ に役割を移したが、古い呼び出しが落ちないよう残す。
-OUT = FIGURES
 
 # 宣言層。人が書き、コードが読む入力。derived/（コードが書く出力）と対になる。
 SPEC = ROOT / "spec"
