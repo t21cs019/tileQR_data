@@ -577,6 +577,23 @@ configs:
       フルスキャンから、他機材と同じ nb>=32・ib>=8・4刻みの部分だけを抽出して
       成形した。size4096 の trial1 のみ nb=512 まで、他は nb=400 止まり。
 
+  xeon-e3-1220v3_s1_smt-off:
+    arch: haswell-xeon-e3-1220v3
+    sockets_used: 1
+    smt: off
+    memory_channels: 2          # 実測で確定（2026-09-13、dmidecode -t 17）
+    turbo: on                   # intel_pstate no_turbo=0 を実測（2026-09-13）
+    numactl: null
+    cores_effective: 4
+    note: >
+      threads=4（4コア、SMT非搭載）。学部生時代に計測した旧データ。
+      size1024/2048/4096/8192 の qr_sweep（各5トライアル）と、
+      size4096 の ssrfb（1トライアル）を収録。size16384 は未計測。
+
+      実機は 4GB DDR3-1600 (Rank 2) x4 を PROC1 DIMM1-4 全スロットに搭載
+      （dmidecode -t 17、2026-09-13）。E3-1220 v3 はデュアルチャネル対応
+      なので、4スロット全使用でデュアルチャネル構成。
+
 
 nodes:
   # 物理ノード名 → architecture

@@ -60,6 +60,7 @@ kinds:
       - {config: i3-10100_s1_smt-off,    threads: 4, sizes: [1024, 2048, 4096, 8192]}
       - {config: dogwood_s1_smt-off,     threads: 8, sizes: [1024, 2048, 4096, 8192]}
       - {config: ryzen7-5800x_s1_smt-on, threads: 16, sizes: [1024, 2048, 4096, 8192]}
+      - {config: xeon-e3-1220v3_s1_smt-off, threads: 4, sizes: [1024, 2048, 4096, 8192]}
 
   ssrfb:
     label: ssrfb カーネル単体の nb×ib スイープ
@@ -101,6 +102,7 @@ kinds:
       - {node: i7-7700,      threads: 1}
       - {node: ryzen,        threads: 1}
       - {node: ryzen5-7400f, threads: 1}
+      - {node: xeon-e3-1220v3, threads: 1}
 
   kernel_dtsmqr:
     label: dtsmqr カーネル単体の nb×ib スイープ

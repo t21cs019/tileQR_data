@@ -11,6 +11,33 @@
 
 ---
 
+## 0.17.0 — xeon-e3-1220v3_s1_smt-off を新規追加
+
+学部時代（Haswell世代の自宅機、Xeon E3-1220 v3）の計測データを取り込んだ。
+`spec/machines.yaml` の architecture / node は以前から登録済み（未計測扱い）
+だったが、`configs` エントリが無く実データも無かった。
+
+qr_sweep（size1024/2048/4096/8192、各5トライアル）と ssrfb（size4096、
+1トライアル）を `raw_data/xeon-e3-1220v3_s1_smt-off/` に配置。元ファイルの
+node 部分が短縮形 `xeon-e3` だったため、`spec/machines.yaml` に既に
+登録済みのノード名 `xeon-e3-1220v3` に合わせてリネームした（この不一致に
+気づかず短縮形のまま置くと、node が machines.yaml の nodes に無い扱いに
+なり validate.py がエラーを出す）。
+
+`spec/machines.yaml` に `configs.xeon-e3-1220v3_s1_smt-off` を追加。
+`spec/plan.yaml` に qr_sweep / ssrfb 双方の target を追加。size16384 は
+未計測のため計画から明示的に除外（sizes を4サイズに上書き）。
+
+`docs/COVERAGE.md` で qr_sweep は4/4サイズ `done`、ssrfb は size4096 のみ
+`done`（size1024/2048/8192 は `missing`）。
+
+memory_channels / turbo は当初 unknown だったが、2026-09-13 に実機で
+確認して確定。4GB DDR3-1600 x4 を全4スロットに搭載したデュアルチャネル
+構成（`dmidecode -t 17`）、`intel_pstate/no_turbo=0` でターボ有効。
+これにより「交絡要因が未確認の構成」から外れた。
+
+---
+
 ## 0.16.0 — ryzen5-7400f_s1_smt-off が全5サイズ解消
 
 size16384（`ryzen5-7400f_size16384_nb32-512_th6_t5_20260831_034701.csv`、
