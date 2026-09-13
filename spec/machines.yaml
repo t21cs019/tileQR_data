@@ -508,6 +508,9 @@ configs:
     smt: on
     memory_channels: unknown    # 自宅機は DIMM を融通し合っていた。要確認
     # 未点検。spotcheck.py で検証すること。
+    # 2026-09-13: trial間の熱ドリフトは無し（TODO_REMEASURE.md「SMT-on
+    # 全構成の熱ドリフト・メモリ不足チェック」参照）。ただしこれは既存raw
+    # データの再現性チェックであり、spotcheck.pyのライブ再計測とは別物。
     turbo: unknown
     numactl: null
     cores_effective: 4
@@ -529,6 +532,9 @@ configs:
     smt: on
     memory_channels: unknown    # 自宅機は DIMM を融通し合っていた。要確認
     # 未点検。spotcheck.py で検証すること。
+    # 2026-09-13: trial間の熱ドリフトは無し（TODO_REMEASURE.md「SMT-on
+    # 全構成の熱ドリフト・メモリ不足チェック」参照）。ただしこれは既存raw
+    # データの再現性チェックであり、spotcheck.pyのライブ再計測とは別物。
     turbo: unknown
     numactl: null
     cores_effective: 6
@@ -576,6 +582,11 @@ configs:
       threads=16（8コア x SMT）。学部生時代に計測した旧データ。nb=4/ib=2刻みの
       フルスキャンから、他機材と同じ nb>=32・ib>=8・4刻みの部分だけを抽出して
       成形した。size4096 の trial1 のみ nb=512 まで、他は nb=400 止まり。
+
+      2026-09-13: trial間の熱ドリフトを確認したが無し（size1024はtrial1のみ
+      他よりやや遅く、trial2以降で安定＝コールドスタート方向で劣化ではない）。
+      詳細は TODO_REMEASURE.md「SMT-on 全構成の熱ドリフト・メモリ不足
+      チェック」参照。
 
   xeon-e3-1220v3_s1_smt-off:
     arch: haswell-xeon-e3-1220v3
