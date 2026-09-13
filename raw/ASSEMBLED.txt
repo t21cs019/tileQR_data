@@ -153,6 +153,11 @@ raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size4096_t2_nb32-512_20260902-184301_r2.
 raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size4096_t2_nb32-512_20260902-184301_r3.csv
 raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size4096_t2_nb32-512_20260902-184301_r4.csv
 raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size4096_t2_nb32-512_20260902-184301_r5.csv
+raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size8192_t2_nb32-512_20260904-085733_r1.csv
+raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size8192_t2_nb32-512_20260904-085733_r2.csv
+raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size8192_t2_nb32-512_20260904-085733_r3.csv
+raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size8192_t2_nb32-512_20260904-085733_r4.csv
+raw/qr_sweep/i3-7100_s1_smt-off/i3-7100_size8192_t2_nb32-512_20260904-085733_r5.csv
 raw/qr_sweep/i3-7100_s1_smt-on/i3-7100_size1024_t4_nb32-512_20260628-203230_r1.csv
 raw/qr_sweep/i3-7100_s1_smt-on/i3-7100_size1024_t4_nb32-512_20260628-203230_r2.csv
 raw/qr_sweep/i3-7100_s1_smt-on/i3-7100_size1024_t4_nb32-512_20260628-203230_r3.csv
