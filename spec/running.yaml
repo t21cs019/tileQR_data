@@ -49,6 +49,14 @@ running:
   # --- 研究室のサーバ ---------------------------------------------------
 
   - kind: qr_sweep
+    config: calc_s2_smt-off
+    threads: 24
+    sizes: [8192]
+    since: 2026-09-13
+    host: calc（研究室）
+    note: 両ソケット使用（threads=24）。calc_s2_smt-off の残り最後の1サイズ。
+
+  - kind: qr_sweep
     config: ryzen7-5800x_s1_smt-on
     threads: 16
     sizes: [8192]
@@ -69,3 +77,13 @@ running:
       （2026-09-05〜06）。s2 は size1024/2048 が解消済み。size8192 は
       5トライアル中1本（par019、jobid 271771）のみ取得済みで残り4本
       （r2-r5）は投入済み・未実行（.shのみ存在）。
+
+  # --- 自宅の PC --------------------------------------------------------
+
+  - kind: ssrfb
+    node: xeon-e3-1220v3
+    threads: 1
+    sizes: [1024, 2048, 8192]
+    since: 2026-09-13
+    host: xeon-e3-1220v3（自宅）
+    note: size4096 は計測済み（2026-09-05、raw/ に取り込み済み）。残り3サイズ。
