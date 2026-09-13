@@ -626,6 +626,7 @@ nodes:
   par032: { arch: aoba-b, source_key: aoba_b }
   par034: { arch: aoba-b, source_key: aoba_b }
   par035: { arch: aoba-b, source_key: aoba_b }
+  par038: { arch: aoba-b, source_key: aoba_b }
   par039: { arch: aoba-b, source_key: aoba_b }
   par042: { arch: aoba-b, source_key: aoba_b }
   par043: { arch: aoba-b, source_key: aoba_b }
@@ -633,6 +634,7 @@ nodes:
   par045: { arch: aoba-b, source_key: aoba_b }
   par047: { arch: aoba-b, source_key: aoba_b }
   par048: { arch: aoba-b, source_key: aoba_b }
+  par049: { arch: aoba-b, source_key: aoba_b }
   par057: { arch: aoba-b, source_key: aoba_b }
   par058: { arch: aoba-b, source_key: aoba_b }
 

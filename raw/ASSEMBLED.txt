@@ -38,11 +38,15 @@ raw/qr_sweep/aoba-b_s2_smt-off/par005_size2048_t128_nb32-512_20260905-184834.csv
 raw/qr_sweep/aoba-b_s2_smt-off/par005_size2048_t128_nb32-512_20260905-193259.csv
 raw/qr_sweep/aoba-b_s2_smt-off/par006_size4096_t128_nb20-512_20260607-235537.csv
 raw/qr_sweep/aoba-b_s2_smt-off/par007_size4096_t128_nb20-512_20260607-235622.csv
+raw/qr_sweep/aoba-b_s2_smt-off/par007_size8192_t128_nb32-512_20260906-044513.csv
+raw/qr_sweep/aoba-b_s2_smt-off/par014_size8192_t128_nb32-512_20260906-043318.csv
 raw/qr_sweep/aoba-b_s2_smt-off/par019_size8192_t128_nb32-512_20260905-141327.csv
 raw/qr_sweep/aoba-b_s2_smt-off/par020_size1024_t128_nb32-512_20260905-143229.csv
+raw/qr_sweep/aoba-b_s2_smt-off/par038_size8192_t128_nb32-512_20260906-043855.csv
 raw/qr_sweep/aoba-b_s2_smt-off/par043_size1024_t128_nb32-512_20260905-145226.csv
 raw/qr_sweep/aoba-b_s2_smt-off/par043_size1024_t128_nb32-512_20260905-151235.csv
 raw/qr_sweep/aoba-b_s2_smt-off/par043_size1024_t128_nb32-512_20260905-153237.csv
+raw/qr_sweep/aoba-b_s2_smt-off/par049_size8192_t128_nb32-512_20260906-043513.csv
 raw/qr_sweep/calc_s1_smt-off/calc_size1024_t12_nb32-512_20260826-092836_r1.csv
 raw/qr_sweep/calc_s1_smt-off/calc_size1024_t12_nb32-512_20260826-092836_r2.csv
 raw/qr_sweep/calc_s1_smt-off/calc_size1024_t12_nb32-512_20260826-092836_r3.csv

@@ -11,6 +11,18 @@
 
 ---
 
+## 0.20.0 — aoba-b_s2_smt-off が全4サイズ解消
+
+size8192 の残り4トライアル（r2-r5、jobid 271959-271962）のCSVを取り込んだ。
+どのノードでいつ完了したかはNQSVジョブの `.o{jobid}` ログと照合して特定
+（par049/par007/par014/par038、いずれも2026-09-06完了、欠測0点）。
+`docs/COVERAGE.md` で `aoba-b_s2_smt-off` が size1024/2048/4096/8192 の
+全4サイズで5/5になり、達成4/4に到達。新規ノードpar038/par049を
+`spec/machines.yaml` に追加登録、`spec/running.yaml` の対応エントリを削除。
+`docs/TODO_REMEASURE.md` の該当項目を解消済みに更新。
+
+---
+
 ## 0.19.0 — calc_s1_smt-off が全5サイズ解消、calc_s2_smt-off にsize2048を追加
 
 ### calc_s1_smt-off: size16384を取り込み、全サイズ解消
