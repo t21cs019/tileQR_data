@@ -48,6 +48,11 @@ raw/qr_sweep/calc_s1_smt-off/calc_size1024_t12_nb32-512_20260826-092836_r2.csv
 raw/qr_sweep/calc_s1_smt-off/calc_size1024_t12_nb32-512_20260826-092836_r3.csv
 raw/qr_sweep/calc_s1_smt-off/calc_size1024_t12_nb32-512_20260826-092836_r4.csv
 raw/qr_sweep/calc_s1_smt-off/calc_size1024_t12_nb32-512_20260826-092836_r5.csv
+raw/qr_sweep/calc_s1_smt-off/calc_size16384_t12_nb32-512_20260828-112300_r1.csv
+raw/qr_sweep/calc_s1_smt-off/calc_size16384_t12_nb32-512_20260828-112300_r2.csv
+raw/qr_sweep/calc_s1_smt-off/calc_size16384_t12_nb32-512_20260828-112300_r3.csv
+raw/qr_sweep/calc_s1_smt-off/calc_size16384_t12_nb32-512_20260828-112300_r4.csv
+raw/qr_sweep/calc_s1_smt-off/calc_size16384_t12_nb32-512_20260828-112300_r5.csv
 raw/qr_sweep/calc_s1_smt-off/calc_size2048_t12_nb32-512_20260826-103930_r1.csv
 raw/qr_sweep/calc_s1_smt-off/calc_size2048_t12_nb32-512_20260826-103930_r2.csv
 raw/qr_sweep/calc_s1_smt-off/calc_size2048_t12_nb32-512_20260826-103930_r3.csv
@@ -68,6 +73,11 @@ raw/qr_sweep/calc_s2_smt-off/calc_size1024_t24_nb32-512_20260625-063259_r2.csv
 raw/qr_sweep/calc_s2_smt-off/calc_size1024_t24_nb32-512_20260625-063259_r3.csv
 raw/qr_sweep/calc_s2_smt-off/calc_size1024_t24_nb32-512_20260625-063259_r4.csv
 raw/qr_sweep/calc_s2_smt-off/calc_size1024_t24_nb32-512_20260625-063259_r5.csv
+raw/qr_sweep/calc_s2_smt-off/calc_size2048_t24_nb32-512_20260629-060732_r1.csv
+raw/qr_sweep/calc_s2_smt-off/calc_size2048_t24_nb32-512_20260629-060732_r2.csv
+raw/qr_sweep/calc_s2_smt-off/calc_size2048_t24_nb32-512_20260629-060732_r3.csv
+raw/qr_sweep/calc_s2_smt-off/calc_size2048_t24_nb32-512_20260629-060732_r4.csv
+raw/qr_sweep/calc_s2_smt-off/calc_size2048_t24_nb32-512_20260629-060732_r5.csv
 raw/qr_sweep/calc_s2_smt-off/calc_size4096_t24_nb20-512_20260511-042006.csv
 raw/qr_sweep/calc_s2_smt-off/calc_size4096_t24_nb20-512_20260608-023809_r1.csv
 raw/qr_sweep/calc_s2_smt-off/calc_size4096_t24_nb20-512_20260608-023809_r2.csv

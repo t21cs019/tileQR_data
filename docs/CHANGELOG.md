@@ -11,6 +11,23 @@
 
 ---
 
+## 0.19.0 — calc_s1_smt-off が全5サイズ解消、calc_s2_smt-off にsize2048を追加
+
+### calc_s1_smt-off: size16384を取り込み、全サイズ解消
+
+`calc_size16384_nb32-512_th12_t5_20260828_112300.csv`（5トライアル、
+欠測なし）を取り込んだ。`docs/COVERAGE.md` で `calc_s1_smt-off` が
+size1024/2048/4096/8192/16384 の全5サイズで5/5になり、達成5/5に到達。
+`spec/running.yaml` の対応エントリ（threads=12 size16384）を削除。
+
+### calc_s2_smt-off: size2048を追加
+
+`calc_size2048_nb32-512_t5_20260629_060732.csv`（5トライアル、欠測なし）
+を取り込んだ。`calc_s2_smt-off` は size1024/2048/4096 の3/4サイズが
+done、残りsize8192のみ。
+
+---
+
 ## 0.18.0 — i3-7100_s1_smt-off size8192 が全5トライアル解消
 
 中間発表に間に合わせるため、`i3-7100_size8192_nb32-512_th2_t5_20260904_085733.csv`
