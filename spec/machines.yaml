@@ -132,7 +132,7 @@ architectures:
 
   coffeelake-i5-8500:
     cpu: Intel Core i5-8500
-    display_order: 35           # 自宅・2018 (Coffee Lake)
+    display_order: 36           # 自宅・2018 (Coffee Lake)
     dashboard_cpu: i5_8500
     vendor: intel
     microarch: coffeelake
@@ -149,7 +149,7 @@ architectures:
 
   coffeelake-i3-8100:
     cpu: Intel Core i3-8100
-    display_order: 36           # 自宅・2017 (Coffee Lake)
+    display_order: 37           # 自宅・2017 (Coffee Lake)
     dashboard_cpu: i3_8100
     vendor: intel
     microarch: coffeelake
@@ -163,9 +163,28 @@ architectures:
     l3_mb_total: 6
     l3_sharing_unit: socket
 
+  coffeelake-i5-9600:
+    cpu: Intel Core i5-9600
+    display_order: 34           # 自宅（友人のPC）・2019 (Coffee Lake R)
+    dashboard_cpu: null        # sources.toml に未登録
+    vendor: intel
+    microarch: coffeelake
+    sockets_physical: 1
+    physical_cores_total: 6
+    smt_capable: false
+    smt_default: off
+    numa_nodes_total: 1
+    l1d_kb_per_core: 32
+    l2_kb_per_core: 256
+    l3_mb_total: 9
+    l3_sharing_unit: socket
+    # 友人のPC（host: plasma-bench-mitsu）。lscpu 実測（2026-09-15、
+    # results/env/plasma-bench-mitsu_env_*.txt）で Thread(s) per core = 1
+    # を確認済み、SMT 非搭載。
+
   coffeelake-i3-9100:
     cpu: Intel Core i3-9100
-    display_order: 34           # 自宅・2019 (Coffee Lake R)
+    display_order: 35           # 自宅・2019 (Coffee Lake R)
     dashboard_cpu: i3_9100
     vendor: intel
     microarch: coffeelake
@@ -181,7 +200,7 @@ architectures:
 
   skylake-i3-6100:
     cpu: Intel Core i3-6100
-    display_order: 41           # 自宅・2015 (Skylake)
+    display_order: 42           # 自宅・2015 (Skylake)
     dashboard_cpu: i3_6100
     vendor: intel
     microarch: skylake
@@ -197,7 +216,7 @@ architectures:
 
   kabylake-i3-7100:
     cpu: Intel Core i3-7100
-    display_order: 40           # 自宅・2017 (Kaby Lake)
+    display_order: 41           # 自宅・2017 (Kaby Lake)
     dashboard_cpu: i3_7100
     vendor: intel
     microarch: kabylake
@@ -213,7 +232,7 @@ architectures:
 
   kabylake-i5-7400:
     cpu: Intel Core i5-7400
-    display_order: 39           # 自宅・2017 (Kaby Lake)
+    display_order: 40           # 自宅・2017 (Kaby Lake)
     dashboard_cpu: i5_7400
     vendor: intel
     microarch: kabylake
@@ -229,7 +248,7 @@ architectures:
 
   kabylake-i5-7500:
     cpu: Intel Core i5-7500
-    display_order: 38           # 自宅・2017 (Kaby Lake)
+    display_order: 39           # 自宅・2017 (Kaby Lake)
     dashboard_cpu: i5_7500
     vendor: intel
     microarch: kabylake
@@ -245,7 +264,7 @@ architectures:
 
   kabylake-i7-7700:
     cpu: Intel Core i7-7700
-    display_order: 37           # 自宅・2017 (Kaby Lake)
+    display_order: 38           # 自宅・2017 (Kaby Lake)
     dashboard_cpu: i7_7700
     vendor: intel
     microarch: kabylake
@@ -261,7 +280,7 @@ architectures:
 
   haswell-xeon-e3-1220v3:
     cpu: Intel Xeon E3-1220 v3
-    display_order: 42           # 自宅・2013 (Haswell) ※設置場所は要確認
+    display_order: 43           # 自宅・2013 (Haswell) ※設置場所は要確認
     dashboard_cpu: xeon_e3_1220v3
     vendor: intel
     microarch: haswell
@@ -502,6 +521,20 @@ configs:
     cores_effective: 6
     note: threads=6。
 
+  i5-9600_s1_smt-off:
+    arch: coffeelake-i5-9600
+    sockets_used: 1
+    smt: off
+    memory_channels: unknown    # 友人のPC。dmidecode未実施のため要確認
+    turbo: on                   # intel_pstate no_turbo=0 を実測（2026-09-15、env より）
+    numactl: null
+    cores_effective: 6
+    note: >
+      threads=6（6コア、SMT非搭載）。友人のPC（host: plasma-bench-mitsu）が
+      2026-09-15〜16 に計測。node 名はホスト名のまま `plasma-bench-mitsu`
+      とし、config 名だけ他機と同じ `{arch}_s{sockets}_smt-{on|off}` 規則に
+      揃えた（node と config は別概念。`docs/design/data-pipeline.md` 参照）。
+
   i7-7700_s1_smt-on:
     arch: kabylake-i7-7700
     sockets_used: 1
@@ -559,6 +592,16 @@ configs:
     numactl: null
     cores_effective: 4
     note: threads=4（4コア、SMT 無効。lscpu 実機確認済み）。
+
+  i3-10100_s1_smt-on:
+    arch: cometlake-i3-10100
+    sockets_used: 1
+    smt: on
+    memory_channels: unknown
+    turbo: unknown
+    numactl: null
+    cores_effective: 4
+    note: threads=8（4コア x SMT）。
 
   dogwood_s1_smt-off:
     arch: broadwell-e-i7-6900k
@@ -673,3 +716,6 @@ nodes:
   corei5-13400F: { arch: raptorlake-i5-13400f, source_key: null }
   i3-10100:      { arch: cometlake-i3-10100,   source_key: null }
   dogwood:       { arch: broadwell-e-i7-6900k, source_key: null }
+
+  # 友人のPC（plasma-bench ツールが出す host 名そのまま）。
+  plasma-bench-mitsu: { arch: coffeelake-i5-9600, source_key: null }
