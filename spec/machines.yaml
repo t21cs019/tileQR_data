@@ -475,11 +475,15 @@ configs:
     sockets_used: 1
     smt: off
     memory_channels: unknown    # 自宅機は DIMM を融通し合っていた。要確認
-    # 形状が同コア数群の外れ値、再計測対象（TODO_REMEASURE.md）。
-    turbo: unknown
+    turbo: unknown              # 要確認（ハード情報の採取待ち）
     numactl: null
     cores_effective: 4
-    note: threads=4（4コア、SMT なし）。
+    note: >
+      threads=4（4コア、SMT なし）。2026-06 の初回計測は形状が外れ値で、
+      2026-09-13〜14 に再計測して置き換えた（旧データは
+      archive/quarantine/i3-8100_first_run_2026-06/）。再計測で
+      ピーク性能が +15〜26% 上がっており、メモリチャネル構成の違いが
+      疑わしいが未確認。size16384 は初回計測の1トライアルのみ残っている。
 
   i5-7400_s1_smt-off:
     arch: kabylake-i5-7400
