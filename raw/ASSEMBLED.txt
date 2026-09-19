@@ -217,7 +217,6 @@ raw/qr_sweep/i3-8100_s1_smt-off/i3-8100_size1024_t4_nb32-512_20260913-190603_r2.
 raw/qr_sweep/i3-8100_s1_smt-off/i3-8100_size1024_t4_nb32-512_20260913-190603_r3.csv
 raw/qr_sweep/i3-8100_s1_smt-off/i3-8100_size1024_t4_nb32-512_20260913-190603_r4.csv
 raw/qr_sweep/i3-8100_s1_smt-off/i3-8100_size1024_t4_nb32-512_20260913-190603_r5.csv
-raw/qr_sweep/i3-8100_s1_smt-off/i3-8100_size16384_t4_nb32-512_20260703-224653.csv
 raw/qr_sweep/i3-8100_s1_smt-off/i3-8100_size2048_t4_nb32-512_20260913-195223_r1.csv
 raw/qr_sweep/i3-8100_s1_smt-off/i3-8100_size2048_t4_nb32-512_20260913-195223_r2.csv
 raw/qr_sweep/i3-8100_s1_smt-off/i3-8100_size2048_t4_nb32-512_20260913-195223_r3.csv
