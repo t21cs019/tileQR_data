@@ -474,16 +474,20 @@ configs:
     arch: coffeelake-i3-8100
     sockets_used: 1
     smt: off
-    memory_channels: unknown    # 自宅機は DIMM を融通し合っていた。要確認
-    turbo: unknown              # 要確認（ハード情報の採取待ち）
+    memory_channels: 2          # 2026-09-19 実測（dmidecode、16GB x2、ChannelA/B）。再計測(09-13〜14)分に対する値
+    turbo: off                  # intel_pstate no_turbo=1 を実測（2026-09-19）。governor=powersave
     numactl: null
     cores_effective: 4
     note: >
-      threads=4（4コア、SMT なし）。2026-06 の初回計測は形状が外れ値で、
-      2026-09-13〜14 に再計測して置き換えた（旧データは
-      archive/quarantine/i3-8100_first_run_2026-06/）。再計測で
-      ピーク性能が +15〜26% 上がっており、メモリチャネル構成の違いが
-      疑わしいが未確認。size16384 は初回計測の1トライアルのみ残っている。
+      threads=4（4コア、SMT なし）。2026-06 の初回計測は 4GB DIMM 1枚
+      （シングルチャネル、DDR4-2400 か 2133、計測者の記憶）で、形状が外れ値
+      だった。2026-09-13〜14 に 16GB x2（デュアルチャネル、Configured
+      2400 MT/s）で再計測して置き換えた（旧データは
+      archive/quarantine/i3-8100_first_run_2026-06/）。ピーク性能は
+      +15〜26% 上がった。dmidecode は 2026-09-19 の採取で、09-13〜14 の
+      計測時に同じ DIMM 構成だったことは計測者の申告に基づく。
+      6月時点の turbo は不明。size16384 は初回計測（シングルチャネル）の
+      1トライアルのみ残っており、再計測データとは条件が違う。
 
   i5-7400_s1_smt-off:
     arch: kabylake-i5-7400
