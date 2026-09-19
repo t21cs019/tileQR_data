@@ -533,4 +533,7 @@ raw/ssrfb/ryzen/ryzen_size1024_t1_nb32-512_20260830-081745.csv
 raw/ssrfb/ryzen/ryzen_size2048_t1_nb32-512_20260830-083637.csv
 raw/ssrfb/ryzen/ryzen_size4096_t1_nb32-512_20260830-085722.csv
 raw/ssrfb/ryzen/ryzen_size8192_t1_nb32-276_20260830-092542.csv
+raw/ssrfb/xeon-e3-1220v3/xeon-e3-1220v3_size1024_t1_nb32-512_20260912-233614.csv
+raw/ssrfb/xeon-e3-1220v3/xeon-e3-1220v3_size2048_t1_nb32-512_20260913-000247.csv
 raw/ssrfb/xeon-e3-1220v3/xeon-e3-1220v3_size4096_t1_nb32-512_20260905-194822.csv
+raw/ssrfb/xeon-e3-1220v3/xeon-e3-1220v3_size8192_t1_nb32-512_20260913-003305.csv
