@@ -640,6 +640,11 @@ configs:
       詳細は TODO_REMEASURE.md「SMT-on 全構成の熱ドリフト・メモリ不足
       チェック」参照。
 
+      研究室のもう1人のメンバーと共用している機械で、ジョブが重なると
+      値が約0.7倍に落ちる。size8192 の2026-09計測は2回ともこれで使えず、
+      archive/quarantine/ryzen7-5800x_size8192_contention_2026-09/ に退避した
+      （2026-10-26）。
+
   xeon-e3-1220v3_s1_smt-off:
     arch: haswell-xeon-e3-1220v3
     sockets_used: 1
