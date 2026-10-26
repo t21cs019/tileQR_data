@@ -15,3 +15,6 @@ __pycache__/
 # `!/figures/.gitkeep` の例外が効かない。中身を無視する形にする。
 /figures/*
 !/figures/.gitkeep
+
+# analysis/ の C ソースからビルドした実行ファイル（ソースから作り直せる）
+analysis/**/greedy_sched
