@@ -438,7 +438,12 @@ configs:
     turbo: unknown
     numactl: null
     cores_effective: 32
-    note: threads=32（1ソケット全32コア）。SMT 無効。
+    note: >
+      threads=32（1ソケット全32コア）。SMT 無効。
+
+      size1024/2048 の2026-07計測は全体に15〜20倍遅く、2026-10-27 に
+      再計測して差し替えた。旧データは
+      archive/quarantine/epyc_size1024-2048_slow_2026-07/ に退避した。
 
   # --- 自宅デスクトップ群 ---
 

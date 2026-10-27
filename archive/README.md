@@ -14,7 +14,8 @@
   `quarantine/i5-7400_single_channel_2026-06/README.md`、
   `quarantine/aoba-b_s2_size8192_incomplete_2026-06/README.md`、
   `quarantine/aoba-b_s2_ssrfb_size8192_killed_2026-09/README.md`、
-  `quarantine/ryzen7-5800x_size8192_contention_2026-09/README.md`。
+  `quarantine/ryzen7-5800x_size8192_contention_2026-09/README.md`、
+  `quarantine/epyc_size1024-2048_slow_2026-07/README.md`。
 
 ## どちらに置くか、あるいは `spec/curation.yaml` で足りるかの判断
 

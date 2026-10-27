@@ -51,12 +51,12 @@ S0 = 4096.0
 
 # 既知の汚染データ。notes/performance_model.md「データ品質の注意」と対応する。
 #   i3-7100        … 計測エラー
-#   epyc 1024/2048 … タスクオーバーヘッド支配で GFlops が異常に低い
 #   i5-8500 8192   … サーマルスロットリング
+# epyc 1024/2048 も以前はここで除外していた（GFlops が異常に低い）。7月の計測が
+# 15〜20倍遅かったためで、2026-10-27 に再計測して差し替えたので外した
+# （archive/quarantine/epyc_size1024-2048_slow_2026-07/）。
 EXCLUDE_CONFIG = ("i3-7100",)
 EXCLUDE_POINTS = (
-    ("epyc_s1_smt-off", 1024),
-    ("epyc_s1_smt-off", 2048),
     ("i5-8500_s1_smt-off", 8192),
 )
 
