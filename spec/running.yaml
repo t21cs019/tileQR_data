@@ -49,14 +49,6 @@ running:
   # --- 研究室のサーバ ---------------------------------------------------
 
   - kind: qr_sweep
-    config: calc_s2_smt-off
-    threads: 24
-    sizes: [8192]
-    since: 2026-09-13
-    host: calc（研究室）
-    note: 両ソケット使用（threads=24）。calc_s2_smt-off の残り最後の1サイズ。
-
-  - kind: qr_sweep
     config: ryzen7-5800x_s1_smt-on
     threads: 16
     sizes: [8192]
