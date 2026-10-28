@@ -389,7 +389,7 @@ configs:
     smt: off
     memory_channels: 8
     turbo: unknown
-    numactl: "--cpunodebind=0-3 --membind=0"   # 2026-09-05 訂正。旧: --cpunodebind=0
+    numactl: "--cpunodebind=0-3 --membind=0-3"   # 2026-10-28 訂正。ジョブスクリプト（gen_tileQR_jobs.sh の NPS4 分岐）は membind=0-3 で、--membind=0 は記録の誤りだった。2026-09-05 以前の旧: --cpunodebind=0
     nps: NPS4                   # 計算ノードの構成。ログインノード(NPS1)と混同しないこと
     cores_effective: 64
     scheduler: nqsv
