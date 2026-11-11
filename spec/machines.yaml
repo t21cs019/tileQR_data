@@ -58,6 +58,25 @@ architectures:
     # L3 共有単位は CCX（Zen 系）。shared-tile cache model の C_unit に対応。
     l3_sharing_unit: ccx
 
+  flow2-t1:
+    cpu: AMD EPYC 9965
+    display_order: 12           # 学外（名大 不老・弐 Type I）
+    dashboard_cpu: null         # cpus.toml に未登録
+    vendor: amd
+    microarch: zen5c
+    sockets_physical: 2
+    physical_cores_total: 384
+    physical_cores_per_socket: 192
+    smt_capable: true
+    smt_default: off            # 計算ノードの lscpu で Thread(s) per core = 1
+    numa_nodes_total: 8         # 2 socket x NPS4。計算ノードの lscpu（各ジョブの _meta.txt）
+    l1d_kb_per_core: 48         # lscpu: L1d 18 MiB / 384
+    l2_kb_per_core: 1024        # lscpu: L2 384 MiB / 384
+    l3_mb_per_ccx: 32           # lscpu: L3 768 MiB / 24 instances
+    cores_per_ccx: 16           # 12 CCD x 16 コア / socket
+    l3_mb_per_socket: 384
+    l3_sharing_unit: ccx
+
   epyc-7543:
     cpu: AMD EPYC 7543
     display_order: 21           # 大学
@@ -408,6 +427,30 @@ configs:
       2026-09-05: size1024/2048/4096/8192 は正しい構成（--cpunodebind=0-3、
       64コア）で再計測完了。2026-09-06、size16384 も完了し全5サイズ解消。
 
+  flow2-t1_s1_smt-off:
+    arch: flow2-t1
+    sockets_used: 1
+    smt: off
+    memory_channels: 12         # per socket。EPYC 9965 の最大構成と同値。要実機確認
+    turbo: on                   # 計算ノードの lscpu で Frequency boost: enabled（_meta.txt）
+    numactl: "--cpunodebind=0-3 --membind=0-3"
+    nps: NPS4
+    cores_effective: 192
+    scheduler: pbs
+    queue: t1-single
+    note: >
+      名大 不老・弐 Type I。片ソケット（NPS4 の4ノード分 = 192コア）に固定、
+      OMP_PLACES=cores OMP_PROC_BIND=close、libgomp、OpenBLAS（OPENBLAS_NUM_THREADS=1）。
+      plasma-bench 7d865e3。threads=192 の系列。2026-11-04 のゼミで許可された
+      size 1024〜8192 の各5回（2026-11-10 計測）。size 16384 は計測しない（許可なし）。
+
+      注意（2026-11-10）: 1回の実行に約 13〜15 ms の遅れが約 4 回に 3 回、確率的に入る。
+      size 1024・2048 は値が2つの水準に分かれ、5回の平均は2水準が混ざった値になる
+      （集計の方法で 1024 は 26%、2048 は 13% 動く）。ingest.py の平均と optima.csv の
+      値はそのまま使わない。集計の方法は未決定。検証は
+      analysis/2026-11-10_flow2-sweep-check/report.md。
+      動作確認の r0（nb 128〜144 の9点）と、10-31 のスレッド固定の A/B テストは取り込んでいない。
+
   # --- 研究室サーバ ---
 
   calc_s2_smt-off:
@@ -710,6 +753,23 @@ nodes:
   par049: { arch: aoba-b, source_key: aoba_b }
   par057: { arch: aoba-b, source_key: aoba_b }
   par058: { arch: aoba-b, source_key: aoba_b }
+
+  # 名大 不老・弐 Type I。PBS で、ジョブごとに空いているノードが割り当たる。
+  t1033: { arch: flow2-t1, source_key: null }
+  t1034: { arch: flow2-t1, source_key: null }
+  t1035: { arch: flow2-t1, source_key: null }
+  t1036: { arch: flow2-t1, source_key: null }
+  t1037: { arch: flow2-t1, source_key: null }
+  t1041: { arch: flow2-t1, source_key: null }
+  t1050: { arch: flow2-t1, source_key: null }
+  t1051: { arch: flow2-t1, source_key: null }
+  t1052: { arch: flow2-t1, source_key: null }
+  t1054: { arch: flow2-t1, source_key: null }
+  t1059: { arch: flow2-t1, source_key: null }
+  t1071: { arch: flow2-t1, source_key: null }
+  t1220: { arch: flow2-t1, source_key: null }
+  t1228: { arch: flow2-t1, source_key: null }
+  t1229: { arch: flow2-t1, source_key: null }
 
   # --- 研究室サーバ ---
   epyc:  { arch: epyc-7543,        source_key: epyc }

@@ -11,6 +11,34 @@
 
 ---
 
+## 0.22.0 — 不老・弐 Type I（flow2-t1_s1_smt-off）を取り込み
+
+名大 不老・弐 Type I（EPYC 9965、p = 192、片ソケット NPS4 の4ノード）の
+size 1024〜8192 各5回（2026-11-10 計測、plasma-bench 7d865e3）を `raw_data/flow2-t1_s1_smt-off/`
+に置き、assemble / ingest した。`machines.yaml` に architecture `flow2-t1`・config・
+ノード15台、`plan.yaml` に sizes 1024〜8192 を追加。size 16384 はゼミで許可されて
+いないので計画に入れない。
+
+plasma-bench の出力名（`flow2-t1_..._size<S>_nb32-512_th192_r<R>.csv`）は `SRC_RE` に
+合わないため、`_meta.txt` の `host` と `date` から `{host}_size{S}_nb32-512_th192_t1_{日付}_{時刻}.csv`
+に改名して置いた。中身はバイト単位で同じ。`_meta.txt` と `_affinity.txt` も同じ名前で横に置いた。
+動作確認の r0（nb 128〜144 の9点）と、10-31 のスレッド固定の A/B テストは入れていない。
+
+**集計の方法は未決定のまま取り込んだ。** 1回の実行に約 13〜15 ms の遅れが約4回に3回、
+確率的に入り、size 1024・2048 は値が2つの水準に分かれる
+（`analysis/2026-11-10_flow2-sweep-check/report.md`）。`raw/` は1回ずつのファイルなので、
+集計の方法はあとから変えられる。それまでは次の値をそのまま主張に使わない。
+
+- `optima.csv`：GROUP_KEYS に node が入っていて、5回がすべて別のノードなので、
+  1行が1回の計測の最大値（trials = 1）になる。COVERAGE の「95% 帯が単点に潰れた」も、
+  この構成では反復がないことによる
+- 各分析の `groupby(...).GFlops.mean()`：2つの水準が混ざった値になる。
+  `analysis/2026-11-10_serial-task-cost/scripts/common10.py` の `load_all()` は全構成を読むので、
+  この版以降に再実行すると不老・弐が入る
+
+この版でほかの構成の `derived/qr_sweep.parquet`・`optima.csv` の値は変わっていない
+（取り込みの前後で比較した）。
+
 ## 0.21.0 — SMT-on全構成の熱ドリフト・メモリ不足チェック
 
 `i3-7100_s1_smt-on`以外のsmt-on 3構成（`i7-7700_s1_smt-on` /

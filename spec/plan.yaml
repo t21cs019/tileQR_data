@@ -45,6 +45,7 @@ kinds:
     targets:
       - {config: aoba-b_s2_smt-off,      threads: 128, sizes: [1024, 2048, 4096, 8192]}
       - {config: aoba-b_s1_smt-off,      threads: 64}
+      - {config: flow2-t1_s1_smt-off,    threads: 192, sizes: [1024, 2048, 4096, 8192]}   # 16384 はゼミで却下（2026-11-04）
       - {config: calc_s2_smt-off,        threads: 24, sizes: [1024, 2048, 4096, 8192]}
       - {config: calc_s1_smt-off,        threads: 12}
       - {config: epyc_s1_smt-off,        threads: 32}
