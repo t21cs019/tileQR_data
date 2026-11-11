@@ -1,0 +1,128 @@
+== A1 格子 ==
+                           file  rows  expected  columns_ok  crlf  missing  extra  duplicates  order_ok  threads_ok  size_ok  nan  zero_or_neg     min       max  ib_min  ib_over_half  ib_step_ok  nb_step_ok nb_range
+ size1024_nb32-512_th192_r1.csv  3963      3963        True  True        0      0           0      True        True     True    0            0  1.6347   89.5377       8             0        True        True   32-512
+ size1024_nb32-512_th192_r2.csv  3963      3963        True  True        0      0           0      True        True     True    0            0  1.7105   85.2430       8             0        True        True   32-512
+ size1024_nb32-512_th192_r3.csv  3963      3963        True  True        0      0           0      True        True     True    0            0  1.6755   85.3867       8             0        True        True   32-512
+ size1024_nb32-512_th192_r4.csv  3963      3963        True  True        0      0           0      True        True     True    0            0  1.6492   81.4791       8             0        True        True   32-512
+ size1024_nb32-512_th192_r5.csv  3963      3963        True  True        0      0           0      True        True     True    0            0  1.6203   86.5806       8             0        True        True   32-512
+ size2048_nb32-512_th192_r1.csv  3963      3963        True  True        0      0           0      True        True     True    0            0  1.9526  345.4825       8             0        True        True   32-512
+ size2048_nb32-512_th192_r2.csv  3963      3963        True  True        0      0           0      True        True     True    0            0  2.1932  343.4771       8             0        True        True   32-512
+ size2048_nb32-512_th192_r3.csv  3963      3963        True  True        0      0           0      True        True     True    0            0  2.2824  340.9091       8             0        True        True   32-512
+ size2048_nb32-512_th192_r4.csv  3963      3963        True  True        0      0           0      True        True     True    0            0  2.0212  345.6317       8             0        True        True   32-512
+ size2048_nb32-512_th192_r5.csv  3963      3963        True  True        0      0           0      True        True     True    0            0  2.0520  348.3501       8             0        True        True   32-512
+ size4096_nb32-512_th192_r1.csv  3963      3963        True  True        0      0           0      True        True     True    0            0  2.3427 1002.5157       8             0        True        True   32-512
+ size4096_nb32-512_th192_r2.csv  3963      3963        True  True        0      0           0      True        True     True    0            0  2.2583  959.8189       8             0        True        True   32-512
+ size4096_nb32-512_th192_r3.csv  3963      3963        True  True        0      0           0      True        True     True    0            0  2.3074  982.4368       8             0        True        True   32-512
+ size4096_nb32-512_th192_r4.csv  3963      3963        True  True        0      0           0      True        True     True    0            0  2.3593  978.9256       8             0        True        True   32-512
+ size4096_nb32-512_th192_r5.csv  3963      3963        True  True        0      0           0      True        True     True    0            0  2.4025  966.2044       8             0        True        True   32-512
+ size8192_nb32-512_th192_r1.csv  1022      1022        True  True        0      0           0      True        True     True    0            0  2.6222 2050.7084       8             0        True        True   32-512
+ size8192_nb32-512_th192_r2.csv  1022      1022        True  True        0      0           0      True        True     True    0            0  2.6895 2117.2071       8             0        True        True   32-512
+ size8192_nb32-512_th192_r3.csv  1022      1022        True  True        0      0           0      True        True     True    0            0  2.4478 2124.1728       8             0        True        True   32-512
+ size8192_nb32-512_th192_r4.csv  1022      1022        True  True        0      0           0      True        True     True    0            0  2.4165 2071.6949       8             0        True        True   32-512
+ size8192_nb32-512_th192_r5.csv  1022      1022        True  True        0      0           0      True        True     True    0            0  2.6994 2044.4162       8             0        True        True   32-512
+size1024_nb128-144_th192_r0.csv     9         9        True  True        0      0           0      True        True     True    0            0 35.7812   78.0175       8             0        True        True  128-144
+
+== A3 meta：値の種類（本番 15 本）==
+config             1 種類: flow2-t1_s1_smt-off
+commit             1 種類: 7d865e3
+plasmatest         1 種類: /home/j377169/Library/plasma/bin/plasmatest
+libs               1 種類: libplasma.so.1.0=>/home/j377169/Library/plasma/lib/libplasma.so.1.0|libplasma_core_blas.so.1.0=>/home/j377169/Library/plasma/lib/libplasma_core_blas.so.1.0|libopenblas.so.0=>/home/j377169/Library/openblas/lib/libopenblas.so.0|libgomp.so.1=>/lib64/libgomp.so.1
+smt                1 種類: 0
+socket_nodes       1 種類: SOCKET: 0 / NODES: 0,1,2,3 (48 cores/node)
+openblas_threads   1 種類: 1
+omp                1 種類: OMP_PLACES=cores OMP_PROC_BIND=close KMP_AFFINITY=（なし）
+numactl            1 種類: numactl --cpunodebind=0,1,2,3 --membind=0,1,2,3
+model              1 種類: AMD EPYC 9965 192-Core Processor
+boost              1 種類: enabled
+lscpu_hash         1 種類: 3762627561
+lscpu_e_hash       1 種類: 3084631461
+numa_hash          7 種類: [np.int64(1843129018), np.int64(2163825397), np.int64(1568850756), np.int64(2784948210), np.int64(312124511), np.int64(223974351), np.int64(2170925751)]
+numa_sizes         7 種類: ['95491,96755,96710,96755,96755,96755,96755,96366', '95491,96755,96755,96755,96755,96710,96755,96366', '95491,96755,96755,96755,96755,96755,96755,96320', '95491,96755,96755,96710,96755,96755,96755,96366', '95491,96710,96755,96755,96755,96755,96755,96366', '95446,96755,96755,96755,96755,96755,96755,96366', '95491,96755,96755,96755,96755,96755,96710,96366']
+ size  rep  host         job                                   cond
+ 1024    1 t1220 111714.jobm P=192 SIZE=1024 STEP=4 NB=32-512 REP=1
+ 1024    2 t1228 111715.jobm P=192 SIZE=1024 STEP=4 NB=32-512 REP=2
+ 1024    3 t1229 111716.jobm P=192 SIZE=1024 STEP=4 NB=32-512 REP=3
+ 1024    4 t1034 111717.jobm P=192 SIZE=1024 STEP=4 NB=32-512 REP=4
+ 1024    5 t1033 111718.jobm P=192 SIZE=1024 STEP=4 NB=32-512 REP=5
+ 2048    1 t1220 111714.jobm P=192 SIZE=2048 STEP=4 NB=32-512 REP=1
+ 2048    2 t1228 111715.jobm P=192 SIZE=2048 STEP=4 NB=32-512 REP=2
+ 2048    3 t1229 111716.jobm P=192 SIZE=2048 STEP=4 NB=32-512 REP=3
+ 2048    4 t1034 111717.jobm P=192 SIZE=2048 STEP=4 NB=32-512 REP=4
+ 2048    5 t1033 111718.jobm P=192 SIZE=2048 STEP=4 NB=32-512 REP=5
+ 4096    1 t1035 111719.jobm P=192 SIZE=4096 STEP=4 NB=32-512 REP=1
+ 4096    2 t1036 111720.jobm P=192 SIZE=4096 STEP=4 NB=32-512 REP=2
+ 4096    3 t1037 111721.jobm P=192 SIZE=4096 STEP=4 NB=32-512 REP=3
+ 4096    4 t1041 111722.jobm P=192 SIZE=4096 STEP=4 NB=32-512 REP=4
+ 4096    5 t1054 111723.jobm P=192 SIZE=4096 STEP=4 NB=32-512 REP=5
+ 8192    1 t1050 111724.jobm P=192 SIZE=8192 STEP=8 NB=32-512 REP=1
+ 8192    2 t1052 111725.jobm P=192 SIZE=8192 STEP=8 NB=32-512 REP=2
+ 8192    3 t1051 111726.jobm P=192 SIZE=8192 STEP=8 NB=32-512 REP=3
+ 8192    4 t1059 111727.jobm P=192 SIZE=8192 STEP=8 NB=32-512 REP=4
+ 8192    5 t1071 111728.jobm P=192 SIZE=8192 STEP=8 NB=32-512 REP=5
+[差] _numa size1024 r2 (t1228): [('node 2 size: 96710 MB', 'node 2 size: 96755 MB'), ('node 5 size: 96755 MB', 'node 5 size: 96710 MB')]
+[差] _numa size1024 r4 (t1034): [('node 2 size: 96710 MB', 'node 2 size: 96755 MB'), ('node 7 size: 96366 MB', 'node 7 size: 96320 MB')]
+[差] _numa size1024 r5 (t1033): [('node 2 size: 96710 MB', 'node 2 size: 96755 MB'), ('node 7 size: 96366 MB', 'node 7 size: 96320 MB')]
+[差] _numa size2048 r2 (t1228): [('node 2 size: 96710 MB', 'node 2 size: 96755 MB'), ('node 5 size: 96755 MB', 'node 5 size: 96710 MB')]
+[差] _numa size2048 r4 (t1034): [('node 2 size: 96710 MB', 'node 2 size: 96755 MB'), ('node 7 size: 96366 MB', 'node 7 size: 96320 MB')]
+[差] _numa size2048 r5 (t1033): [('node 2 size: 96710 MB', 'node 2 size: 96755 MB'), ('node 7 size: 96366 MB', 'node 7 size: 96320 MB')]
+[差] _numa size4096 r1 (t1035): [('node 2 size: 96710 MB', 'node 2 size: 96755 MB'), ('node 3 size: 96755 MB', 'node 3 size: 96710 MB')]
+[差] _numa size4096 r2 (t1036): [('node 2 size: 96710 MB', 'node 2 size: 96755 MB'), ('node 5 size: 96755 MB', 'node 5 size: 96710 MB')]
+[差] _numa size4096 r3 (t1037): [('node 1 size: 96755 MB', 'node 1 size: 96710 MB'), ('node 2 size: 96710 MB', 'node 2 size: 96755 MB')]
+[差] _numa size4096 r4 (t1041): [('node 2 size: 96710 MB', 'node 2 size: 96755 MB'), ('node 7 size: 96366 MB', 'node 7 size: 96320 MB')]
+[差] _numa size4096 r5 (t1054): [('node 2 size: 96710 MB', 'node 2 size: 96755 MB'), ('node 7 size: 96366 MB', 'node 7 size: 96320 MB')]
+[差] _numa size8192 r1 (t1050): [('node 0 size: 95491 MB', 'node 0 size: 95446 MB'), ('node 2 size: 96710 MB', 'node 2 size: 96755 MB')]
+[差] _numa size8192 r2 (t1052): [('node 2 size: 96710 MB', 'node 2 size: 96755 MB'), ('node 7 size: 96366 MB', 'node 7 size: 96320 MB')]
+[差] _numa size8192 r3 (t1051): [('node 2 size: 96710 MB', 'node 2 size: 96755 MB'), ('node 7 size: 96366 MB', 'node 7 size: 96320 MB')]
+[差] _numa size8192 r4 (t1059): [('node 2 size: 96710 MB', 'node 2 size: 96755 MB'), ('node 6 size: 96755 MB', 'node 6 size: 96710 MB')]
+[差] _numa size8192 r5 (t1071): [('node 0 size: 95491 MB', 'node 0 size: 95446 MB'), ('node 2 size: 96710 MB', 'node 2 size: 96755 MB')]
+[差] _numa size1024 r0 (t1252): [('node 2 size: 96710 MB', 'node 2 size: 96755 MB'), ('node 7 size: 96366 MB', 'node 7 size: 96320 MB')]
+r0: [{'host': 't1252', 'job': '111712.jobm', 'commit': '7d865e3', 'cond': 'P=192 SIZE=1024 STEP=16 NB=128-144 REP=0', 'omp': 'OMP_PLACES=cores OMP_PROC_BIND=close KMP_AFFINITY=（なし）', 'numactl': 'numactl --cpunodebind=0,1,2,3 --membind=0,1,2,3'}]
+
+== A4 affinity ==
+ size  rep  host  threads  threads_0_191  one_cpu_each  distinct_cpus  distinct_cores  all_socket0 numa_nodes  identity_map check_status  check_time_ms  check_gflops
+ 1024    1 t1220      192           True          True            192             192         True    0,1,2,3          True         pass           54.8      209.1868
+ 1024    2 t1228      192           True          True            192             192         True    0,1,2,3          True         pass           52.8      217.0881
+ 1024    3 t1229      192           True          True            192             192         True    0,1,2,3          True         pass           58.1      197.3013
+ 1024    4 t1034      192           True          True            192             192         True    0,1,2,3          True         pass           54.7      209.5458
+ 1024    5 t1033      192           True          True            192             192         True    0,1,2,3          True         pass           54.8      209.2116
+ 2048    1 t1220      192           True          True            192             192         True    0,1,2,3          True         pass           58.5      195.7660
+ 2048    2 t1228      192           True          True            192             192         True    0,1,2,3          True         pass           48.5      236.4577
+ 2048    3 t1229      192           True          True            192             192         True    0,1,2,3          True         pass           48.7      235.4703
+ 2048    4 t1034      192           True          True            192             192         True    0,1,2,3          True         pass           52.1      219.7869
+ 2048    5 t1033      192           True          True            192             192         True    0,1,2,3          True         pass           46.1      248.5556
+ 4096    1 t1035      192           True          True            192             192         True    0,1,2,3          True         pass           56.6      202.3996
+ 4096    2 t1036      192           True          True            192             192         True    0,1,2,3          True         pass           57.6      199.0195
+ 4096    3 t1037      192           True          True            192             192         True    0,1,2,3          True         pass           55.0      208.5571
+ 4096    4 t1041      192           True          True            192             192         True    0,1,2,3          True         pass           54.6      210.0734
+ 4096    5 t1054      192           True          True            192             192         True    0,1,2,3          True         pass           60.4      189.7072
+ 8192    1 t1050      192           True          True            192             192         True    0,1,2,3          True         pass           57.4      199.6332
+ 8192    2 t1052      192           True          True            192             192         True    0,1,2,3          True         pass           59.0      194.2604
+ 8192    3 t1051      192           True          True            192             192         True    0,1,2,3          True         pass           59.1      193.8205
+ 8192    4 t1059      192           True          True            192             192         True    0,1,2,3          True         pass           58.3      196.7242
+ 8192    5 t1071      192           True          True            192             192         True    0,1,2,3          True         pass           52.5      218.3694
+ 1024    0 t1252      192           True          True            192             192         True    0,1,2,3          True         pass          255.5       44.8571
+plasmatest の見出し: ['PLASMA 25.5.27, OpenMP num threads 192,  OpenBLAS 0.3.28 ']
+
+== A5 スナップショット ==
+ size  rep  host               start                 end  elapsed_s        uptime users       load_start          load_end  free_s0_start_GB  free_s1_start_GB  dfree_s0_MB  dfree_s1_MB  dfree_node_min_MB  mhz_start  mhz_end  scaling_pct_lscpu
+ 1024    1 t1220 2026-11-10 19:20:20 2026-11-10 19:28:34      494.0 8 days, 21:09   0/0     15.4/3.2/2.5    78.7/87.3/48.9        365.630859        366.901367         1228          582               -722       2994     2858                 56
+ 1024    2 t1228 2026-11-10 19:20:22 2026-11-10 19:28:41      499.0 9 days,  7:46   0/0      0.1/0.0/1.5    75.8/80.8/46.3        366.721680        366.955078          181         1436               -696       2995     2899                 58
+ 1024    3 t1229 2026-11-10 19:20:20 2026-11-10 19:28:36      496.0 9 days,  7:46   0/0      0.1/0.0/4.8   112.7/96.1/53.6        367.440430        369.264648         -532          108               -709       3004     2867                 55
+ 1024    4 t1034 2026-11-10 19:20:24 2026-11-10 19:28:43      499.0 9 days,  7:46   0/0      0.1/0.0/0.3  117.8/102.1/54.1        366.354492        366.810547          441         1291               -642       2963     2931                 58
+ 1024    5 t1033 2026-11-10 19:20:22 2026-11-10 19:28:35      493.0 9 days,  7:46   0/0      0.2/0.0/1.4   103.5/90.5/50.4        367.547852        369.274414         -435          132               -697       2980     2862                 57
+ 2048    1 t1220 2026-11-10 19:28:35 2026-11-10 19:51:00     1345.0 8 days, 21:17   0/0   72.5/85.9/48.7    40.3/82.8/96.2        366.849609        367.470703          500          767                 12       2990     3261                 56
+ 2048    2 t1228 2026-11-10 19:28:41 2026-11-10 19:51:01     1340.0 9 days,  7:54   0/0   75.8/80.8/46.3    49.9/85.0/96.4        366.866211        368.358398          515          396                 -1       2952     2961                 57
+ 2048    3 t1229 2026-11-10 19:28:37 2026-11-10 19:50:48     1331.0 9 days,  7:54   0/0  112.7/96.1/53.6   70.6/93.2/101.6        366.865234        369.372070          570            0                 -6       2983     2923                 59
+ 2048    4 t1034 2026-11-10 19:28:44 2026-11-10 19:51:01     1337.0 9 days,  7:54   0/0 117.8/102.1/54.1  93.7/103.6/107.6        366.773438        368.069336          598          669                 21       2954     3158                 57
+ 2048    5 t1033 2026-11-10 19:28:36 2026-11-10 19:50:49     1333.0 9 days,  7:54   0/0  103.5/90.5/50.4    32.6/78.6/95.5        367.129883        369.407227          469           16                  2       2956     3082                 58
+ 4096    1 t1035 2026-11-10 19:20:22 2026-11-10 20:53:02     5560.0 9 days,  7:46   0/0      0.2/0.0/0.0   55.5/76.7/100.4        367.644531        369.796875         -132          -79               -246       2997     2970                 57
+ 4096    2 t1036 2026-11-10 19:20:22 2026-11-10 20:51:49     5487.0 9 days,  7:46   0/0      0.1/0.0/0.0    36.3/56.6/86.1        367.399414        369.929688          -83           -4               -211       2994     3188                 56
+ 4096    3 t1037 2026-11-10 19:20:22 2026-11-10 20:52:07     5505.0 9 days,  7:46   0/0      0.2/0.0/0.0   74.3/80.0/101.2        367.724609        369.679688         -124           -6               -224       2983     3078                 56
+ 4096    4 t1041 2026-11-10 19:20:22 2026-11-10 20:52:32     5530.0 9 days,  7:46   0/0      0.2/0.1/0.2   53.6/88.5/105.7        367.444336        369.594727          -86           20               -302       3040     2977                 58
+ 4096    5 t1054 2026-11-10 19:20:22 2026-11-10 20:52:31     5529.0 9 days,  7:46   0/0      0.1/0.0/0.0   71.9/93.5/103.2        367.945312        369.309570         -125          -41               -243       3003     2926                 59
+ 8192    1 t1050 2026-11-10 19:20:22 2026-11-10 21:53:36     9194.0 9 days,  7:46   0/0      0.1/0.0/0.0   79.4/87.7/109.5        367.653320        369.018555           48          -42                -71       3016     2990                 57
+ 8192    2 t1052 2026-11-10 19:20:22 2026-11-10 21:51:29     9067.0 9 days,  7:46   0/0      0.0/0.0/0.0   78.8/97.8/113.8        367.690430        369.655273            2          -65                -63       3034     2986                 58
+ 8192    3 t1051 2026-11-10 19:20:22 2026-11-10 21:53:32     9190.0 9 days,  7:46   0/0      0.0/0.0/0.0   70.1/95.0/115.0        367.366211        369.604492          -51          -59               -114       2992     2988                 57
+ 8192    4 t1059 2026-11-10 19:20:22 2026-11-10 21:52:39     9137.0 9 days,  7:46   0/0      0.0/0.0/0.0   88.3/99.3/110.2        367.184570        369.815430          -20          -34                -90       2986     3104                 57
+ 8192    5 t1071 2026-11-10 19:20:22 2026-11-10 21:49:57     8975.0 9 days,  7:46   0/0     15.3/3.2/1.0 117.7/120.5/126.4        367.104492        370.196289            9          -83                -71       2984     3008                 63
+ 1024    0 t1252 2026-11-10 19:17:17 2026-11-10 19:17:18        1.0 9 days,  7:43   0/0      0.1/0.0/0.0       0.1/0.0/0.0        368.477539        369.384766         -101            5               -121       2984     2989                 59
