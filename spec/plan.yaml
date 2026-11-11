@@ -108,6 +108,8 @@ kinds:
       - {node: ryzen,        threads: 1}
       - {node: ryzen5-7400f, threads: 1}
       - {node: xeon-e3-1220v3, threads: 1}
+      # 不老・弐 Type I。有償なので size 4096 だけ（5回、2026-11-11）。ジョブごとにノードが変わる。
+      - {node: t1205,        threads: 1, sizes: [4096]}
 
   kernel_dtsmqr:
     label: dtsmqr カーネル単体の nb×ib スイープ

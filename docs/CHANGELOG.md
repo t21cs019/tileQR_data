@@ -11,6 +11,28 @@
 
 ---
 
+## 0.23.0 — 不老・弐 Type I の ssrfb（DTSMQR 1コア）を取り込み
+
+不老・弐 Type I の DTSMQR 単体を1コアに固定した計測（size 4096、5回、2026-11-11、
+plasma-bench ee9701b、ノード t1205、PBS 112117.jobm）を `raw_data/flow2-t1_s1_smt-off/` に置き、
+assemble / ingest した。β を1コアで決めるため（2026-10-28 のゼミの決定）。
+`machines.yaml` にノード t1205、`plan.yaml` の ssrfb に `{node: t1205, sizes: [4096]}` を追加。
+有償なので size は 4096 だけ。ほかの機種のように 1024〜8192 の4つはない。
+
+plasma-bench の出力名（`flow2-t1_s1_smt-off_core1_ssrfb_size4096_nb32-512_th1_r<R>.csv`）は
+`SRC_RE` に合わないので、`_meta.txt` の `host` と `date` から
+`{host}_ssrfb_size4096_nb32-512_th1_t1_{日付}_{時刻}.csv` に改名した。中身はバイト単位で同じ。
+`_meta.txt` と `_clock.txt`（固定したコアのクロック、60 秒ごと）も同じ名前で横に置いた。
+
+**最初の点（nb 32, ib 8）は5回とも遅い**（0.05〜4.24 GFlops。隣の ib 12 は約 14）。
+i7-7700・ryzen で見つかった、起動直後の1点目だけ遅くなる現象と同じ形。不老・弐は有償で
+測り直せないので、置換も除外もしていない。β の当てはめ（ib = nb/8、nb ≥ 64）には入らない。
+nb 32 の値を使うときは注意する。ほかに1回だけ外れた点が2つある（r1 の nb 52/ib 24 が中央値の
+0.06 倍、r5 の nb 372/ib 8 が 0.55 倍）。
+
+この版でほかのノードの `derived/ssrfb.parquet` の行は変わっていない。`qr_sweep.parquet`・
+`optima.csv` も変わっていない（取り込みの前後で比較した）。
+
 ## 0.22.0 — 不老・弐 Type I（flow2-t1_s1_smt-off）を取り込み
 
 名大 不老・弐 Type I（EPYC 9965、p = 192、片ソケット NPS4 の4ノード）の

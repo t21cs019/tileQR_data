@@ -768,6 +768,7 @@ nodes:
   t1059: { arch: flow2-t1, source_key: null }
   t1071: { arch: flow2-t1, source_key: null }
   t1220: { arch: flow2-t1, source_key: null }
+  t1205: { arch: flow2-t1, source_key: null }   # ssrfb 1コア（2026-11-11）
   t1228: { arch: flow2-t1, source_key: null }
   t1229: { arch: flow2-t1, source_key: null }
 
