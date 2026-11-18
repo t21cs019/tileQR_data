@@ -1,0 +1,7 @@
+% PLASMA 25.5.27, OpenMP num threads 8, Intel MKL 2025.0.2, 2026-11-18 09:55:57
+% input: /home/kubota/Library/plasma/bin/plasmatest dgeqrf --dim=8192x8192 --nb=32 --ib=8
+
+  Status      Error       Time    Gflop/s  House. mode       m       n    nb    ib  padA
+    pass   1.33e-18    22.8791    32.0442            f    8192    8192    32     8     0
+
+% All tests passed

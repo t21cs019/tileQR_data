@@ -1,0 +1,15 @@
+% PLASMA 25.5.27, OpenMP num threads 8, Intel MKL 2025.0.2, 2026-11-18 10:25:31
+% input: /home/kubota/Library/plasma/bin/plasmatest dgeqrf --dim=2048x2048 --nb=128 --ib=32
+
+  Status      Error       Time    Gflop/s  House. mode       m       n    nb    ib  padA
+AFFINITY level=1 thread=3 cpus=3
+AFFINITY level=1 thread=1 cpus=1
+AFFINITY level=1 thread=2 cpus=2
+AFFINITY level=1 thread=0 cpus=0
+AFFINITY level=1 thread=4 cpus=4
+AFFINITY level=1 thread=6 cpus=6
+AFFINITY level=1 thread=5 cpus=5
+AFFINITY level=1 thread=7 cpus=7
+    pass   1.97e-18     0.0677   169.2733            f    2048    2048   128    32     0
+
+% All tests passed

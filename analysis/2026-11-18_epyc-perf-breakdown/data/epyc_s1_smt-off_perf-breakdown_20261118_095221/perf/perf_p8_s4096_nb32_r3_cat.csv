@@ -1,0 +1,13 @@
+cat,main_in,worker_in,main_out,worker_out,freq,window_used
+blas,207,33418,386,0,1999,M1
+core_blas,103,2673,0,0,1999,M1
+core_dlacpy,0,1,0,0,1999,M1
+dlacpy_task,5,0,0,0,1999,M1
+libc_malloc,3,0,0,0,1999,M1
+libc_mem,21,61,14,0,1999,M1
+libc_other,14,121,10,0,1999,M1
+omp_other,443,1376,2,0,1999,M1
+omp_task,4214,2452,0,0,1999,M1
+omp_wait,18,159,0,0,1999,M1
+other_user,908,828,102,0,1999,M1
+plasma_other,115,0,0,0,1999,M1

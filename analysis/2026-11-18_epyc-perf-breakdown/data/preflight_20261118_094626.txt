@@ -1,0 +1,68 @@
+# preflight 2026-11-18 09:46:26 host=epyc user=kubota kernel=5.15.0-203-generic
+
+## 1. 他のジョブ（共用機。他のユーザーの CPU 使用率の合計が 100% を超えていたら流さない）
+ 09:46:26 up 2 days, 11:39,  0 users,  load average: 0.06, 0.10, 0.08
+USER                 %CPU     ELAPSED COMMAND
+kubota                7.1       13:59 /home/kubota/.vscode-server/cli/servers/Stable-69047191fc427f2f92828279aae1d90d8eeda7ab/server/node --dns-result-order=ipv4first /home/kubota/.vscode-server/cli/servers/Stable-69047191fc427f2f92828279aae1d90d8eeda7ab/server/out/bootstrap-fork --type=extensionHost --transformURIs --useHostProxy=false
+kubota                1.1       08:53 /home/kubota/.vscode-server/extensions/anthropic.claude-code-2.1.322-linux-x64/resources/native-binary/claude --output-format stream-json --verbose --input-format stream-json --max-thinking-tokens=31999 --permission-prompt-tool=stdio --setting-sources=user,project,local --permission-mode=auto --debug --debug-to-stderr --enable-auth-status --no-chrome --replay-user-messages
+kubota                0.8       14:01 /home/kubota/.vscode-server/code-69047191fc427f2f92828279aae1d90d8eeda7ab command-shell --cli-data-dir /home/kubota/.vscode-server/cli --parent-process-id 64698 --on-host=127.0.0.1 --on-port
+tanaka                0.7    13:07:00 claude
+kubota                0.7       13:47 /home/kubota/.vscode-server/extensions/anthropic.claude-code-2.1.322-linux-x64/resources/native-binary/claude --output-format stream-json --verbose --input-format stream-json --max-thinking-tokens=31999 --permission-prompt-tool=stdio --resume=cd1a5a57-dc8c-4adf-814a-d99d726de43e --setting-sources=user,project,local --permission-mode=auto --debug --debug-to-stderr --enable-auth-status --no-chrome --replay-user-messages
+kubota                0.6       13:59 /home/kubota/.vscode-server/cli/servers/Stable-69047191fc427f2f92828279aae1d90d8eeda7ab/server/node /home/kubota/.vscode-server/cli/servers/Stable-69047191fc427f2f92828279aae1d90d8eeda7ab/server/out/bootstrap-fork --type=fileWatcher
+kubota                0.5       14:02 sshd: kubota@notty
+other_users_cpu_pct=1
+
+## 2. perf・strace・time
+perf     /usr/bin/perf
+strace   /usr/bin/strace
+time (GNU Time) UNKNOWN
+perf version 5.15.223
+strace -- version 5.16
+perf_event_paranoid=0
+kptr_restrict=1
+ptrace_scope=0
+perf_event_max_sample_rate=100000
+THP=always [madvise] never
+governor=schedutil
+sudo -n: 使えない
+
+## 3. perf の試し打ち（cpu-clock。カーネルのサンプルが取れるか）
+perf record exit=0
+WARNING: Kernel address maps (/proc/{kallsyms,modules}) are restricted,
+check /proc/sys/kernel/kptr_restrict and /proc/sys/kernel/perf_event_paranoid.
+
+Samples in kernel functions may not be resolved if a suitable vmlinux
+file is not found in the buildid cache or in the vmlinux path.
+              sh 70661 214745.448368:      15440dc6b887 __strlen_avx2 (/usr/lib/x86_64-linux-gnu/libc.so.6)
+              sh 70661 214745.449367:      5582d24c9f16 [unknown] (/usr/bin/dash)
+              sh 70661 214745.450368:      15440db5be95 _IO_default_xsputn (/usr/lib/x86_64-linux-gnu/libc.so.6)
+kernel samples: 0
+       perf-exec     0     0.000000: PERF_RECORD_COMM: perf-exec:70661/70661
+              sh 70661 214745.447367: PERF_RECORD_COMM exec: sh:70661/70661
+strace -f -c の試し打ち:
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 35.08    0.000561           4       122       120 openat
+ 28.71    0.000459           3       122       110 newfstatat
+
+## 4. plasmatest（--test=n のときの出力の形と、どのライブラリが使われるか）
+PLASMA_TEST=/home/kubota/Library/plasma/bin/plasmatest
+	libplasma.so.1.0 => /usr/local/lib/libplasma.so.1.0 (0x000014ee342a6000)
+	libplasma_core_blas.so.1.0 => /usr/local/lib/libplasma_core_blas.so.1.0 (0x000014ee33e6e000)
+	libopenblas.so.0 => /usr/local/lib/libopenblas.so.0 (0x000014ee32f29000)
+	libmkl_intel_lp64.so.2 => /opt/intel/oneapi/mkl/2025.2/lib/libmkl_intel_lp64.so.2 (0x000014ee31fea000)
+	libmkl_intel_thread.so.2 => /opt/intel/oneapi/mkl/2025.2/lib/libmkl_intel_thread.so.2 (0x000014ee2fc5c000)
+	libmkl_core.so.2 => /opt/intel/oneapi/mkl/2025.2/lib/libmkl_core.so.2 (0x000014ee2bc17000)
+	libiomp5.so => /opt/intel/oneapi/compiler/2025.2/lib/libiomp5.so (0x000014ee2b600000)
+	libgomp.so.1 => /lib/x86_64-linux-gnu/libgomp.so.1 (0x000014ee2bae4000)
+git: 6ae6556 feat/tau-campaign
+% PLASMA 25.5.27, OpenMP num threads 8, Intel MKL 2025.0.2, 2026-11-18 09:46:28
+% input: /home/kubota/Library/plasma/bin/plasmatest dgeqrf --dim=1024x1024 --nb=64 --ib=16 --test=n
+
+  Status      Error       Time    Gflop/s  House. mode       m       n    nb    ib  padA
+      --         --     0.0259    55.4623            f    1024    1024    64    16     0
+
+% All tests passed
+（上の行の3列目が Time、4列目が Gflop/s であること）
+
+# preflight 終わり

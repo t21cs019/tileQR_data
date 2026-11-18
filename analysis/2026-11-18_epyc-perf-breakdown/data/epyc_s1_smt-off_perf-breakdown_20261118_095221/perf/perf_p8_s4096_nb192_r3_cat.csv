@@ -1,0 +1,10 @@
+cat,main_in,worker_in,main_out,worker_out,freq,window_used
+blas,711,5042,377,0,1999,M1
+core_blas,10,48,0,0,1999,M1
+libc_mem,5,49,13,0,1999,M1
+libc_other,1,0,10,0,1999,M1
+omp_other,5,24,2,0,1999,M1
+omp_task,16,81,0,0,1999,M1
+omp_wait,2,19,0,0,1999,M1
+other_user,62,133,110,0,1999,M1
+plasma_other,1,0,0,0,1999,M1

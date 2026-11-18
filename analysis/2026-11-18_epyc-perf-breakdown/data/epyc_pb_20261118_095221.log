@@ -1,0 +1,215 @@
+===== preflight =====
+numactl --cpunodebind=0 --membind=0
+bound: 32 cores（論理 CPU 32）/ P = 32
+affinity (bind=close): threads=32, 異なるコア集合=32, P=32
+numactl --cpunodebind=0 --membind=0
+bound: 32 cores（論理 CPU 32）/ P = 8
+[note] P=8 はノードの一部だけを使う（close で先頭から詰める）
+affinity (bind=close): threads=8, 異なるコア集合=8, P=8
+output: results/benchmark/epyc_s1_smt-off_perf-breakdown_20261118_095221
+--- 開始: 2026-11-18 09:52:22 ---
+ 09:52:22 up 2 days, 11:45,  1 user,  load average: 0.03, 0.06, 0.07
+node 0 free: 118139 MB
+mean cpu MHz = 2376 (32 cpus)
+===== start（条件 10 × 種類 3 × 5 回）=====
+r1 ref    p32 size  4096 nb  32    2.6716 s   34.3090 GFlops  other_cpu 1%  (10 sec)
+[reduce_perf] perf_p32_s4096_nb32_r1 window=M1 len=2.7899s M1_len=2.789901000011014 M2_len=2.449044999986654 Time=2.7132 samples=172727
+r1 perf   p32 size  4096 nb  32    2.7132 s   33.7829 GFlops  other_cpu 1%  (16 sec)
+r1 plain  p32 size  4096 nb  32    2.6669 s   34.3690 GFlops  other_cpu 1%  (19 sec)
+r1 ref    p32 size  4096 nb 192    0.1655 s  553.6868 GFlops  other_cpu 1%  (21 sec)
+[reduce_perf] perf_p32_s4096_nb192_r1 window=M1 len=0.1777s M1_len=0.17766499999561347 M2_len=0.0 Time=0.1661 samples=11675
+r1 perf   p32 size  4096 nb 192    0.1661 s  551.8500 GFlops  other_cpu 1%  (22 sec)
+r1 plain  p32 size  4096 nb 192    0.1652 s  554.7254 GFlops  other_cpu 1%  (23 sec)
+r1 ref    p32 size  8192 nb  32   20.8069 s   35.2355 GFlops  other_cpu 1%  (129 sec)
+[reduce_perf] perf_p32_s8192_nb32_r1 window=M1 len=21.3288s M1_len=21.328785999998217 M2_len=19.4609969999874 Time=20.8136 samples=331654
+r1 perf   p32 size  8192 nb  32   20.8136 s   35.2242 GFlops  other_cpu 1%  (155 sec)
+r1 plain  p32 size  8192 nb  32   20.8286 s   35.1988 GFlops  other_cpu 1%  (177 sec)
+r1 ref    p32 size  8192 nb 192    1.0054 s  729.2239 GFlops  other_cpu 1%  (184 sec)
+[reduce_perf] perf_p32_s8192_nb192_r1 window=M1 len=1.0594s M1_len=1.0593609999923501 M2_len=0.05802699999185279 Time=1.0143 samples=64501
+r1 perf   p32 size  8192 nb 192    1.0143 s  722.8080 GFlops  other_cpu 1%  (187 sec)
+r1 plain  p32 size  8192 nb 192    1.0283 s  712.9589 GFlops  other_cpu 1%  (190 sec)
+[reduce_perf] perf_p32_s512_nb32_r1 window=M1 len=0.0176s M1_len=0.017586999980267137 M2_len=0.0 Time=0.0161 samples=4583
+r1 perf   p32 size   512 nb  32    0.0161 s   11.1239 GFlops  other_cpu 1%  (191 sec)
+r1 plain  p32 size   512 nb  32    0.0131 s   13.6949 GFlops  other_cpu 1%  (191 sec)
+r1 ref    p8  size  4096 nb  32    2.8206 s   32.4968 GFlops  other_cpu 1%  (202 sec)
+[reduce_perf] perf_p8_s4096_nb32_r1 window=M1 len=2.9324s M1_len=2.9323629999998957 M2_len=2.5099649999756366 Time=2.8561 samples=46172
+r1 perf   p8  size  4096 nb  32    2.8561 s   32.0926 GFlops  other_cpu 1%  (207 sec)
+r1 plain  p8  size  4096 nb  32    2.9254 s   31.3322 GFlops  other_cpu 1%  (210 sec)
+r1 ref    p8  size  4096 nb 192    0.3937 s  232.7938 GFlops  other_cpu 1%  (213 sec)
+[reduce_perf] perf_p8_s4096_nb192_r1 window=M1 len=0.4101s M1_len=0.41014299998641945 M2_len=0.0 Time=0.3975 samples=6744
+r1 perf   p8  size  4096 nb 192    0.3975 s  230.5826 GFlops  other_cpu 1%  (214 sec)
+r1 plain  p8  size  4096 nb 192    0.3944 s  232.4225 GFlops  other_cpu 1%  (215 sec)
+r1 ref    p8  size  8192 nb  32   22.8791 s   32.0442 GFlops  other_cpu 1%  (319 sec)
+[reduce_perf] perf_p8_s8192_nb32_r1 window=M1 len=23.1069s M1_len=23.10685100001865 M2_len=21.263984999997774 Time=22.5954 samples=90800
+r1 perf   p8  size  8192 nb  32   22.5954 s   32.4465 GFlops  other_cpu 1%  (345 sec)
+r1 plain  p8  size  8192 nb  32   22.5764 s   32.4739 GFlops  other_cpu 1%  (369 sec)
+r1 ref    p8  size  8192 nb 192    2.9260 s  250.5642 GFlops  other_cpu 1%  (383 sec)
+[reduce_perf] perf_p8_s8192_nb192_r1 window=M1 len=3.0009s M1_len=3.0009159999899566 M2_len=0.05918099998962134 Time=2.9571 samples=48849
+r1 perf   p8  size  8192 nb 192    2.9571 s  247.9265 GFlops  other_cpu 1%  (389 sec)
+r1 plain  p8  size  8192 nb 192    2.9398 s  249.3826 GFlops  other_cpu 1%  (393 sec)
+[reduce_perf] perf_p8_s512_nb32_r1 window=M1 len=0.0106s M1_len=0.010600000008707866 M2_len=0.0025830000231508166 Time=0.0099 samples=947
+r1 perf   p8  size   512 nb  32    0.0099 s   18.1186 GFlops  other_cpu 1%  (394 sec)
+r1 plain  p8  size   512 nb  32    0.0092 s   19.4228 GFlops  other_cpu 1%  (395 sec)
+--- round 1 終わり:  09:58:57 up 2 days, 11:51,  1 user,  load average: 8.10, 10.49, 5.81 / other_cpu=1% ---
+[reduce_perf] perf_p32_s4096_nb32_r2 window=M1 len=2.7703s M1_len=2.7702989999961574 M2_len=2.3822490000166 Time=2.6905 samples=171587
+r2 perf   p32 size  4096 nb  32    2.6905 s   34.0674 GFlops  other_cpu 1%  (400 sec)
+r2 plain  p32 size  4096 nb  32    2.7206 s   33.6915 GFlops  other_cpu 1%  (403 sec)
+r2 ref    p32 size  4096 nb  32    2.7182 s   33.7203 GFlops  other_cpu 1%  (414 sec)
+[reduce_perf] perf_p32_s4096_nb192_r2 window=M1 len=0.1793s M1_len=0.1793490000127349 M2_len=0.0 Time=0.1661 samples=11736
+r2 perf   p32 size  4096 nb 192    0.1661 s  551.9633 GFlops  other_cpu 1%  (415 sec)
+r2 plain  p32 size  4096 nb 192    0.1650 s  555.6466 GFlops  other_cpu 1%  (416 sec)
+r2 ref    p32 size  4096 nb 192    0.1651 s  555.2766 GFlops  other_cpu 1%  (417 sec)
+[reduce_perf] perf_p32_s8192_nb32_r2 window=M1 len=21.3103s M1_len=21.310253000003286 M2_len=19.569641000009142 Time=20.7954 samples=331557
+r2 perf   p32 size  8192 nb  32   20.7954 s   35.2550 GFlops  other_cpu 1%  (443 sec)
+r2 plain  p32 size  8192 nb  32   20.7737 s   35.2919 GFlops  other_cpu 1%  (465 sec)
+r2 ref    p32 size  8192 nb  32   21.3148 s   34.3959 GFlops  other_cpu 1%  (572 sec)
+[reduce_perf] perf_p32_s8192_nb192_r2 window=M1 len=1.0641s M1_len=1.0641170000017155 M2_len=0.05452499998500571 Time=1.0175 samples=64698
+r2 perf   p32 size  8192 nb 192    1.0175 s  720.5405 GFlops  other_cpu 1%  (576 sec)
+r2 plain  p32 size  8192 nb 192    1.0164 s  721.3287 GFlops  other_cpu 1%  (578 sec)
+r2 ref    p32 size  8192 nb 192    1.0092 s  726.4319 GFlops  other_cpu 1%  (584 sec)
+[reduce_perf] perf_p32_s512_nb32_r2 window=M1 len=0.0163s M1_len=0.01626500001293607 M2_len=0.004071000003023073 Time=0.0151 samples=4440
+r2 perf   p32 size   512 nb  32    0.0151 s   11.8517 GFlops  other_cpu 1%  (586 sec)
+r2 plain  p32 size   512 nb  32    0.0133 s   13.5327 GFlops  other_cpu 1%  (586 sec)
+[reduce_perf] perf_p8_s4096_nb32_r2 window=M1 len=2.9310s M1_len=2.931023000011919 M2_len=2.482328000012785 Time=2.8542 samples=46140
+r2 perf   p8  size  4096 nb  32    2.8542 s   32.1136 GFlops  other_cpu 1%  (590 sec)
+r2 plain  p8  size  4096 nb  32    2.8758 s   31.8722 GFlops  other_cpu 1%  (594 sec)
+r2 ref    p8  size  4096 nb  32    2.8855 s   31.7661 GFlops  other_cpu 1%  (605 sec)
+[reduce_perf] perf_p8_s4096_nb192_r2 window=M1 len=0.4093s M1_len=0.40932899998733774 M2_len=0.0 Time=0.3966 samples=6722
+r2 perf   p8  size  4096 nb 192    0.3966 s  231.1186 GFlops  other_cpu 1%  (606 sec)
+r2 plain  p8  size  4096 nb 192    0.3970 s  230.8868 GFlops  other_cpu 1%  (607 sec)
+r2 ref    p8  size  4096 nb 192    0.4021 s  227.9799 GFlops  other_cpu 1%  (609 sec)
+[reduce_perf] perf_p8_s8192_nb32_r2 window=M1 len=22.7698s M1_len=22.769846000010148 M2_len=20.954983000003267 Time=22.259 samples=89456
+r2 perf   p8  size  8192 nb  32   22.2590 s   32.9368 GFlops  other_cpu 1%  (634 sec)
+r2 plain  p8  size  8192 nb  32   22.6316 s   32.3946 GFlops  other_cpu 1%  (659 sec)
+r2 ref    p8  size  8192 nb  32   22.3053 s   32.8685 GFlops  other_cpu 1%  (762 sec)
+[reduce_perf] perf_p8_s8192_nb192_r2 window=M1 len=2.9874s M1_len=2.9873509999888483 M2_len=0.06573400000343099 Time=2.9428 samples=48617
+r2 perf   p8  size  8192 nb 192    2.9428 s  249.1326 GFlops  other_cpu 1%  (768 sec)
+r2 plain  p8  size  8192 nb 192    2.9556 s  248.0533 GFlops  other_cpu 1%  (772 sec)
+r2 ref    p8  size  8192 nb 192    2.9398 s  249.3874 GFlops  other_cpu 1%  (786 sec)
+[reduce_perf] perf_p8_s512_nb32_r2 window=M1 len=0.0113s M1_len=0.01127200000337325 M2_len=0.010250999999698251 Time=0.0105 samples=999
+r2 perf   p8  size   512 nb  32    0.0105 s   17.0415 GFlops  other_cpu 1%  (787 sec)
+r2 plain  p8  size   512 nb  32    0.0095 s   18.8118 GFlops  other_cpu 1%  (787 sec)
+--- round 2 終わり:  10:05:29 up 2 days, 11:58,  1 user,  load average: 6.74, 13.48, 9.75 / other_cpu=1% ---
+r3 plain  p32 size  4096 nb  32    2.6894 s   34.0813 GFlops  other_cpu 1%  (791 sec)
+r3 ref    p32 size  4096 nb  32    2.6805 s   34.1954 GFlops  other_cpu 1%  (801 sec)
+[reduce_perf] perf_p32_s4096_nb32_r3 window=M1 len=2.7630s M1_len=2.762994999997318 M2_len=2.4113190000061877 Time=2.6803 samples=170846
+r3 perf   p32 size  4096 nb  32    2.6803 s   34.1974 GFlops  other_cpu 1%  (806 sec)
+r3 plain  p32 size  4096 nb 192    0.1648 s  556.2206 GFlops  other_cpu 1%  (807 sec)
+r3 ref    p32 size  4096 nb 192    0.1647 s  556.4573 GFlops  other_cpu 1%  (809 sec)
+[reduce_perf] perf_p32_s4096_nb192_r3 window=M1 len=0.1792s M1_len=0.17919500000425614 M2_len=0.0 Time=0.1659 samples=11728
+r3 perf   p32 size  4096 nb 192    0.1659 s  552.3487 GFlops  other_cpu 1%  (810 sec)
+r3 plain  p32 size  8192 nb  32   20.7150 s   35.3918 GFlops  other_cpu 1%  (832 sec)
+r3 ref    p32 size  8192 nb  32   21.0523 s   34.8248 GFlops  other_cpu 1%  (940 sec)
+[reduce_perf] perf_p32_s8192_nb32_r3 window=M1 len=21.3005s M1_len=21.300511000008555 M2_len=19.395524999999907 Time=20.7856 samples=331356
+r3 perf   p32 size  8192 nb  32   20.7856 s   35.2717 GFlops  other_cpu 1%  (966 sec)
+r3 plain  p32 size  8192 nb 192    1.0145 s  722.6911 GFlops  other_cpu 1%  (968 sec)
+r3 ref    p32 size  8192 nb 192    1.0129 s  723.7757 GFlops  other_cpu 1%  (975 sec)
+[reduce_perf] perf_p32_s8192_nb192_r3 window=M1 len=1.0622s M1_len=1.062192999990657 M2_len=0.07356300001265481 Time=1.0144 samples=64527
+r3 perf   p32 size  8192 nb 192    1.0144 s  722.7603 GFlops  other_cpu 1%  (978 sec)
+r3 plain  p32 size   512 nb  32    0.0129 s   13.9360 GFlops  other_cpu 1%  (979 sec)
+[reduce_perf] perf_p32_s512_nb32_r3 window=M1 len=0.0171s M1_len=0.017083999991882592 M2_len=0.0032219999993685633 Time=0.0161 samples=4480
+r3 perf   p32 size   512 nb  32    0.0161 s   11.1252 GFlops  other_cpu 1%  (980 sec)
+r3 plain  p8  size  4096 nb  32    2.9595 s   30.9714 GFlops  other_cpu 1%  (983 sec)
+r3 ref    p8  size  4096 nb  32    2.9236 s   31.3516 GFlops  other_cpu 1%  (995 sec)
+[reduce_perf] perf_p8_s4096_nb32_r3 window=M1 len=3.0273s M1_len=3.0273009999946225 M2_len=2.641013999993447 Time=2.9492 samples=47654
+r3 perf   p8  size  4096 nb  32    2.9492 s   31.0797 GFlops  other_cpu 1%  (999 sec)
+r3 plain  p8  size  4096 nb 192    0.3941 s  232.5687 GFlops  other_cpu 1%  (1000 sec)
+r3 ref    p8  size  4096 nb 192    0.3940 s  232.6425 GFlops  other_cpu 1%  (1002 sec)
+[reduce_perf] perf_p8_s4096_nb192_r3 window=M1 len=0.4073s M1_len=0.4073410000128206 M2_len=0.0 Time=0.3957 samples=6721
+r3 perf   p8  size  4096 nb 192    0.3957 s  231.6115 GFlops  other_cpu 1%  (1004 sec)
+r3 plain  p8  size  8192 nb  32   22.8048 s   32.1485 GFlops  other_cpu 1%  (1028 sec)
+r3 ref    p8  size  8192 nb  32   22.5655 s   32.4896 GFlops  other_cpu 1%  (1132 sec)
+[reduce_perf] perf_p8_s8192_nb32_r3 window=M1 len=22.9502s M1_len=22.950228000001516 M2_len=21.18384499999229 Time=22.4586 samples=90229
+r3 perf   p8  size  8192 nb  32   22.4586 s   32.6442 GFlops  other_cpu 1%  (1158 sec)
+r3 plain  p8  size  8192 nb 192    2.9639 s  247.3600 GFlops  other_cpu 1%  (1162 sec)
+r3 ref    p8  size  8192 nb 192    2.9413 s  249.2538 GFlops  other_cpu 1%  (1176 sec)
+[reduce_perf] perf_p8_s8192_nb192_r3 window=M1 len=2.9920s M1_len=2.9919640000152867 M2_len=0.04003099998226389 Time=2.9454 samples=48667
+r3 perf   p8  size  8192 nb 192    2.9454 s  248.9094 GFlops  other_cpu 1%  (1182 sec)
+r3 plain  p8  size   512 nb  32    0.0092 s   19.5748 GFlops  other_cpu 1%  (1182 sec)
+[reduce_perf] perf_p8_s512_nb32_r3 window=M1 len=0.0115s M1_len=0.01151199999731034 M2_len=0.001724000001559034 Time=0.0108 samples=1025
+r3 perf   p8  size   512 nb  32    0.0108 s   16.6253 GFlops  other_cpu 1%  (1183 sec)
+--- round 3 終わり:  10:12:05 up 2 days, 12:04,  1 user,  load average: 7.03, 14.30, 12.31 / other_cpu=1% ---
+r4 ref    p32 size  4096 nb  32    2.6784 s   34.2214 GFlops  other_cpu 1%  (1193 sec)
+[reduce_perf] perf_p32_s4096_nb32_r4 window=M1 len=2.7825s M1_len=2.7825230000016745 M2_len=2.436260999995284 Time=2.7001 samples=172180
+r4 perf   p32 size  4096 nb  32    2.7001 s   33.9472 GFlops  other_cpu 1%  (1199 sec)
+r4 plain  p32 size  4096 nb  32    2.7238 s   33.6509 GFlops  other_cpu 1%  (1202 sec)
+r4 ref    p32 size  4096 nb 192    0.1723 s  532.0041 GFlops  other_cpu 1%  (1203 sec)
+[reduce_perf] perf_p32_s4096_nb192_r4 window=M1 len=0.1804s M1_len=0.1803500000096392 M2_len=None Time=0.167 samples=11844
+r4 perf   p32 size  4096 nb 192    0.1670 s  548.8264 GFlops  other_cpu 1%  (1205 sec)
+r4 plain  p32 size  4096 nb 192    0.1678 s  546.3734 GFlops  other_cpu 1%  (1205 sec)
+r4 ref    p32 size  8192 nb  32   20.7661 s   35.3047 GFlops  other_cpu 1%  (1311 sec)
+[reduce_perf] perf_p32_s8192_nb32_r4 window=M1 len=21.4637s M1_len=21.46371999999974 M2_len=19.7248649999965 Time=20.9286 samples=333593
+r4 perf   p32 size  8192 nb  32   20.9286 s   35.0306 GFlops  other_cpu 1%  (1337 sec)
+r4 plain  p32 size  8192 nb  32   20.8070 s   35.2354 GFlops  other_cpu 1%  (1359 sec)
+r4 ref    p32 size  8192 nb 192    1.0129 s  723.8399 GFlops  other_cpu 1%  (1366 sec)
+[reduce_perf] perf_p32_s8192_nb192_r4 window=M1 len=1.0670s M1_len=1.0669969999871682 M2_len=0.0570490000245627 Time=1.0201 samples=64675
+r4 perf   p32 size  8192 nb 192    1.0201 s  718.6708 GFlops  other_cpu 1%  (1370 sec)
+r4 plain  p32 size  8192 nb 192    1.0095 s  726.2276 GFlops  other_cpu 1%  (1372 sec)
+[reduce_perf] perf_p32_s512_nb32_r4 window=M1 len=0.0166s M1_len=0.016644000017549843 M2_len=None Time=0.0154 samples=4562
+r4 perf   p32 size   512 nb  32    0.0154 s   11.6662 GFlops  other_cpu 1%  (1373 sec)
+r4 plain  p32 size   512 nb  32    0.0135 s   13.3120 GFlops  other_cpu 1%  (1373 sec)
+r4 ref    p8  size  4096 nb  32    2.8779 s   31.8497 GFlops  other_cpu 1%  (1385 sec)
+[reduce_perf] perf_p8_s4096_nb32_r4 window=M1 len=3.0487s M1_len=3.0487170000269543 M2_len=2.661135000002105 Time=2.972 samples=48023
+r4 perf   p8  size  4096 nb  32    2.9720 s   30.8409 GFlops  other_cpu 1%  (1389 sec)
+r4 plain  p8  size  4096 nb  32    2.8303 s   32.3847 GFlops  other_cpu 1%  (1393 sec)
+r4 ref    p8  size  4096 nb 192    0.3949 s  232.0824 GFlops  other_cpu 1%  (1395 sec)
+[reduce_perf] perf_p8_s4096_nb192_r4 window=M1 len=0.4139s M1_len=0.4138749999983702 M2_len=0.0 Time=0.4012 samples=6788
+r4 perf   p8  size  4096 nb 192    0.4012 s  228.4663 GFlops  other_cpu 1%  (1396 sec)
+r4 plain  p8  size  4096 nb 192    0.3942 s  232.5469 GFlops  other_cpu 1%  (1397 sec)
+r4 ref    p8  size  8192 nb  32   22.4939 s   32.5929 GFlops  other_cpu 1%  (1499 sec)
+[reduce_perf] perf_p8_s8192_nb32_r4 window=M1 len=22.6263s M1_len=22.626260999997612 M2_len=20.9256699999969 Time=22.1399 samples=88968
+r4 perf   p8  size  8192 nb  32   22.1399 s   33.1141 GFlops  other_cpu 1%  (1524 sec)
+r4 plain  p8  size  8192 nb  32   23.0017 s   31.8734 GFlops  other_cpu 1%  (1549 sec)
+r4 ref    p8  size  8192 nb 192    2.9304 s  250.1863 GFlops  other_cpu 1%  (1563 sec)
+[reduce_perf] perf_p8_s8192_nb192_r4 window=M1 len=3.0038s M1_len=3.0037740000116173 M2_len=0.07077200000640005 Time=2.9595 samples=48885
+r4 perf   p8  size  8192 nb 192    2.9595 s  247.7246 GFlops  other_cpu 1%  (1569 sec)
+r4 plain  p8  size  8192 nb 192    2.9374 s  249.5865 GFlops  other_cpu 1%  (1573 sec)
+[reduce_perf] perf_p8_s512_nb32_r4 window=M1 len=0.0110s M1_len=0.010967000009259209 M2_len=0.0008000000088941306 Time=0.0102 samples=971
+r4 perf   p8  size   512 nb  32    0.0102 s   17.6712 GFlops  other_cpu 1%  (1574 sec)
+r4 plain  p8  size   512 nb  32    0.0095 s   18.8688 GFlops  other_cpu 1%  (1574 sec)
+--- round 4 終わり:  10:18:36 up 2 days, 12:11,  1 user,  load average: 7.57, 14.14, 13.67 / other_cpu=1% ---
+[reduce_perf] perf_p32_s4096_nb32_r5 window=M1 len=2.7682s M1_len=2.7681619999930263 M2_len=2.421713000017917 Time=2.6863 samples=171229
+r5 perf   p32 size  4096 nb  32    2.6863 s   34.1215 GFlops  other_cpu 1%  (1580 sec)
+r5 plain  p32 size  4096 nb  32    2.6669 s   34.3691 GFlops  other_cpu 1%  (1583 sec)
+r5 ref    p32 size  4096 nb  32    2.6824 s   34.1705 GFlops  other_cpu 1%  (1593 sec)
+[reduce_perf] perf_p32_s4096_nb192_r5 window=M1 len=0.1815s M1_len=0.18148400000063702 M2_len=0.0 Time=0.168 samples=11901
+r5 perf   p32 size  4096 nb 192    0.1680 s  545.5601 GFlops  other_cpu 1%  (1595 sec)
+r5 plain  p32 size  4096 nb 192    0.1650 s  555.6137 GFlops  other_cpu 1%  (1595 sec)
+r5 ref    p32 size  4096 nb 192    0.1650 s  555.4892 GFlops  other_cpu 1%  (1597 sec)
+[reduce_perf] perf_p32_s8192_nb32_r5 window=M1 len=21.2741s M1_len=21.274063999997452 M2_len=19.440062000008766 Time=20.7509 samples=330648
+r5 perf   p32 size  8192 nb  32   20.7509 s   35.3307 GFlops  other_cpu 1%  (1622 sec)
+r5 plain  p32 size  8192 nb  32   20.9815 s   34.9423 GFlops  other_cpu 1%  (1645 sec)
+r5 ref    p32 size  8192 nb  32   21.1610 s   34.6460 GFlops  other_cpu 1%  (1753 sec)
+[reduce_perf] perf_p32_s8192_nb192_r5 window=M1 len=1.0623s M1_len=1.0622779999976046 M2_len=0.07227599999168888 Time=1.0162 samples=64356
+r5 perf   p32 size  8192 nb 192    1.0162 s  721.4806 GFlops  other_cpu 1%  (1756 sec)
+r5 plain  p32 size  8192 nb 192    1.0037 s  730.4336 GFlops  other_cpu 1%  (1759 sec)
+r5 ref    p32 size  8192 nb 192    1.0063 s  728.5746 GFlops  other_cpu 1%  (1765 sec)
+[reduce_perf] perf_p32_s512_nb32_r5 window=M1 len=0.0153s M1_len=0.015294000011635944 M2_len=0.007868999993661419 Time=0.0141 samples=4219
+r5 perf   p32 size   512 nb  32    0.0141 s   12.7258 GFlops  other_cpu 1%  (1767 sec)
+r5 plain  p32 size   512 nb  32    0.0130 s   13.8501 GFlops  other_cpu 1%  (1767 sec)
+[reduce_perf] perf_p8_s4096_nb32_r5 window=M1 len=3.0293s M1_len=3.0292780000017956 M2_len=2.6229159999929834 Time=2.9511 samples=47653
+r5 perf   p8  size  4096 nb  32    2.9511 s   31.0600 GFlops  other_cpu 1%  (1771 sec)
+r5 plain  p8  size  4096 nb  32    2.9564 s   31.0034 GFlops  other_cpu 1%  (1775 sec)
+r5 ref    p8  size  4096 nb  32    2.8810 s   31.8152 GFlops  other_cpu 1%  (1786 sec)
+[reduce_perf] perf_p8_s4096_nb192_r5 window=M1 len=0.4096s M1_len=0.4095849999866914 M2_len=None Time=0.3977 samples=6732
+r5 perf   p8  size  4096 nb 192    0.3977 s  230.4630 GFlops  other_cpu 1%  (1787 sec)
+r5 plain  p8  size  4096 nb 192    0.3974 s  230.6603 GFlops  other_cpu 1%  (1788 sec)
+r5 ref    p8  size  4096 nb 192    0.3945 s  232.3354 GFlops  other_cpu 1%  (1790 sec)
+[reduce_perf] perf_p8_s8192_nb32_r5 window=M1 len=22.7719s M1_len=22.77194099998451 M2_len=20.850972000014735 Time=22.282 samples=89535
+r5 perf   p8  size  8192 nb  32   22.2820 s   32.9028 GFlops  other_cpu 1%  (1815 sec)
+r5 plain  p8  size  8192 nb  32   23.2119 s   31.5847 GFlops  other_cpu 1%  (1840 sec)
+r5 ref    p8  size  8192 nb  32   22.9910 s   31.8883 GFlops  other_cpu 1%  (1946 sec)
+[reduce_perf] perf_p8_s8192_nb192_r5 window=M1 len=2.9938s M1_len=2.9938429999747314 M2_len=0.07220799999777228 Time=2.9481 samples=48687
+r5 perf   p8  size  8192 nb 192    2.9481 s  248.6859 GFlops  other_cpu 1%  (1951 sec)
+r5 plain  p8  size  8192 nb 192    2.9339 s  249.8833 GFlops  other_cpu 1%  (1956 sec)
+r5 ref    p8  size  8192 nb 192    2.9504 s  248.4883 GFlops  other_cpu 1%  (1970 sec)
+[reduce_perf] perf_p8_s512_nb32_r5 window=M1 len=0.0103s M1_len=0.01034900001832284 M2_len=None Time=0.009 samples=952
+r5 perf   p8  size   512 nb  32    0.0090 s   19.8520 GFlops  other_cpu 1%  (1971 sec)
+r5 plain  p8  size   512 nb  32    0.0096 s   18.6132 GFlops  other_cpu 1%  (1971 sec)
+--- round 5 終わり:  10:25:13 up 2 days, 12:17,  1 user,  load average: 8.81, 14.70, 14.83 / other_cpu=1% ---
+===== end (1971 sec) =====
+--- 終了: 2026-11-18 10:25:13 ---
+ 10:25:13 up 2 days, 12:17,  1 user,  load average: 8.81, 14.70, 14.83
+node 0 free: 118228 MB
+mean cpu MHz = 2485 (32 cpus)
+結果: results/benchmark/epyc_s1_smt-off_perf-breakdown_20261118_095221（これを ~/Download/epyc/ に持ち帰る。perf.data は消してある）
