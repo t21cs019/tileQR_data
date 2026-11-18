@@ -28,7 +28,7 @@ ap.add_argument("--threads", type=int, required=True)
 ap.add_argument("--time", type=float, default=0.0)
 ap.add_argument("--freq", type=int, required=True)
 ap.add_argument("--out", required=True)
-ap.add_argument("--window", choices=["M1", "M2"], default="M1", help="cat.csv に使う区間")
+ap.add_argument("--window", choices=["M1", "M1T", "M2"], default="M1", help="cat.csv に使う区間")
 a = ap.parse_args()
 
 EV = re.compile(r"(\d+\.\d+):\s+PERF_RECORD_(FORK|EXIT)\((\d+):(\d+)\):\((\d+):(\d+)\)")
@@ -140,8 +140,12 @@ for m in ("M1", "M2"):
     w = win[m]
     win[m + "_len"] = (w[1] - w[0]) if w and w[0] is not None and w[1] is not None else None
 
-use = win[a.window]
+if a.window == "M1T" and win["M1"] and a.time > 0:
+    # 始まりは M1（ワーカーの FORK）、長さは plasmatest の Time（計時の終わりより後の尻尾を除く）
+    win["M1T"] = [win["M1"][0], win["M1"][0] + a.time]
+use = win[a.window] if a.window != "M1T" else win.get("M1T")
 if not use or use[1] is None:
+    a.window = "M1"
     use = win["M2"] or [t0, max(s[0] for s in samples)]
     win["used"] = "M2(fallback)" if win["M2"] else "all"
 else:

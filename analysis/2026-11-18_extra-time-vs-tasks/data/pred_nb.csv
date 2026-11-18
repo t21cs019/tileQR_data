@@ -1,0 +1,20 @@
+panel,size,pred_nb_source,grid_nb_used,on_grid,argmin_model_time_on_grid,source
+EPYC 7543,1024,52,52,True,52,tau_predictions.csv nb_theory
+EPYC 7543,2048,92,92,True,92,tau_predictions.csv nb_theory
+EPYC 7543,4096,160,160,True,160,tau_predictions.csv nb_theory
+EPYC 7543,8192,264,264,True,264,tau_predictions.csv nb_theory
+EPYC 7543,16384,440,440,True,440,tau_predictions.csv nb_theory
+EPYC 7702,1024,40,40,True,40,tau_predictions.csv nb_theory
+EPYC 7702,2048,72,72,True,72,tau_predictions.csv nb_theory
+EPYC 7702,4096,124,124,True,124,tau_predictions.csv nb_theory
+EPYC 7702,8192,208,208,True,208,tau_predictions.csv nb_theory
+EPYC 7702,16384,344,344,True,344,tau_predictions.csv nb_theory
+Xeon 4214,1024,72,72,True,72,tau_predictions.csv nb_theory
+Xeon 4214,2048,120,120,True,120,tau_predictions.csv nb_theory
+Xeon 4214,4096,200,200,True,200,tau_predictions.csv nb_theory
+Xeon 4214,8192,328,328,True,328,tau_predictions.csv nb_theory
+Xeon 4214,16384,512,512,True,512,tau_predictions.csv nb_theory
+不老・弐,1024,32,32,True,32,c_table_points tag=pred
+不老・弐,2048,40,40,True,40,c_table_points tag=pred
+不老・弐,4096,72,72,True,72,c_table_points tag=pred
+不老・弐,8192,128,128,True,128,c_table_points tag=pred
